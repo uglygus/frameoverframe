@@ -1,6 +1,5 @@
-
 .DS_Store
-
+.idea/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -127,3 +126,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.idea/vidshed.iml
+.idea/vcs.xml
+.idea/movpy.iml
+.idea/modules.xml
+.DS_Store
