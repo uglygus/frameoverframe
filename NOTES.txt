@@ -1,0 +1,22 @@
+
+
+
+Command to convert docstrings to google format:
+pyment -o google -w ../frameoverframe/autotrace.py 
+
+
+
+Commands to build docs:
+
+cd docs
+
+# for some reason it pulls info from the pip installed version so:
+pip3 install ..
+
+sphinx-quickstart
+
+sphinx-apidoc -f -o . ../frameoverframe
+
+make clean html
+
+open ./_build/html/index.html 

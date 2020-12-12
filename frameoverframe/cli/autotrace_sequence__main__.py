@@ -14,9 +14,9 @@ from moviepy.editor import ImageSequenceClip
 from PIL import Image
 
 import frameoverframe.autotrace
-#from frameoverframe.tracer import process_file
 
-import frameoverframe.tracer
+
+import frameoverframe.autotrace_sequence
 
 def collect_args():
     parser = argparse.ArgumentParser(
@@ -51,7 +51,7 @@ def main():
         single_input= os.path.abspath(single_input)
 
         if os.path.isfile(single_input):
-            frameoverframe.tracer.process_file(single_input, args)
+            frameoverframe.autotrace_sequence.process_file(single_input, args)
 
         if os.path.isdir(single_input):
             print('Cannot process directories. input must be a video file.')

@@ -139,4 +139,3 @@ def merge(input_dirs):
         shutil.rmtree(d)
 
     return outdir
-

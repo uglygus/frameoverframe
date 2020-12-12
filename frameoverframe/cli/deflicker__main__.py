@@ -9,11 +9,15 @@ Usage:
     timelapse-deflicker.py <inputdir> [options]
 
 Options:
-    -o <dir>, --outdir=<dir>  Output directory [default: deflickered]
+    -o <dir>, --outdir=<dir>  Output directory [default: INPATH/INFOLDERNAME_deflickered]
     -w <N>, --window=<N>      Window size for rolling mean [default: 10]
     -q, --quiet               Only output errors and warnings
     -f <fmt>, --format=<fmt>  Output format for the scaled images [default: png]
     -s <s>, --sigma=<s>       Sigma for the sigma clipping
+
+
+    forked from timelapse-deflicker by Maximilian Nöthe
+    https://github.com/MaxNoe/timelapse-deflicker
 '''
 
 import sys
@@ -22,11 +26,11 @@ import logging
 from docopt import docopt, DocoptExit
 from schema import Schema, And, Or, Use, SchemaError
 
-from frameoverframe.deflicker import deflicker
-#import deflicker
-
+from frameoverframe.deflicker import deflicker, find_images
+from frameoverframe.utils import create_workdir
 
 def mkdir_p(directory):
+    """ create directory without complaining if it already exists. """
     logger = logging.getLogger()
     if not os.path.exists(directory):
         logger.info('Created directory: {}'.format(directory))
@@ -52,9 +56,14 @@ args_schema = Schema({
 
 
 def main():
+    """
+        deflicker: commandline app
+    """
     try:
         args = docopt(__doc__, ) #version=deflicker.__version__)
         args = args_schema.validate(args)
+
+        print('args==', args)
 
         logging.basicConfig(
             level=logging.WARNING if args['--quiet'] else logging.INFO,
@@ -62,12 +71,19 @@ def main():
             datefmt='%H:%M:%S',
         )
         logger = logging.getLogger()
-        logger.info('This is deflicker {}'.format(deflicker.__version__))
+        logger.info('This is deflicker')
 
-        images = deflicker.find_images(args['<inputdir>'])
+        images = find_images(args['<inputdir>'])
         if not images:
             logger.error('No images found in "{}"'.format(args['<inputdir>']))
             sys.exit(1)
+
+        if args['--outdir'] == 'INPATH/INFOLDERNAME_deflickered':
+            
+            args['--outdir'] = create_workdir( args['<inputdir>'], 'deflickered', nested=False)
+
+
+        print('args==', args)
 
         deflicker(
             images,

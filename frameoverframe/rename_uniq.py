@@ -79,4 +79,3 @@ def rename_uniq_dir(dirname):
         rename_uniq_file(f)
 
     return
-

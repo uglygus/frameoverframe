@@ -15,8 +15,8 @@ import sys
 from frameoverframe.rename_uniq import rename_uniq_file, rename_uniq_dir
 
 
-def main():
-    ''' do the main thing '''
+def collect_args():
+    ''' collect commandline arguments '''
 
     parser = argparse.ArgumentParser(
         description='commandline file processor python template ')
@@ -24,6 +24,14 @@ def main():
     parser.add_argument("input", nargs='*',
                         default=None, help="folder(s) of files to rename")
 
+    return parser
+
+
+
+def main():
+    ''' do the main thing '''
+
+    parser = collect_args()
     args = parser.parse_args()
 
     if not args.input:

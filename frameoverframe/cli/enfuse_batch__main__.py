@@ -20,15 +20,12 @@ import multiprocessing
 
 from PIL import Image
 
-from which import which
 
 from frameoverframe.enfuse_batch import process_dir
 
-
-def main():
-
-#    global enfuse_bin
-
+def collect_args():
+    ''' collect commandline arguments '''
+    
     parser = argparse.ArgumentParser(
         description='Blend several images together from an image sequence to create another '
                     'image sequence using enfuse by Hugin.')
@@ -50,10 +47,14 @@ def main():
     parser.add_argument("input_dir",  help='Input directory of images.')
 
     parser.add_argument("-o", "--output_dir", dest="output_dir", default=None, help='Output directory; will be created if necessary.')
+   
+    return parser
+    
+def main():
+    """ enfuse_batch do the main thing """
 
+    parser = collect_args()
     args = parser.parse_args()
-
-#    print(args)
 
     if not args.output_dir:
         args.output_dir = args.input_dir + '-enfused'

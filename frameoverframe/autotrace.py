@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-'''
-    fof module
-
+"""
     This is an example of a frameoverframe module. It is a wrapper for the
     autotrace C program to do the actual tracing.
 
@@ -9,29 +7,24 @@
     If they need to work with a file like autotrace does then they save the file
     process it and optionally keep the file for future runs.
 
-   img :        a PIL image
-   filename :   name of file the image is from ie. the video file
-   framenumber :integer framenumber   in the video file
+    autotrace hi-mom-8bit.tga -output-file hi-mom.eps --despec kle-level 20
 
-    autotrace hi-mom-8bit.tga -output-file hi-mom.eps --despeckle-level 20
-'''
+"""
 
 import os
 from pathlib import Path
 import inspect
 import sys
 from subprocess import PIPE, run
+import shutil
 
 import quotelib
-from which import which
-
 
 from .utils import *
 
 
 def autotrace(img, filename, framenumber, centerline, save_png=False):
-    '''
-        This is an example of a frameoverframe module
+    """This is an example of a frameoverframe module
         modules take a PIL Image and return a PIL Image
         If they need to work with a file like autotrace does then they save the file
         process it and optionally keep the file for future runs.
@@ -42,10 +35,19 @@ def autotrace(img, filename, framenumber, centerline, save_png=False):
 
        returns: a PIL image or None
 
-    '''
+    Args:
+      img: a PIL image
+      filename (int): name of file the image is from ie. the video file
+      framenumber (int): framenumber   in the video file
+      centerline (bool): whether to used centerline only or outlines
+      save_png (bool): wether to save a png version or not. (Default value = False)
+
+    Returns:
+        PIL Image or None
+    """
 
 
-    autotrace_bin = which('autotrace')
+    autotrace_bin = shutil.which('autotrace')
 
     filenameonly = Path(filename).stem
     # the inspect returns this functions name
@@ -87,9 +89,6 @@ def autotrace(img, filename, framenumber, centerline, save_png=False):
             print('stdout = ', result.stderr)
             print('stderr = ', result.stderr)
             sys.exit(1)
-
-
-
     #
     # Premiere can read eps files directly so we do not need to save these
     # frameoverframe needs to get an image back but I am going to skip

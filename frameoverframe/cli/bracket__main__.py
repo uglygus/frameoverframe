@@ -1,61 +1,52 @@
 #!/usr/bin/env python3
+"""
+    bracket - module docstring
+
+"""
 
 import argparse
 import os
-import shutil
 import sys
 
-#import frameoverframe.bracket as bracket
-
 from frameoverframe.bracket import split, merge
-from frameoverframe.renumber import renumber
 
 
-def main():
-    '''
-        do the main thing
-    '''
+def collect_args():
+    """collect commandline arguments"""
+
     parser = argparse.ArgumentParser(
         description='commandline file processor python template ')
 
-    verbs = parser.add_subparsers(dest='verb', help='verbs')
+    group = parser.add_mutually_exclusive_group(required=True)
 
-    # split command
-    split_parser = verbs.add_parser(
-        'split', help='Split one folder into several')
+    group.add_argument('-s', '--split', action='store_true', dest='split',
+                       help='split the folder')
 
-    split_parser.add_argument('-b', '--brackets', required=True, type=int,
-                              dest='brackets', help='number of brackets')
+    group.add_argument('-m', '--merge', action='store_true', dest='merge',
+                       help='merge the folders')
 
-    split_parser.add_argument("input", nargs='*',
-                              default=None, help="folder(s)")
+    parser.add_argument('-b', '--brackets', required=True, type=int,
+                        dest='brackets', help='number of brackets')
 
-    # merge command
-    merge_parser = verbs.add_parser(
-        'merge', help='Merge several folders into one')
+    parser.add_argument("input", nargs='*', default=None, help="folder(s)")
 
-    merge_parser.add_argument('-b', '--brackets', required=True, type=int,
-                              dest='brackets', help='number of brackets')
+    return parser
 
-    merge_parser.add_argument("input", nargs='*',
-                              default=None, help="folder(s)")
 
+
+def main():
+    """do the main thing"""
+
+    parser = collect_args()
     args = parser.parse_args()
 
     print('args==', args)
-
-    if not args.verb or not args.input or not args.brackets:
-        parser.print_help()
-        split_parser.print_help()
-        merge_parser.print_help()
-        return 0
 
     if args.brackets < 2:
         print('-brackets must be at least 2.')
         return 1
 
-    if args.verb == 'split':
-
+    if args.split:
         for single_input in args.input:
             if not os.path.isdir(single_input):
                 print('ERROR: input is not a directory: ' + single_input)
@@ -64,8 +55,7 @@ def main():
 
             split(args.brackets, single_input)
 
-    if args.verb == 'merge':
-
+    if args.merge:
         print(args.brackets, len(args.input))
         merge(args.input)
 

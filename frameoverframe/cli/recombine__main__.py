@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
-
-"""
-Recombines folders of images
-
-        accepts a list of directories to be combined and renumbered. Combines files into
-        directories with max_files in each directory.
-
+"""    Recombines several folders with many images in each folder so that
+    the images order is maintained but the folders hold as many images
+    as possible up to the maximum number of files specified.
 
 """
 
@@ -25,20 +21,23 @@ from frameoverframe.recombine import recombine
 
 
 def dir_path(path):
-    ''' for argparse directory type test. '''
+    """for argparse directory type test.
+
+    Args:
+      path:
+
+    Returns:
+
+    """
     if os.path.isdir(path):
         return path
     else:
         raise argparse.ArgumentTypeError(f"readable_dir:{path} is not a valid path")
 
 
-def main():
-    '''
-        Can be called from the commmandline:
-    usage: renumber.py [-h] [-o DST_DIR] [-i] [-s START_AT] [-x PREFIX] [-p PADDING] src_dir src_dir src_dir ...
+def collect_args():
 
-    '''
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 
     parser.add_argument('src_dirs', nargs='+', type=dir_path,
                         help="Source directories. ",
@@ -64,6 +63,20 @@ def main():
                         help="How many digits for number. (default 5) eg. 00001.jpg",
                         )
 
+    return parser
+
+
+def main():
+    """Can be called from the commmandline:
+    usage: renumber.py [-h] [-o DST_DIR] [-i] [-s START_AT] [-x PREFIX] [-p PADDING] src_dir src_dir src_dir ...
+
+    Args:
+
+    Returns:
+
+    """
+
+    parser = collect_args()
     args = parser.parse_args()
 
    # print('args=', args)

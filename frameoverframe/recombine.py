@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-
 """
-Recombines folders of images
+    Recombines folders of images
 
         accepts a list of directories to be combined and renumbered. Combines files into
         directories with max_files in each directory.
@@ -16,22 +15,36 @@ import argparse
 import sys
 import re
 import math
+from time import strftime
 from pathlib import Path
 
-#from . import renumber
-
 from .renumber import renumber
+from .utils import sorted_listdir
 
-#from rename_uniq import rename_uniq_dir
 
 def strip_bad_ending(string):
+    """
+    strips off spaces, underscores and dashes from the right of string
+    Args:
+      string:
+
+    Returns:
+
+    """
     return string.rstrip(' _-')
 
 
 def _split_name_number(name):
-    # Splits a given string into name and number where number is the at the end
-    # of the string, e.g. 'foo2bar003baz_001' will be split into 'foo2bar003baz_'
-    # and '001'
+    """Splits a given string into name and number where number is at the end
+        of the string, e.g. 'foo2bar003baz_001' will be split into 'foo2bar003baz_'
+        and '001'
+
+    Args:
+      name:
+
+    Returns:
+
+    """
 
     regex = r'^(.*?)(\d*)$'
     m = re.search(regex, name)
@@ -42,10 +55,20 @@ def _split_name_number(name):
 
 
 def recombine(src_dirs, dst_dir=None, copy_files=False, max_files=10000, prefix=':folder', padding=5):
-    '''
-        accepts a list of directories to be combined and renumbered. Combines files into
+    """Accepts a list of directories to be combined and renumbered. Combines files into
         directories with max_files in each directory.
-    '''
+
+    Args:
+      src_dirs:
+      dst_dir:  (Default value = None)
+      copy_files:  (Default value = False)
+      max_files:  (Default value = 10000)
+      prefix:  (Default value = ':folder')
+      padding:  (Default value = 5)
+
+    Returns:
+
+    """
 
     src_dirs.sort()
 
@@ -61,11 +84,10 @@ def recombine(src_dirs, dst_dir=None, copy_files=False, max_files=10000, prefix=
 
     item_count = 0
     for directory in src_dirs:
-        item_count += len(os.listdir(directory))
+        item_count += len(sorted_listdir(directory))
 
     dirs_needed = math.ceil(item_count / max_files)
 
-   # print('total number of items  = ', item_count)
     print('Creating', dirs_needed, 'new directories. For', item_count, 'items...')
 
     dst_dirs = []
@@ -81,9 +103,7 @@ def recombine(src_dirs, dst_dir=None, copy_files=False, max_files=10000, prefix=
 
     for directory in src_dirs:
 
-        for item in os.listdir(directory):
-            if item == '.DS_Store':
-                continue
+        for item in sorted_listdir(directory):
             if not os.path.isfile(os.path.join(directory, item)):
                 continue
             all_files.append(os.path.join(directory, item))
@@ -91,10 +111,16 @@ def recombine(src_dirs, dst_dir=None, copy_files=False, max_files=10000, prefix=
     current_dir = 0
     count = 0
 
-    for dst in dst_dirs:
-        if os.path.exists(dst):
-            print('ERROR: Output file already exists.', dst)
-            return
+    tmp_dst_dirs = []
+    for dst_dir in dst_dirs:
+        if os.path.exists(dst_dir):
+            print('WARNING: Output directory already exists.', dst_dir)
+            dst_dir = dst_dir + '~recombined_' + strftime("%Y%m%d_%H%M%S")
+            print('Renaming output directory to:', dst_dir)
+        tmp_dst_dirs.append(dst_dir)
+    dst_dirs=tmp_dst_dirs
+
+    #print('dst_dirs=',dst_dirs)
 
     for item in all_files:
         if count >= max_files:
@@ -109,28 +135,61 @@ def recombine(src_dirs, dst_dir=None, copy_files=False, max_files=10000, prefix=
         item_dest = dst + '/' + os.path.basename(Path(item).parent) + '-' + os.path.basename(item)
 
         if copy_files:
-            #print('recombine copying : ', item, ' -->', item_dest)
+          #  print('recombine copying : ', item, ' -->', item_dest)
             shutil.copyfile(item, item_dest)
         else:
-            #print('recombine moving : ', item, ' -->', item_dest)
+          #  print('recombine moving : ', item, ' -->', item_dest)
             shutil.move(item, item_dest)
         count += 1
-
-    # renumber new files
-    for one_dst_dir in dst_dirs:
-        prefix = os.path.basename(os.path.normpath(one_dst_dir))
-        renumber(one_dst_dir, inplace=True, prefix=prefix, padding=padding)
 
     # remove empty directories
     if not copy_files:
         for directory in src_dirs:
             shutil.rmtree(directory)
 
+   # input('about to remove timestamps')
+   # print('dst_dirs = ', dst_dirs)
+    new_dst_dirs = []
+    # remove empty directories
+    # remove = 20200810_132823
+    # ~recombined_20200810_133221
+    # ~recombined_dddddddd_dddddd
+    p = re.compile('(.+)~recombined_\d\d\d\d\d\d\d\d_\d\d\d\d\d\d')
+    for directory in dst_dirs:
+        m = p.search(directory)
+        if m is None:
+            new_dst_dirs.append(directory)
+    #        print('m was None')
+            continue
+    #    print('m.group()=',m.group())
+    #    print('m.group=1', m.group(1))
+        new_dir = m.group(1)
+
+        if os.path.exists(new_dir):
+            new_dir= new_dir + '~recombined_' + strftime("%Y%m%d_%H%M%S")
+
+       # print('shutil.move(', directory, ', ' ,new_dir)
+        shutil.move(directory, new_dir)
+        new_dst_dirs.append(new_dir)
+    dst_dirs = new_dst_dirs
+
+    #input('about to renumber')
+    # renumber new files
+    for one_dst_dir in dst_dirs:
+        prefix = os.path.basename(os.path.normpath(one_dst_dir))
+        renumber(one_dst_dir, inplace=True, prefix=prefix, sort_method='name', padding=padding)
+
 
 def dir_path(path):
-    ''' for argparse directory type test. '''
+    """for argparse directory type test.
+
+    Args:
+      path:
+
+    Returns:
+
+    """
     if os.path.isdir(path):
         return path
     else:
         raise argparse.ArgumentTypeError(f"readable_dir:{path} is not a valid path")
-

@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+"""
+    A small tool for deflickering images for time lapse videos.
+    The brightness of the images are adjusted to a rolling mean above <N> images
+    For the calculation of the image brightness, outliers are discarded via
+    sigma clipping if the --sigma option is given
+
+    forked from timelapse-deflicker by Maximilian Nöthe
+    https://github.com/MaxNoe/timelapse-deflicker
+"""
+
 
 import logging
 import numpy as np
@@ -47,28 +57,6 @@ def find_images(directory, extensions=['.jpg', '.png', '.tiff', '.tif']):
     )
     return sorted(images)
 
-# def calc_brightness(images, sigma=2.5):
-#     logger = logging.getLogger()
-#     logger.info('Calculating brightness of the images')
-# 
-#     brightness = []
-#     prog = getProgressBar(logger)
-#     for filename in prog(images):
-#         image = io.imread(filename)
-#         mask = np.ones_like(image[:, :, 0], dtype=bool)
-# 
-#         if sigma is not None:
-#             for channel in range(3):
-#                 mean = np.mean(image[:, :, channel])
-#                 std = np.std(image[:, :, channel])
-#                 dist = np.abs(image[:, :, channel] - mean) / std
-#                 mask[dist > sigma] = False
-# 
-#         brightness_value = np.mean(image[mask])
-#         print(brightness_value)
-#         brightness.append(brightness_value)
-# 
-#     return np.array(brightness)
 
 def calc_brightness(images, sigma=2.5):
     logger = logging.getLogger()

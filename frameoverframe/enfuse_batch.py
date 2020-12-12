@@ -20,9 +20,6 @@ import multiprocessing
 
 from PIL import Image
 
-from which import which
-
-
 
 def enfuse(infiles,  output_file, counter, hardmask=False):
 
@@ -34,7 +31,7 @@ def enfuse(infiles,  output_file, counter, hardmask=False):
     print('output_dir=', output_dir)
     print('outname=', outname)
 
-    enfuse_bin = which('enfuse')
+    enfuse_bin = shutil.which('enfuse')
 
     weight = dict([('exposure',   0.2),   #default 1
                    ('saturation', 0.6),   #default 0.2
@@ -85,7 +82,7 @@ def convert(image_path, output_file, counter):
         counter (int) : the counter of the current image (used to name output file)
     '''
 
-    convert_bin = which('convert')
+    convert_bin = shutil.which('convert')
 
     sys_call = [convert_bin, ]
 
@@ -264,5 +261,3 @@ def process_dir(num, hardmask, shuffle_frames, skip_frames, method, input_dir, o
 #                         print('\njob {} finished removing'.format(job.pid) )
 #                         jobs.remove(job)
 #                         dots=2
-
-

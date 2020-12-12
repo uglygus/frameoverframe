@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-
 """
+renumber
+
 Renumbers image sequences by renaming them sequentially.
 Can be used as a module or a called from the commandline.
 
@@ -15,6 +16,7 @@ specify the start number of sequence etc. Please read through the renumber()
 docstring for more.
 
 """
+
 import os
 import shutil
 import uuid
@@ -24,13 +26,9 @@ import re
 
 from frameoverframe.renumber import renumber
 
+def collect_args():
+    """ collect commandline arguments """
 
-def main():
-    '''
-        Can be called from the commmandline:
-    usage: renumber.py [-h] [-o DST_DIR] [-i] [-s START_AT] [-x PREFIX] [-p PADDING] src_dir
-
-    '''
     parser = argparse.ArgumentParser()
 
     parser.add_argument('src_dir',
@@ -45,6 +43,10 @@ def main():
         help="Copy files to a new direcotory otherwise they are renamed inplace. (default False)",
     )
 
+    parser.add_argument( "--sort-method", type=str, default=None,
+        help="Method to use when sorting files: 'name' or 'exif_date' ",
+    )
+
     parser.add_argument( "-s", "--start_at", type=int, default=0,
         help="Start number for renaming sequence. (default 0)",
     )
@@ -57,28 +59,27 @@ def main():
         help="How many digits for number. (default 5) eg. 00001.jpg",
     )
 
+    return parser
+
+def main():
+    """
+    Can be called from the commmandline:
+    usage: renumber.py [-h] [-o DST_DIR] [-i] [-s START_AT] [-x PREFIX] [-p PADDING] src_dir
+
+    """
+
+    parser = collect_args()
     args = parser.parse_args()
 
-    print('args=', args)
-
-
     if args.prefix == ':folder':
-        print(' him om')
-        print('dirname=', os.path.dirname(args.src_dir) )
-        print('basename=', os.path.basename(args.src_dir) )
-
-        print('normbasename=', os.path.basename( os.path.normpath(args.src_dir)) )
         prefix = os.path.basename( os.path.normpath(args.src_dir))
-
-        print('prefix=', prefix)
-
         args.prefix = prefix
-
 
     renumber(
         args.src_dir,
         dst_dir = args.dst_dir,
         inplace = not args.safe,
+        sort_method = args.sort_method,
         start_at = args.start_at,
         prefix = args.prefix,
         padding = args.padding,

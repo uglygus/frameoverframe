@@ -10,21 +10,21 @@
 import os
 from pathlib import Path
 import sys
-import argparse
 import shutil
 import time
 from subprocess import run, PIPE
 from PIL import Image
 
 import multiprocessingsimple
-from which import which
+
 
 import quotelib
-from .utils import *
+#from .utils import *
+
 
 def convert_to_png(infile, outfile='', delete_original=True):
     '''
-        use PIL to convert to png and optionally delete original
+        use PIL to convert an image to png and optionally delete original
 
         input  (str) : image filename
         output (str) : image filename
@@ -33,7 +33,7 @@ def convert_to_png(infile, outfile='', delete_original=True):
 
     if outfile == '':
         infile_dir = os.path.dirname(infile)
-        infile_name, infile_ext = os.path.splitext(infile)
+        infile_name = os.path.splitext(infile)[0]
         outfile = os.path.join(infile_dir, infile_name + '.png')
 
     try:
@@ -56,7 +56,7 @@ def align_image_stack(infiles, out_dir='', prefix='aligned-'):
         we will accept an output dir here.
 
         Takes any number of image files and creates a new TIF file for
-        each one. The new files are n "aligned-0000.tif" etc.
+        each one. The new files are named "aligned-0000.tif" etc.
 
         Calls:  align_image_stack -a aligned-  --align-to-first [images]
 
@@ -67,7 +67,7 @@ def align_image_stack(infiles, out_dir='', prefix='aligned-'):
         returns (list): list of new aligned files
     '''
 
-    align_image_stack_bin = which('align_image_stack')
+    align_image_stack_bin = shutil.which('align_image_stack')
 
     original_cwd = os.getcwd()
 
@@ -89,7 +89,7 @@ def align_image_stack(infiles, out_dir='', prefix='aligned-'):
     for item in infiles:
         sys_call.append(item)
 
-    print('calling : ' + ' '.join( quotelib.quote(sys_call) ))
+    print('calling : ' + ' '.join(quotelib.quote(sys_call)))
 
     result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=False)
    # print('autotrace returncode={}, stdout={}, stderr={}'.format(result.returncode, result.stdout, result.stderr))
@@ -105,9 +105,6 @@ def align_image_stack(infiles, out_dir='', prefix='aligned-'):
 
     for infile in infiles:
         aligned_images.append(os.path.join(out_dir, os.path.basename(infile)))
-
-
-
 
     print('aligned_images=', aligned_images)
     os.chdir(original_cwd)
@@ -128,9 +125,6 @@ def align_image_stack_sequence(infiles, bracket, out_dir='', prefix='aligned-'):
         out_dir (string) : directory to output files to (default: current directory)
 
     '''
-
- #   print('\n\nSTART align_image_stack_sequence')
- #   print('infiles=', infiles, 'bracket=',bracket)
 
     infiles.sort()
 
@@ -163,7 +157,7 @@ def align_image_stack_sequence(infiles, bracket, out_dir='', prefix='aligned-'):
             # test if this stack has already been processed on a previous run.
             already_processed = 0
             for i in range(0, bracket):
-            #    print('i=', i, ' global_counter=', global_counter, 'index=', global_counter-i+1 )
+                #    print('i=', i, ' global_counter=', global_counter, 'index=', global_counter-i+1 )
 
                 an_orig_filename = os.path.splitext(
                     os.path.basename(infiles[global_counter-i]))[0]
@@ -185,17 +179,11 @@ def align_image_stack_sequence(infiles, bracket, out_dir='', prefix='aligned-'):
 
                 tmp_dir_list = os.listdir(tmp_dir)
 
-
-#                 #convert newly aligned images from .tif to .png to save space (almost 50%)
-#                 for tif_file in tmp_dir_list:
-#                     convert_to_png(os.path.join(tmp_dir,tif_file))
-
-
-                #convert newly aligned images from .tif to .png to save space (almost 50%)
+                # convert newly aligned images from .tif to .png to save space (almost 50%)
                 png_pool = multiprocessingsimple.MultiprocessingSimple()
 
                 for tif_file in tmp_dir_list:
-                    png_pool.add_job(convert_to_png, args=(os.path.join(tmp_dir, tif_file), ) )
+                    png_pool.add_job(convert_to_png, args=(os.path.join(tmp_dir, tif_file), ))
 
                 while png_pool.still_working():
                     time.sleep(1)
@@ -227,4 +215,3 @@ def align_image_stack_sequence(infiles, bracket, out_dir='', prefix='aligned-'):
         global_counter += 1
 
     shutil.rmtree(tmp_dir)
-
