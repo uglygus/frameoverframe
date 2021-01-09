@@ -46,6 +46,7 @@ def print_exif_tags(filename, alltags=False):
                        'LensModel', 'MakerNote WhiteBalance'):
                 print(f"{tag} :  {tags[tag]}")
 
+
 def get_brightness(filename):
     ''' Average pixels, then transform to "perceived brightness".
         sourced from here:
@@ -60,7 +61,7 @@ def get_brightness(filename):
 
 
 
-def fps(img1, img2):
+def fps_single(img1, img2):
     """
 
     calculated time difference betweeen images based on exif data
@@ -102,7 +103,7 @@ def fps_dir(input_dir):
         input_dir (str): path to a folder of images
 
     Returns(int):
-        prints fps of each file
+        displays a graph of the fps
 
     """
 
@@ -113,11 +114,13 @@ def fps_dir(input_dir):
     diffs = []
     for f in files:
 
-        diff = fps(prev, f)
+        diff = fps_single(prev, f)
         diffs.append(diff)
         #print(diff)
         prev = f
 
+    avg = sum(diffs)/len(diffs)
+    print("The average is fps as shot is ", round(avg,2), "seconds between frames.")
 
     plt.plot(diffs)
     plt.title(input_dir)

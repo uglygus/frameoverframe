@@ -23,9 +23,6 @@ def collect_args():
     parser.add_argument("input", nargs='*', default=None, help="folder(s)")
     parser.add_argument("-a", "--alltags", action='store_true', default=False, 
                         dest='alltags', help="include all EXIF tags")
-#     parser.add_argument('-c', '--centerline', action='store_true', default=False,
-#                         dest='centerline', help='recurse into directories')
-
     return parser
 
 
@@ -48,7 +45,8 @@ def main():
         stat = ImageStat.Stat(im)
         print(' stat= ', stat)
         print('dir im = ', dir(im))
-        print(' width= ', width)
+        print(' width= ', im.width)
+        print(' size= ', im.size)
         print('Number of frames :', frames)
         
         info.fps_dir(item)
