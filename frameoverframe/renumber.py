@@ -121,8 +121,10 @@ def renumber(src_dir, dst_dir=None, inplace=False, sort_method=None, start_at=0,
 
 
     file_list_name = sort_by_name(file_list)
-    file_list_date = sort_by_exif_date(file_list, src_dir)
-
+    if sort_method != "name":
+        file_list_date = sort_by_exif_date(file_list, src_dir)
+    else:
+        file_list_date = None
 
     # double check sort_method
     if sort_method == None:
