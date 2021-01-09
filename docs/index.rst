@@ -19,8 +19,6 @@ enfuse_batch.py - combine multiple images together to create new ones. Either fo
 
 align_image_stack_sequence.py - wrapper for align image stack that allows it to be run against a folder of timelapse bracketed images.
 
-hi mom this is doc
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

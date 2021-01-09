@@ -12,6 +12,7 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('../frameoverframe'))
 
 
@@ -22,7 +23,7 @@ copyright = '2020, uglygus'
 author = 'uglygus'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.3'
+release = '0.0.6'
 
 
 # -- General configuration ---------------------------------------------------

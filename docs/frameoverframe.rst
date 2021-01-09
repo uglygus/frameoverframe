@@ -68,6 +68,14 @@ frameoverframe.img2vid module
    :undoc-members:
    :show-inheritance:
 
+frameoverframe.info module
+--------------------------
+
+.. automodule:: frameoverframe.info
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 frameoverframe.recombine module
 -------------------------------
 
@@ -112,6 +120,14 @@ frameoverframe.utils module
 ---------------------------
 
 .. automodule:: frameoverframe.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+frameoverframe.vid2img module
+-----------------------------
+
+.. automodule:: frameoverframe.vid2img
    :members:
    :undoc-members:
    :show-inheritance:

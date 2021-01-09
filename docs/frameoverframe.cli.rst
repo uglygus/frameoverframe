@@ -44,6 +44,22 @@ frameoverframe.cli.enfuse\_batch\_\_main\_\_ module
    :undoc-members:
    :show-inheritance:
 
+frameoverframe.cli.fof\_\_main\_\_ module
+-----------------------------------------
+
+.. automodule:: frameoverframe.cli.fof__main__
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+frameoverframe.cli.fofinfo\_\_main\_\_ module
+---------------------------------------------
+
+.. automodule:: frameoverframe.cli.fofinfo__main__
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 frameoverframe.cli.img2vid\_\_main\_\_ module
 ---------------------------------------------
 
@@ -96,6 +112,14 @@ frameoverframe.cli.unmix\_\_main\_\_ module
 -------------------------------------------
 
 .. automodule:: frameoverframe.cli.unmix__main__
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+frameoverframe.cli.vid2img\_\_main\_\_ module
+---------------------------------------------
+
+.. automodule:: frameoverframe.cli.vid2img__main__
    :members:
    :undoc-members:
    :show-inheritance:
