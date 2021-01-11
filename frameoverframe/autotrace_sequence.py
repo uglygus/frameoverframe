@@ -62,7 +62,7 @@ def process_file(filename, args):
 #                 print('args.scalefactor=', args.scalefactor)
 #                 print('new width=', int(img.size[0]*args.scalefactor / 100))
 
-                resize = (int(img.size[0]*args.scalefactor / 100),
+                resize = (int(img.size[0]*args.scalefactor/100),
                           int(img.size[1]*args.scalefactor/100))
 
                 img = img.resize(resize, Image.LANCZOS)
@@ -70,8 +70,7 @@ def process_file(filename, args):
                 print('original size: ', frame.shape[1], 'x', frame.shape[0],
                       ', tracing size:', img.size[0], 'x', img.size[1])
 
-                p = multiprocessing.Process(target=autotrace, args=(
-                    img, filename, framenumber, args.centerline))
+                p = multiprocessing.Process(target=autotrace, args=(img, filename, framenumber, args.centerline))
                 jobs.append(p)
                 p.start()
 
