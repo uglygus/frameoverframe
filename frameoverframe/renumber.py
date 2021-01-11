@@ -119,9 +119,8 @@ def renumber(src_dir, dst_dir=None, inplace=False, sort_method=None, start_at=0,
         if os.path.isfile(os.path.join(src_dir,f)):
             file_list.append(f)
 
-
     file_list_name = sort_by_name(file_list)
-    if sort_method != "name":
+    if sort_method == "exif_date":
         file_list_date = sort_by_exif_date(file_list, src_dir)
     else:
         file_list_date = None

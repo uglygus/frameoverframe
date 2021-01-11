@@ -43,7 +43,7 @@ def collect_args():
         help="Copy files to a new direcotory otherwise they are renamed inplace. (default False)",
     )
 
-    parser.add_argument( "-s", "--sort-method", type=str, default=None,
+    parser.add_argument( "-s", "--sort-method", type=str, default=None, choices = ['name', 'exif_date'],
         help="Method to use when sorting files: 'name' or 'exif_date' ",
     )
 
