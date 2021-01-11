@@ -30,6 +30,7 @@ def collect_args():
                         Scale is a percentage. 50=half size, defalut = 50. \
                         4k images must be scaled down. Autotrace will crash \
                         on large images.')
+    parser.add_argument('-j', '--jobs', default='0', type=int, help='Number of parallel prcesseses to spawn. default=0 (same as cpu count)')                    
     return parser
 
 

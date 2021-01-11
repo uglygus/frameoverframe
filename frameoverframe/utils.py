@@ -320,7 +320,13 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
     print('scale=', scale)
 
     gs_bin = shutil.which('gs')
+    
+    if not gs_bin:
+        print(f'ERROR: ABORTING:  Cannot find executable \'gs\' {gs_bin=}')
+        
+        sys.exit(1)
 
+    print(f' ------##---- {gs_bin=}')
     call_list = [gs_bin,
                  '-q',      # quiet
                  '-dBATCH',  # exit after last file

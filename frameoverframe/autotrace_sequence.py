@@ -13,7 +13,7 @@ from .autotrace import autotrace
 
 SAVE_OUTPUT_MOV = False
 
-MAX_JOBS = 10  # number of concurrent threads. MacBook Pro has 12 cores.
+#MAX_JOBS = 10  # number of concurrent threads. MacBook Pro has 12 cores.
 
 
 def process_file(filename, args):
@@ -30,8 +30,13 @@ def process_file(filename, args):
     print('clip size=', clip.size)
 
     jobs = []
-    max_jobs = multiprocessing.cpu_count() - 1   # leave one core free
-    max_jobs = min(max_jobs, MAX_JOBS)
+    
+    if args.jobs==0:   
+     #   max_jobs = multiprocessing.cpu_count() - 1   # leave one core free
+        max_jobs = multiprocessing.cpu_count() - 1
+    else:
+        max_jobs = min(multiprocessing.cpu_count() - 1, args.jobs)
+
     print('max_jobs=', max_jobs)
 
     print('Using {} or {} cores.'.format(max_jobs, multiprocessing.cpu_count()))
