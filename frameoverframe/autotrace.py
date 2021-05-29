@@ -48,6 +48,10 @@ def autotrace(img, filename, framenumber, centerline, save_png=False):
 
 
     autotrace_bin = shutil.which('autotrace')
+    if not autotrace_bin:
+        print('ERROR: The autotrace binary is not in your PATH')
+        sys.exit(1)
+
 
     filenameonly = Path(filename).stem
     # the inspect returns this functions name

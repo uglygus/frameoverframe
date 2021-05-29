@@ -22,51 +22,100 @@ import argparse
 import sys
 import re
 
+from datetime import datetime
+
 import  frameoverframe.utils as utils
 
-# def _split_name_number(name):
-#     # Splits a given string into name and number where number is the at the end
-#     # of the string, e.g. 'foo2bar003baz001' will be split into:
-#     # 'foo2bar003baz', '001'
-#     # 
-# 
-#     regex='^(.*?)(\d*)$'
-#     m = re.search(regex, name)
-#     name_part = m.group(1)
-#     num_part = m.group(2)
-# 
-#     return name_part, num_part
 
-def sort_by_name(files):
-    """ sorts a list of files by their alnpha-numeric name """
-    files.sort()
-    return files
-
-def sort_by_exif_date(files, src_dir):
-    """ sorts a list of files by their EXIF creation date name
-        sorts descending
+def thin(src_dir, every, dst_dir=None, inplace=False):
     """
+        thins files from a folder. Does not recurse into sum folders.
+        keep 1 file; skip (every-1) files; keep 1 file ....
+        
+        src_dir[]: a list of source directories to be thinned
+        
+        every: keep every nth file. eg 2 = keep the first of every 2 files
+               eg 16 = keep the first of every 16 files.
 
-    name_date =[]
-    for file in files:
-        exif_date = utils.exif_creation_date(os.path.join(src_dir, file))
+        dst_dir: destination directory
+                 If blank will create a new dir called input_dir_thinned_xxxxxx
 
-        if not exif_date:
-            print(f'ERROR: Trying to sort by EXIFdate. File does not have an EXIF date: {file}')
-            sys.exit(1)
+        inplace: unimplemented
+     """
 
-        name_date.append( [ file, exif_date] )
+    print(f'thin() {src_dir=}, {dst_dir=}, {inplace=}')
 
-    name_date = sorted(name_date, key=lambda x: x[1], reverse=True)
+    src_dir.sort()
 
-    sorted_files = []
+    for one_src_dir in src_dir:    
+        utils.test_one_extension(one_src_dir)
+    
+    file_list=[]
+    
+    # collect only the files we want - could check file type or extensions here
+    for one_src_dir in src_dir:
+        for f in os.listdir(one_src_dir):
+            if f == '.DS_Store':
+                continue
+            if os.path.isfile(os.path.join(one_src_dir,f)):
+                file_list.append(os.path.join(one_src_dir,f))
 
-    for item in name_date:
-        sorted_files.append(item[0])
+        print(f'RAW:   {file_list=}')
 
-    sorted_files.reverse()
+        file_list.sort()
+    
+        print(f'SORTED:   {file_list=}')
+    
+        # Create destination directory as required
+        if dst_dir is None:
 
-    return sorted_files
+            if inplace:
+                dst_dir = one_src_dir
+            else:
+                dateTimeObj = datetime.now()
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S)")
+                print('Current Timestamp : ', timestamp)
+                dir_only=os.path.basename(one_src_dir)
+                thinned_dir_name = '{0}_{1}_{2}'.format(os.path.basename(one_src_dir), 'thinned',timestamp)
+
+                dst_dir = os.path.join(os.path.dirname(one_src_dir), thinned_dir_name)
+                if not os.path.exists(dst_dir):
+                    os.makedirs(dst_dir)
+
+
+        print(f'BEFORE:   {file_list=}')
+
+        file_list=file_list[::every]
+    
+        print(f'AFTER:    {file_list=}')
+    
+       # sys.exit()
+    
+        file_name, ext = os.path.splitext(file_list[0])
+        name_part, num_part = utils._split_name_number(file_name)
+        prefix = name_part
+    
+        for f in file_list:
+          #  file_name, ext = os.path.splitext(file_list[0])
+
+            src_dir, src_name = os.path.split(f)
+
+            dst_name = src_name
+
+            print(f'{src_dir=}, {src_name=}')
+
+            input('ccc')
+            src = os.path.join(src_dir, src_name)
+            dst = os.path.join(dst_dir, dst_name)
+
+            if inplace:
+                print('moving file: ', src, '->', dst)
+                shutil.move(src, dst)
+            else:
+                print('copying file: ', src, '->', dst)
+                shutil.copy2(src, dst)
+           
+
 
 
 def renumber(src_dir, dst_dir=None, inplace=False, sort_method=None, start_at=0, prefix=None, padding=5):
@@ -160,7 +209,7 @@ def renumber(src_dir, dst_dir=None, inplace=False, sort_method=None, start_at=0,
     # get prefix if it is not assigned
     if prefix == None:
         file_name, ext = os.path.splitext(file_list[0])
-        name_part, num_part = utils._split_name_number(file_name)
+        name_part, num_part = _split_name_number(file_name)
         prefix = name_part
 
     print(f'{prefix=}')
@@ -208,8 +257,7 @@ def renumber_many(src_dirs, dst_dir=None, inplace=False, start_at=0, max_number=
         accepts a list of directories to be combined and renumbered. Combines files into
         directories with max_number in each directory.
     '''
-
-
+    
     for directory in src_dirs:
         d(directory)
 

@@ -13,9 +13,9 @@ import quotelib
 import exifread
 
 def exif_creation_date(filename):
-    """ given an image file return the creatin time: EXIF DateTimeOriginal. """
+    """ given an image file return the creation time: EXIF DateTimeOriginal. """
 
-    # Open image file for reading (binary mode
+    # Open image file for reading in binary mode
     try:
         fh = open(filename, 'rb')
     except FileNotFoundError:
@@ -216,6 +216,18 @@ def get_eps_size(epsfile):
    # print('get_eps_size({}) returning: ({}x{})'.format(epsfile,width,height))
     return (width,height)
 
+def _split_name_number(name):
+    # Splits a given string into name and number where number is the at the end
+    # of the string, e.g. 'foo2bar003baz001' will be split into:
+    # 'foo2bar003baz', '001'
+    # 
+
+    regex='^(.*?)(\d*)$'
+    m = re.search(regex, name)
+    name_part = m.group(1)
+    num_part = m.group(2)
+
+    return name_part, num_part
 
 def calculate_scale_factor( orig_tup, new_tup, allow_crop=False):
 

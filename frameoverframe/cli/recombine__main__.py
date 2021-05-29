@@ -44,7 +44,7 @@ def collect_args():
                         )
 
     parser.add_argument("-m", "--max_files", type=int, default=10000,
-                        help="Max number of files per directory. (default 100000)",
+                        help="Max number of files per directory. (default 10000)",
                         )
 
     parser.add_argument("-o", "--dst_dir", type=str, default=None,

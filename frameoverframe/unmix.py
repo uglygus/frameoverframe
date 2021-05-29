@@ -31,17 +31,28 @@ import  frameoverframe.utils as utils
 
 def new_dirname(src_dir, ext):
     """ returns a new dirname based on ext of a file
+        takes into account any trailing digits and keeps them trailing
 
         src_dir  the original dir
         ext      the extension of one of the files in src_dir
 
-        eg. new_dirname(/path/to/final/, 'JPG')
+        eg: new_dirname(/path/to/final_01, 'JPG')
 
         Returns(str):
-            /path/to/final_JPG
+            /path/to/final_JPG_01
     """
 
-    return os.path.join(os.path.dirname(src_dir), os.path.basename(src_dir) + '_' + ext )
+ 	# does it end in numbers _01 ? If so keep the numbers at the end.
+ 	
+    m = re.search("_[0-9]+$", os.path.basename(src_dir))
+ 
+    if m:
+        stripped = re.sub("_[0-9]+$", '',  os.path.basename(src_dir))
+        newdir = stripped + '_' + ext + m[0]        
+    else:
+        newdir=os.path.basename(src_dir) + '_' + ext 
+    return os.path.join(os.path.dirname(src_dir), newdir )
+
 
 
 def unmix(src_dir):
@@ -58,12 +69,11 @@ def unmix(src_dir):
     """
 
     file_list = []
-
-    if len(utils.ext_list(src_dir)) <= 1 :
-        print('OK: Looks good folder is already unmixed.', src_dir)
-        return
-
     ext_list = utils.ext_list(src_dir)
+    
+    if len(ext_list) <= 1 :
+        print('unmix: Looks good folder is already unmixed.', src_dir)
+        return
 
     for ext in ext_list:
         ext = ext.lstrip('.')

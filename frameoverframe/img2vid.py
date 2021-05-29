@@ -25,6 +25,7 @@ import os
 import shutil
 import sys
 from PIL import Image
+Image.MAX_IMAGE_PIXELS = 244022272
 import tempfile
 
 from quotelib import quote
@@ -32,7 +33,7 @@ from quotelib import quote
 from frameoverframe.utils import sorted_listdir, test_one_extension
 import  frameoverframe.utils as utils
 
-def img2vid(input_dirs, output_file, profile='preview'):
+def img2vid(input_dirs, output_file, profile='preview', framenumber=False):
     ''' convert multiple image_dirs to a single video file '''
 
 
@@ -50,19 +51,51 @@ def img2vid(input_dirs, output_file, profile='preview'):
             return
 
 #     profileff=''
+                         ## these need a space at the end!  #y=h-(2*lh): "
+
+
+
+    print(f'--------------ddd {framenumber=}')
+
+
+    if framenumber:
+        fnumber_filter =  (","
+                           "drawtext=fontfile=Arial.ttf:"
+                           "text='%{frame_num}':"
+                           "start_number=1:"
+                           "x=w*0.9-tw: y=h*0.85:"
+                           "fontcolor=white:"
+                           "fontsize=100:"
+                           "box=0:"
+                           "boxcolor=white:"
+                           "boxborderw=5")
+    else:
+        framenumber=''
 
     if profile == 'preview':
 
         suffix = '_preview'
         outfile_ext = '.mp4'
 
+#ffmpeg -i input -vf "drawtext=fontfile=System/Library/Fonts/Supplemental/Arial.ttf: text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=200: box=1: boxcolor=white: boxborderw=5" -c:a copy output
+
+
+
         ffmpeg_settings = [
                 '-r', "24000/1001",
                 '-vcodec', 'libx264',
                 '-pix_fmt', 'yuv420p',
                 '-preset', 'veryfast',
-                '-vf', 'scale=1920:-1',  # largest size is 1920x? DOES NOT CROP
+               # '-vf', "scale=1920:-1:",
+                '-vf', "scale=1920:-2" + fnumber_filter # largest size is 1920x? DOES NOT CROP    These need a SPACE after them
+
             ]
+
+
+    #    ffmpeg_settings.append("-vf",  "drawtext=fontfile=Arial.ttf: text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=200: box=1: boxcolor=white: boxborderw=5",
+                             #  ])
+
+
 
     elif profile == 'best_h264':
 
@@ -75,7 +108,7 @@ def img2vid(input_dirs, output_file, profile='preview'):
             '-crf', "17",
             '-pix_fmt', 'yuv422p',
             '-preset', 'veryslow',
-            '-vf', "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160",  # fit in UHD4k and crop as needed
+            '-vf', "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" + fnumber_filter,  # fit in UHD4k and crop as needed
            # '-vf', "scale=3840:2160:force_original_aspect_ratio=decrease,pad=3840:2160:-1:-1:color=black",  # fit in UHD4k and pad
         ]
 
@@ -89,7 +122,7 @@ def img2vid(input_dirs, output_file, profile='preview'):
             '-vcodec', 'dnxhd',
             '-profile:v', "dnxhr_sq",
             '-pix_fmt', 'yuv422p',
-            '-vf', "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160",  # fit in UHD4k and crop as needed
+            '-vf', "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" + fnumber_filter,  # fit in UHD4k and crop as needed
            # '-vf', "scale=3840:2160:force_original_aspect_ratio=decrease,pad=3840:2160:-1:-1:color=black",  # fit in UHD4k and pad
         ]
 
@@ -105,7 +138,13 @@ def img2vid(input_dirs, output_file, profile='preview'):
         print('NOT setting output_filepath')
         out_filepath = output_file
 
-    im = Image.open(sorted_listdir(input_dirs[0])[0])
+    try:
+        im = Image.open(sorted_listdir(input_dirs[0])[0])
+    except DecompressionBombError:
+        print('Image is too large fro PIL to open. ' \
+              ' Change this line: PIL.Image.MAX_IMAGE_PIXELS = 244022272" in img2vid.py'
+              )
+
     width, height = im.size
 
     # test that all sequences are the same size

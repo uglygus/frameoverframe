@@ -1,0 +1,4 @@
+
+
+PixelShift 2 DNG --- cannot be called from the commandline
+use the GUI!!

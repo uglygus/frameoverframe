@@ -35,7 +35,7 @@ def collect_args():
 
     parser = argparse.ArgumentParser(description='Unmix\'s images that are stored in the same folder. This helps with Canon folders which store the CR2 and JPG files in the same folder.')
 
-    parser.add_argument('src_dir',
+    parser.add_argument('src_dirs', nargs='+',
         help="Source directory. ",
     )
 
@@ -51,7 +51,9 @@ def main():
     parser = collect_args()
     args = parser.parse_args()
 
-    unmix(args.src_dir)
+    for directory in args.src_dirs:
+        print('unmixing', directory,'...')
+        unmix(directory)
 
 if __name__ == "__main__":
     sys.exit(main())

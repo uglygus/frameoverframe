@@ -15,11 +15,12 @@ import argparse
 import sys
 import re
 import math
+from time import sleep
 from time import strftime
 from pathlib import Path
 
 from .renumber import renumber
-from .utils import sorted_listdir
+from .utils import sorted_listdir, test_one_extension
 
 
 def strip_bad_ending(string):
@@ -101,15 +102,20 @@ def recombine(src_dirs, dst_dir=None, copy_files=False, max_files=10000, prefix=
 
     all_files = []
 
+    # test all folders to make sure they contain only one extension
+    print("checking to make sure there's only one extension")
     for directory in src_dirs:
+        print(directory, '... ', end = '')
+        test_one_extension(directory, fatal=True)
+        print('OK')
 
+    for directory in src_dirs:
         for item in sorted_listdir(directory):
             if not os.path.isfile(os.path.join(directory, item)):
                 continue
             all_files.append(os.path.join(directory, item))
 
-    current_dir = 0
-    count = 0
+
 
     tmp_dst_dirs = []
     for dst_dir in dst_dirs:
@@ -121,7 +127,8 @@ def recombine(src_dirs, dst_dir=None, copy_files=False, max_files=10000, prefix=
     dst_dirs=tmp_dst_dirs
 
     #print('dst_dirs=',dst_dirs)
-
+    current_dir = 0
+    count = 0
     for item in all_files:
         if count >= max_files:
             count = 0
@@ -130,15 +137,16 @@ def recombine(src_dirs, dst_dir=None, copy_files=False, max_files=10000, prefix=
         dst = dst_dirs[current_dir]
 
         if not os.path.exists(dst):
+            print('os.makedirs( ', dst)
             os.makedirs(dst)
 
         item_dest = dst + '/' + os.path.basename(Path(item).parent) + '-' + os.path.basename(item)
 
         if copy_files:
-          #  print('recombine copying : ', item, ' -->', item_dest)
+            print('recombine copying : ', item, ' -->', item_dest)
             shutil.copyfile(item, item_dest)
         else:
-          #  print('recombine moving : ', item, ' -->', item_dest)
+            print('recombine moving : ', item, ' -->', item_dest)
             shutil.move(item, item_dest)
         count += 1
 
@@ -147,8 +155,8 @@ def recombine(src_dirs, dst_dir=None, copy_files=False, max_files=10000, prefix=
         for directory in src_dirs:
             shutil.rmtree(directory)
 
-   # input('about to remove timestamps')
-   # print('dst_dirs = ', dst_dirs)
+    #input('about to remove timestamps')
+    print('about to remove timestamps:  dst_dirs = ', dst_dirs)
     new_dst_dirs = []
     # remove empty directories
     # remove = 20200810_132823
@@ -166,17 +174,41 @@ def recombine(src_dirs, dst_dir=None, copy_files=False, max_files=10000, prefix=
         new_dir = m.group(1)
 
         if os.path.exists(new_dir):
+            print('new_dir exists new_dir=', new_dir)
             new_dir= new_dir + '~recombined_' + strftime("%Y%m%d_%H%M%S")
+            print('reset newdir: now  new_dir=', new_dir)
 
-       # print('shutil.move(', directory, ', ' ,new_dir)
-        shutil.move(directory, new_dir)
+        # under WSL linking to the NAS this fails because the OS still reports the dir as existing
+        # if it fails wait a sec and retry...
+        #print ('sleep...')
+        #sleep(2)
+
+
+        i=0
+        again=True
+        while(again):
+            try:
+                print('shutil.move(', directory, ', ' ,new_dir)
+                shutil.move(directory, new_dir)
+                again=False
+            except (PermissionError, FileExistsError) as e:
+                print('caught error: ', e)
+                if i>=20:
+                    print('failed 20 times, exiting.')
+                    sys.exit(100)
+                print ('Permission Error occured retrying in 1s...')
+                sleep(1)
+                i=i+1
+            print('bottom of WHIL:E UP UP UP')
+
         new_dst_dirs.append(new_dir)
     dst_dirs = new_dst_dirs
 
     #input('about to renumber')
     # renumber new files
     for one_dst_dir in dst_dirs:
-        prefix = os.path.basename(os.path.normpath(one_dst_dir))
+        if prefix==":folder":
+            prefix = os.path.basename(os.path.normpath(one_dst_dir))
         renumber(one_dst_dir, inplace=True, prefix=prefix, sort_method='name', padding=padding)
 
 

@@ -19,11 +19,8 @@ import exifread
 
 import  frameoverframe.utils as utils
 
-# import  frameoverframe.utils.sorted_listdir as sorted_listdir
-# import  frameoverframe.utils.exif_creation_date as exif_creation_date
-
 def print_exif_tags(filename, alltags=False):
-    import exifread
+
     # Open image file for reading (binary mode)
     f = open(filename, 'rb')
     tags = exifread.process_file(f)
