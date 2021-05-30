@@ -132,3 +132,4 @@ dmypy.json
 .idea/modules.xml
 .idea/movpy.iml
 .idea/modules.xml
+.DS_Store
