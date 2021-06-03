@@ -1,6 +1,8 @@
-import setuptools
 import codecs
 import os.path
+
+import setuptools
+
 
 def read(rel_path):
     here = os.path.abspath(os.path.dirname(__file__))
@@ -12,8 +14,8 @@ def get_version(rel_path):
         if line.startswith('__version__'):
             delim = '"' if '"' in line else "'"
             return line.split(delim)[1]
-    else:
-        raise RuntimeError("Unable to find version string.")
+        else:
+            raise RuntimeError("Unable to find version string.")
 
 
 print('packages=', setuptools.find_packages())
@@ -24,12 +26,12 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="frameoverframe",
     version=get_version("frameoverframe/__init__.py"),
-    author="Example Author",
-    author_email="author@example.com",
+    author="Cooper Battersby",
+    author_email="cooperbattersby@egmail.com",
     description="Utils for processing image sequences",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/pypa/sampleproject",
+    url="https://github.com/uglygus/frameoverframe",
     packages=setuptools.find_packages(),
 
     classifiers=[
