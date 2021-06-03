@@ -2,6 +2,8 @@
 
 A collection of scripts for working with image sequences, timelapse's or just straight video.
 
+....................................................................... june 03
+
 
 ***tracer.py*** vector based tracing of frames
 
