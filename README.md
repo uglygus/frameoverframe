@@ -13,6 +13,7 @@ A collection of scripts for working with image sequences, timelapse's or just st
 
 ***align\_image\_stack_sequence.py*** - wrapper for align image stack that allows it to be run against a folder of timelapse bracketed images.
 
+***thin.py*** - reduce files from a folder by keeping 1 file and skip a number of files, does not recurse into sum folder.
 
 
 # tracer.py
