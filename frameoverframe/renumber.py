@@ -4,7 +4,7 @@ Renumbers image sequences by renaming them sequentially.
 Can be used as a module or a called from the commandline.
 
 For example: prodeng01.jpg prodeng11.png prodeng27.jpg
-$renumber.py .
+$ renumber.py .
 Would become: (split by sequence)
 prodeng_00001.jpg prodeng_00002.jpg prodeng_00003.jpg
 
@@ -22,19 +22,6 @@ import sys
 import re
 
 import frameoverframe.utils as utils
-
-# def _split_name_number(name):
-#     # Splits a given string into name and number where number is the at the end
-#     # of the string, e.g. 'foo2bar003baz001' will be split into:
-#     # 'foo2bar003baz', '001'
-#     #
-#
-#     regex='^(.*?)(\d*)$'
-#     m = re.search(regex, name)
-#     name_part = m.group(1)
-#     num_part = m.group(2)
-#
-#     return name_part, num_part
 
 
 def sort_by_name(files):
