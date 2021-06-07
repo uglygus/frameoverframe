@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 Renumbers image sequences by renaming them sequentially.
 Can be used as a module or a called from the commandline.
@@ -22,37 +21,44 @@ import argparse
 import sys
 import re
 
-import  frameoverframe.utils as utils
+import frameoverframe.utils as utils
 
 # def _split_name_number(name):
 #     # Splits a given string into name and number where number is the at the end
 #     # of the string, e.g. 'foo2bar003baz001' will be split into:
 #     # 'foo2bar003baz', '001'
+#     #
+#
 #     regex='^(.*?)(\d*)$'
 #     m = re.search(regex, name)
 #     name_part = m.group(1)
 #     num_part = m.group(2)
+#
 #     return name_part, num_part
+
 
 def sort_by_name(files):
     """ sorts a list of files by their alnpha-numeric name """
     files.sort()
     return files
 
+
 def sort_by_exif_date(files, src_dir):
     """ sorts a list of files by their EXIF creation date name
         sorts descending
     """
 
-    name_date =[]
+    name_date = []
     for file in files:
         exif_date = utils.exif_creation_date(os.path.join(src_dir, file))
 
         if not exif_date:
-            print(f'ERROR: Trying to sort by EXIFdate. File does not have an EXIF date: {file}')
+            print(
+                f'ERROR: Trying to sort by EXIFdate. File does not have an EXIF date: {file}'
+            )
             sys.exit(1)
 
-        name_date.append( [ file, exif_date] )
+        name_date.append([file, exif_date])
 
     name_date = sorted(name_date, key=lambda x: x[1], reverse=True)
 
@@ -66,7 +72,13 @@ def sort_by_exif_date(files, src_dir):
     return sorted_files
 
 
-def renumber(src_dir, dst_dir=None, inplace=False, sort_method=None, start_at=0, prefix=None, padding=5):
+def renumber(src_dir,
+             dst_dir=None,
+             inplace=False,
+             sort_method=None,
+             start_at=0,
+             prefix=None,
+             padding=5):
     """
     Renames files representing an image sequence in the given directory to
     number them sequentially.
@@ -114,7 +126,7 @@ def renumber(src_dir, dst_dir=None, inplace=False, sort_method=None, start_at=0,
     for f in os.listdir(src_dir):
         if f == '.DS_Store':
             continue
-        if os.path.isfile(os.path.join(src_dir,f)):
+        if os.path.isfile(os.path.join(src_dir, f)):
             file_list.append(f)
 
     file_list_name = sort_by_name(file_list)
@@ -125,21 +137,22 @@ def renumber(src_dir, dst_dir=None, inplace=False, sort_method=None, start_at=0,
         file_list_date = None
         sort_method = 'name'
 
-
     print(f'{file_list_name=}')
     print(f'{file_list_date=}')
-
-
 
     # double check sort_method
     if sort_method == None:
         if file_list_name != file_list_date:
-            print(f'STOPPING: Alphanumeric order and exif date order do not match!. Specify a --sort_method on the commandline. For dir: {src_dir}')
+            print(
+                f'STOPPING: Alphanumeric order and exif date order do not match!. Specify a --sort_method on the commandline. For dir: {src_dir}'
+            )
 
-            i=0
+            i = 0
             for i in range(len(file_list_name)):
                 if file_list_name[i] != file_list_date[i]:
-                    print(f'differnet name=,{file_list_name[i]} --- {file_list_date[i]}')
+                    print(
+                        f'differnet name=,{file_list_name[i]} --- {file_list_date[i]}'
+                    )
 
             sys.exit(1)
         else:
@@ -172,10 +185,13 @@ def renumber(src_dir, dst_dir=None, inplace=False, sort_method=None, start_at=0,
         if inplace:
             dst_dir = src_dir
         else:
-            dir_only=os.path.basename(src_dir)
-            renumbered_dir_name = '{0}_{1}_{2}'.format(os.path.basename(src_dir), 'renumbered', uuid.uuid4().hex[:8])
+            dir_only = os.path.basename(src_dir)
+            renumbered_dir_name = '{0}_{1}_{2}'.format(
+                os.path.basename(src_dir), 'renumbered',
+                uuid.uuid4().hex[:8])
 
-            dst_dir = os.path.join(os.path.dirname(src_dir), renumbered_dir_name)
+            dst_dir = os.path.join(os.path.dirname(src_dir),
+                                   renumbered_dir_name)
             if not os.path.exists(dst_dir):
                 os.makedirs(dst_dir)
 
@@ -183,7 +199,8 @@ def renumber(src_dir, dst_dir=None, inplace=False, sort_method=None, start_at=0,
     for f in file_list:
         file_name, ext = os.path.splitext(file_list[0])
 
-        dst_file_name = '{0}{1}{2}'.format(prefix, str(counter).zfill(padding), ext)
+        dst_file_name = '{0}{1}{2}'.format(prefix,
+                                           str(counter).zfill(padding), ext)
 
         src = os.path.join(src_dir, f)
         dst = os.path.join(dst_dir, dst_file_name)
@@ -195,29 +212,34 @@ def renumber(src_dir, dst_dir=None, inplace=False, sort_method=None, start_at=0,
             print('copying file: ', src, '->', dst)
             try:
                 shutil.copy2(src, dst)
-            except OSError as error :
+            except OSError as error:
                 free = shutil.disk_usage(dst)[2]
-                if free < 1000 :
+                if free < 1000:
                     print(f'Out of disk space! OSError {error}')
                     print('free=', free)
                 else:
                     print(f'OSError unknown reason {error}')
                 break
-        counter+=1
+        counter += 1
 
     return dst_dir
 
 
-
-def renumber_many(src_dirs, dst_dir=None, inplace=False, start_at=0, max_number=10000, prefix=None, padding=5):
+def renumber_many(src_dirs,
+                  dst_dir=None,
+                  inplace=False,
+                  start_at=0,
+                  max_number=10000,
+                  prefix=None,
+                  padding=5):
     '''
         accepts a list of directories to be combined and renumbered. Combines files into
         directories with max_number in each directory.
     '''
 
-
     for directory in src_dirs:
-        d(directory)
-
+        dx = d(directory)
+        print('type(dx) = ;', type(dx))
         if len(directory) < max_number:
-            print('len(directory)=', len(directory), 'which is less than max_number=', max_number)
+            print('len(directory)=', len(directory),
+                  'which is less than max_number=', max_number)
