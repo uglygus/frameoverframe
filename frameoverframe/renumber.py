@@ -17,9 +17,8 @@ docstring for more.
 import os
 import shutil
 import uuid
-import argparse
 import sys
-import re
+
 
 import frameoverframe.utils as utils
 
@@ -124,18 +123,18 @@ def renumber(src_dir,
         file_list_date = None
         sort_method = 'name'
 
-    print(f'{file_list_name=}')
-    print(f'{file_list_date=}')
+    #print(f'{file_list_name=}')
+    #print(f'{file_list_date=}')
 
     # double check sort_method
-    if sort_method == None:
+    if sort_method is None:
         if file_list_name != file_list_date:
             print(
                 f'STOPPING: Alphanumeric order and exif date order do not match!. Specify a --sort_method on the commandline. For dir: {src_dir}'
             )
 
             i = 0
-            for i in range(len(file_list_name)):
+            for i in enumerate(file_list_name): # range(len(file_list_name)):
                 if file_list_name[i] != file_list_date[i]:
                     print(
                         f'differnet name=,{file_list_name[i]} --- {file_list_date[i]}'
@@ -155,9 +154,9 @@ def renumber(src_dir,
         sys.exit(1)
 
     # get prefix if it is not assigned
-    if prefix == None:
+    if prefix is None:
         file_name, ext = os.path.splitext(file_list[0])
-        name_part, num_part = utils._split_name_number(file_name)
+        name_part = utils._split_name_number(file_name)[0]
         prefix = name_part
 
     print(f'{prefix=}')
@@ -172,7 +171,6 @@ def renumber(src_dir,
         if inplace:
             dst_dir = src_dir
         else:
-            dir_only = os.path.basename(src_dir)
             renumbered_dir_name = '{0}_{1}_{2}'.format(
                 os.path.basename(src_dir), 'renumbered',
                 uuid.uuid4().hex[:8])
@@ -210,23 +208,3 @@ def renumber(src_dir,
         counter += 1
 
     return dst_dir
-
-
-def renumber_many(src_dirs,
-                  dst_dir=None,
-                  inplace=False,
-                  start_at=0,
-                  max_number=10000,
-                  prefix=None,
-                  padding=5):
-    '''
-        accepts a list of directories to be combined and renumbered. Combines files into
-        directories with max_number in each directory.
-    '''
-
-    for directory in src_dirs:
-        dx = d(directory)
-        print('type(dx) = ;', type(dx))
-        if len(directory) < max_number:
-            print('len(directory)=', len(directory),
-                  'which is less than max_number=', max_number)
