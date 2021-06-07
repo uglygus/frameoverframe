@@ -36,7 +36,7 @@ def vid2img(input_mov, output_folder=None):
     input(' calling ffmpeg ...')
 
     if ffmpeg_bin:
-
+        print('got here')
         sys_call = [ffmpeg_bin,
                     '-i', input_mov,
                     output_folder + '/' + filename + '_' + '%08d' + '.png'

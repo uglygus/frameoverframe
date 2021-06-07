@@ -124,11 +124,3 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
-# Pyre type checker
-.pyre/
-.idea/vidshed.iml
-.idea/vcs.xml
-.idea/movpy.iml
-.idea/modules.xml
-.idea/movpy.iml
-.idea/modules.xml
