@@ -28,13 +28,10 @@ import  frameoverframe.utils as utils
 #     # Splits a given string into name and number where number is the at the end
 #     # of the string, e.g. 'foo2bar003baz001' will be split into:
 #     # 'foo2bar003baz', '001'
-#     # 
-# 
 #     regex='^(.*?)(\d*)$'
 #     m = re.search(regex, name)
 #     name_part = m.group(1)
 #     num_part = m.group(2)
-# 
 #     return name_part, num_part
 
 def sort_by_name(files):
@@ -196,7 +193,16 @@ def renumber(src_dir, dst_dir=None, inplace=False, sort_method=None, start_at=0,
             shutil.move(src, dst)
         else:
             print('copying file: ', src, '->', dst)
-            shutil.copy2(src, dst)
+            try:
+                shutil.copy2(src, dst)
+            except OSError as error :
+                free = shutil.disk_usage(dst)[2]
+                if free < 1000 :
+                    print(f'Out of disk space! OSError {error}')
+                    print('free=', free)
+                else:
+                    print(f'OSError unknown reason {error}')
+                break
         counter+=1
 
     return dst_dir
