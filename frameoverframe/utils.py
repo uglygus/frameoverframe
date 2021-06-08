@@ -20,7 +20,7 @@ def exif_creation_date(filename):
         fh = open(filename, 'rb')
     except FileNotFoundError:
         return()
-    
+
     tags = exifread.process_file(fh, stop_tag='DateTimeOriginal', details=False)
 
     try:
@@ -28,7 +28,7 @@ def exif_creation_date(filename):
     except KeyError:
         exifdate = None
 
-    return(exifdate)
+    return exifdate
 
 
 def file_not_exist(filepath):
@@ -57,7 +57,8 @@ def test_one_extension(src_dir, fatal=True):
 
     if len(ext_list(src_dir)) > 1:
         if fatal:
-            print('ERROR: Directory contains files with more than one extension. Consider running \'unmix\' ', src_dir)
+            print('ERROR: Directory contains '
+            	  'files with more than one extension. Consider running \'unmix\' ', src_dir)
             sys.exit(1)
         else:
             return False
@@ -121,11 +122,11 @@ def create_workdir(filename, action='', nested=True):
     nested=TRUE
     filename = /test/out.mp4  action = autotrace
     returns: /test/out/autotrace
-    
+
     nested=FALSE
     filename = /test/out.mp4  action = autotrace
     returns: /test/out-autotrace
-      
+
 
     Args:
         filename (str):
@@ -141,8 +142,8 @@ def create_workdir(filename, action='', nested=True):
     if nested:
         outdir = directory + '/' + filenameonly + '/' + action
     else:
-        outdir = directory + '/' + filenameonly + '-' + action 
- 
+        outdir = directory + '/' + filenameonly + '-' + action
+
     #print('making outdir - ', outdir)
     try:
         os.makedirs(outdir, exist_ok=True)
@@ -220,7 +221,7 @@ def _split_name_number(name):
     # Splits a given string into name and number where number is the at the end
     # of the string, e.g. 'foo2bar003baz001' will be split into:
     # 'foo2bar003baz', '001'
-    # 
+    #
 
     regex='^(.*?)(\d*)$'
     m = re.search(regex, name)
@@ -244,8 +245,9 @@ def calculate_scale_factor( orig_tup, new_tup, allow_crop=False):
     Args:
       orig_tup (tuple) : original dimensions (width,height) eg (1920,1080)
       new_tup (tuple) : new dimensions (width,height) eg (3840,2160)
-      allow_crop (boolean) : True = make dimensions fill screen and crop excess
-                             False = make dimensions fit within the new box leaving black bars  (Default value = False)
+      allow_crop (boolean) : True  = make dimensions fill screen and crop excess
+                             False = make dimensions fit within the new box leaving
+                                     black bars  (Default value = False)
 
     Returns:
         float : ration to be applied to make new rectangle fit inside original rectangle
@@ -332,10 +334,10 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
     print('scale=', scale)
 
     gs_bin = shutil.which('gs')
-    
+
     if not gs_bin:
         print(f'ERROR: ABORTING:  Cannot find executable \'gs\' {gs_bin=}')
-        
+
         sys.exit(1)
 
     print(f' ------##---- {gs_bin=}')

@@ -19,7 +19,7 @@ def already_renamed(filename):
 
     prefix = os.path.basename(os.path.split(filename)[0])
     fileonly = os.path.basename( os.path.normpath(filename))
-
+   
     if fileonly.startswith(prefix):
         return True
     return False

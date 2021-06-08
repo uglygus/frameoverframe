@@ -133,7 +133,6 @@ def renumber(src_dir,
                 f'STOPPING: Alphanumeric order and exif date order do not match!. Specify a --sort_method on the commandline. For dir: {src_dir}'
             )
 
-            i = 0
             for i in enumerate(file_list_name): # range(len(file_list_name)):
                 if file_list_name[i] != file_list_date[i]:
                     print(
@@ -200,10 +199,10 @@ def renumber(src_dir,
             except OSError as error:
                 free = shutil.disk_usage(dst)[2]
                 if free < 1000:
-                    print(f'Out of disk space! OSError {error}')
+                    print(f'Out of disk space! OSError: {error}')
                     print('free=', free)
                 else:
-                    print(f'OSError unknown reason {error}')
+                    print(f'OSError unknown reason: {error}')
                 break
         counter += 1
 
