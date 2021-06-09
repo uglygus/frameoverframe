@@ -19,23 +19,25 @@ from frameoverframe.thin import thin
 
 
 def collect_args():
-    """ collect commandline arguments """
+    """collect commandline arguments"""
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('src_dir', nargs='+',
-        help="Source directory. ")
+    parser.add_argument("src_dir", nargs="+", help="Source directory. ")
 
-    parser.add_argument( '-e','--every', type=int, required=True,
-        help="copy every nth file")
+    parser.add_argument("-e", "--every", type=int, required=True, help="copy every nth file")
 
-    parser.add_argument( "-o", "--dst_dir", type=str, default=None,
-        help="Destination directory")
+    parser.add_argument("-o", "--dst_dir", type=str, default=None, help="Destination directory")
 
-    parser.add_argument( "--inplace", action="store_false", default=False,
-        help="Copy files to a new direcotory otherwise they are renamed inplace. (default False)",)
+    parser.add_argument(
+        "--inplace",
+        action="store_false",
+        default=False,
+        help="Copy files to a new direcotory otherwise they are renamed inplace. (default False)",
+    )
 
     return parser
+
 
 def main():
     """
@@ -52,9 +54,10 @@ def main():
     thin(
         args.src_dir,
         args.every,
-        dst_dir = args.dst_dir,
-        inplace = args.inplace,
+        dst_dir=args.dst_dir,
+        inplace=args.inplace,
     )
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -23,8 +23,8 @@ def rolling_mean(data, window):
     """Compute the rolling mean of the data over the given window."""
     result = np.full_like(data, np.nan)
 
-    conv = np.convolve(data, np.ones(window)/window, mode='valid')
-    result[(len(data) - len(conv))//2: (len(conv) - len(data))//2] = conv
+    conv = np.convolve(data, np.ones(window) / window, mode="valid")
+    result[(len(data) - len(conv)) // 2 : (len(conv) - len(data)) // 2] = conv
 
     return result
 
@@ -33,11 +33,11 @@ def getProgressBar(logger, level=logging.INFO, **kwargs):
     if logger.getEffectiveLevel() <= level:
         prog = ProgressBar(**kwargs)
     else:
-        prog = lambda x:  x
+        prog = lambda x: x
     return prog
 
 
-def find_images(directory, extensions=['.jpg', '.png', '.tiff', '.tif']):
+def find_images(directory, extensions=[".jpg", ".png", ".tiff", ".tif"]):
     logger = logging.getLogger()
 
     images = []
@@ -48,13 +48,13 @@ def find_images(directory, extensions=['.jpg', '.png', '.tiff', '.tif']):
         if extension.lower() in extensions:
             images.append(os.path.join(root, f))
 
-    logger.info('Found %s images in directory %s', len(images), directory)
+    logger.info("Found %s images in directory %s", len(images), directory)
     return sorted(images)
 
 
 def calc_brightness(images, sigma=2.5):
     logger = logging.getLogger()
-    logger.info('Calculating brightness of the images')
+    logger.info("Calculating brightness of the images")
 
     brightness = []
     # prog = getProgressBar(logger)
@@ -77,24 +77,24 @@ def calc_brightness(images, sigma=2.5):
 
 
 def scale_image_brightness(image, scale):
-    """ scale image brightness by a factor """
+    """scale image brightness by a factor"""
     adjusted_image = scale * img_as_float(image)
     # handle overflow:
     adjusted_image[adjusted_image >= 1.0] = 1.0
 
     # catch warning for loosing some accuracy by converting back to int types
     with warnings.catch_warnings():
-        warnings.simplefilter('ignore', category=UserWarning)
-        if image.dtype == np.dtype('uint8'):
+        warnings.simplefilter("ignore", category=UserWarning)
+        if image.dtype == np.dtype("uint8"):
             adjusted_image = img_as_ubyte(adjusted_image)
-        elif image.dtype == np.dtype('uint16'):
+        elif image.dtype == np.dtype("uint16"):
             adjusted_image = img_as_uint(adjusted_image)
 
     return adjusted_image
 
 
-def deflicker(images, window, outdir, fmt='png', sigma=2.5):
-    """ Deflicker image sequence.
+def deflicker(images, window, outdir, fmt="png", sigma=2.5):
+    """Deflicker image sequence.
 
     Image brightness is scaled to match a rolling mean to avoid flickering
 
@@ -114,7 +114,7 @@ def deflicker(images, window, outdir, fmt='png', sigma=2.5):
 
     target_brightness = rolling_mean(brightness, window)
 
-    logger.info('Start brightness correction')
+    logger.info("Start brightness correction")
     prog = getProgressBar(logger, maxval=len(images))
     for filename, b, tb in prog(list(zip(images, brightness, target_brightness))):
         image = io.imread(filename)
@@ -124,13 +124,10 @@ def deflicker(images, window, outdir, fmt='png', sigma=2.5):
             adjusted_image = scale_image_brightness(image, tb / b)
 
         with warnings.catch_warnings():
-            warnings.simplefilter('ignore', category=UserWarning)
+            warnings.simplefilter("ignore", category=UserWarning)
             io.imsave(
-                os.path.join(
-                    outdir,
-                    os.path.splitext(os.path.basename(filename))[0] + '.' + fmt
-                ),
+                os.path.join(outdir, os.path.splitext(os.path.basename(filename))[0] + "." + fmt),
                 adjusted_image,
             )
     print()
-    logger.info('Brightness correction finished')
+    logger.info("Brightness correction finished")

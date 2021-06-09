@@ -23,14 +23,14 @@ import frameoverframe.utils as utils
 
 
 def sort_by_name(files):
-    """ sorts a list of files by their alnpha-numeric name """
+    """sorts a list of files by their alnpha-numeric name"""
     files.sort()
     return files
 
 
 def sort_by_exif_date(files, src_dir):
-    """ sorts a list of files by their EXIF creation date name
-        sorts descending
+    """sorts a list of files by their EXIF creation date name
+    sorts descending
     """
 
     name_date = []
@@ -38,9 +38,7 @@ def sort_by_exif_date(files, src_dir):
         exif_date = utils.exif_creation_date(os.path.join(src_dir, file))
 
         if not exif_date:
-            print(
-                f'ERROR: Trying to sort by EXIFdate. File does not have an EXIF date: {file}'
-            )
+            print(f"ERROR: Trying to sort by EXIFdate. File does not have an EXIF date: {file}")
             sys.exit(1)
 
         name_date.append([file, exif_date])
@@ -57,13 +55,9 @@ def sort_by_exif_date(files, src_dir):
     return sorted_files
 
 
-def renumber(src_dir,
-             dst_dir=None,
-             inplace=False,
-             sort_method=None,
-             start_at=0,
-             prefix=None,
-             padding=5):
+def renumber(
+    src_dir, dst_dir=None, inplace=False, sort_method=None, start_at=0, prefix=None, padding=5
+):
     """
     Renames files representing an image sequence in the given directory to
     number them sequentially.
@@ -102,14 +96,14 @@ def renumber(src_dir,
 
     utils.test_one_extension(src_dir)
 
-    print('renumber start_at=', start_at)
-    print('renumber prefix=', prefix)
-    print('renumber inplace=', inplace)
-    print('renumber sort_method=', sort_method)
+    print("renumber start_at=", start_at)
+    print("renumber prefix=", prefix)
+    print("renumber inplace=", inplace)
+    print("renumber sort_method=", sort_method)
 
     # collect only the files we want - could check file type or extensions here
     for f in os.listdir(src_dir):
-        if f == '.DS_Store':
+        if f == ".DS_Store":
             continue
         if os.path.isfile(os.path.join(src_dir, f)):
             file_list.append(f)
@@ -118,37 +112,35 @@ def renumber(src_dir,
     if sort_method == "exif_date":
         file_list_date = sort_by_exif_date(file_list, src_dir)
     else:
-        print('EXIF date not present. Sorting by name.')
+        print("EXIF date not present. Sorting by name.")
         file_list_date = None
-        sort_method = 'name'
+        sort_method = "name"
 
-    #print(f'{file_list_name=}')
-    #print(f'{file_list_date=}')
+    # print(f'{file_list_name=}')
+    # print(f'{file_list_date=}')
 
     # double check sort_method
     if sort_method is None:
         if file_list_name != file_list_date:
             print(
-                f'STOPPING: Alphanumeric order and exif date order do not match!. Specify a --sort_method on the commandline. For dir: {src_dir}'
+                f"STOPPING: Alphanumeric order and exif date order do not match!. Specify a --sort_method on the commandline. For dir: {src_dir}"
             )
 
-            for i in enumerate(file_list_name): # range(len(file_list_name)):
+            for i in enumerate(file_list_name):  # range(len(file_list_name)):
                 if file_list_name[i] != file_list_date[i]:
-                    print(
-                        f'differnet name=,{file_list_name[i]} --- {file_list_date[i]}'
-                    )
+                    print(f"differnet name=,{file_list_name[i]} --- {file_list_date[i]}")
 
             sys.exit(1)
         else:
-            sort_method = 'name'
+            sort_method = "name"
 
-    print(f' sort method: {sort_method}')
-    if sort_method == 'name':
+    print(f" sort method: {sort_method}")
+    if sort_method == "name":
         file_list = sort_by_name(file_list)
-    elif sort_method == 'exif_date':
+    elif sort_method == "exif_date":
         file_list = sort_by_exif_date(file_list, src_dir)
     else:
-        print(f'unknown sort method: {sort_method}')
+        print(f"unknown sort method: {sort_method}")
         sys.exit(1)
 
     # get prefix if it is not assigned
@@ -157,11 +149,11 @@ def renumber(src_dir,
         name_part = utils._split_name_number(file_name)[0]
         prefix = name_part
 
-    print(f'{prefix=}')
+    print(f"{prefix=}")
 
     # append the underscore to prefix only if it is not empty and doenst end in '_'
-    if not prefix == '' and not prefix.endswith('_'):
-        prefix = prefix + '_'
+    if not prefix == "" and not prefix.endswith("_"):
+        prefix = prefix + "_"
 
     # Create destination directory as required
     if dst_dir is None:
@@ -169,12 +161,11 @@ def renumber(src_dir,
         if inplace:
             dst_dir = src_dir
         else:
-            renumbered_dir_name = '{0}_{1}_{2}'.format(
-                os.path.basename(src_dir), 'renumbered',
-                uuid.uuid4().hex[:8])
+            renumbered_dir_name = "{0}_{1}_{2}".format(
+                os.path.basename(src_dir), "renumbered", uuid.uuid4().hex[:8]
+            )
 
-            dst_dir = os.path.join(os.path.dirname(src_dir),
-                                   renumbered_dir_name)
+            dst_dir = os.path.join(os.path.dirname(src_dir), renumbered_dir_name)
             if not os.path.exists(dst_dir):
                 os.makedirs(dst_dir)
 
@@ -182,26 +173,25 @@ def renumber(src_dir,
     for f in file_list:
         file_name, ext = os.path.splitext(file_list[0])
 
-        dst_file_name = '{0}{1}{2}'.format(prefix,
-                                           str(counter).zfill(padding), ext)
+        dst_file_name = "{0}{1}{2}".format(prefix, str(counter).zfill(padding), ext)
 
         src = os.path.join(src_dir, f)
         dst = os.path.join(dst_dir, dst_file_name)
 
         if inplace:
-            print('moving file: ', src, '->', dst)
+            print("moving file: ", src, "->", dst)
             shutil.move(src, dst)
         else:
-            print('copying file: ', src, '->', dst)
+            print("copying file: ", src, "->", dst)
             try:
                 shutil.copy2(src, dst)
             except OSError as error:
                 free = shutil.disk_usage(dst)[2]
                 if free < 1000:
-                    print(f'Out of disk space! OSError: {error}')
-                    print('free=', free)
+                    print(f"Out of disk space! OSError: {error}")
+                    print("free=", free)
                 else:
-                    print(f'OSError unknown reason: {error}')
+                    print(f"OSError unknown reason: {error}")
                 break
         counter += 1
 

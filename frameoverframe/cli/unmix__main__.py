@@ -31,15 +31,20 @@ from frameoverframe.unmix import unmix
 
 
 def collect_args():
-    """ collect commandline arguments """
+    """collect commandline arguments"""
 
-    parser = argparse.ArgumentParser(description='Unmix\'s images that are stored in the same folder. This helps with Canon folders which store the CR2 and JPG files in the same folder.')
+    parser = argparse.ArgumentParser(
+        description="Unmix's images that are stored in the same folder. This helps with Canon folders which store the CR2 and JPG files in the same folder."
+    )
 
-    parser.add_argument('src_dirs', nargs='+',
+    parser.add_argument(
+        "src_dirs",
+        nargs="+",
         help="Source directory. ",
     )
 
     return parser
+
 
 def main():
     """
@@ -52,8 +57,9 @@ def main():
     args = parser.parse_args()
 
     for directory in args.src_dirs:
-        print('unmixing', directory,'...')
+        print("unmixing", directory, "...")
         unmix(directory)
+
 
 if __name__ == "__main__":
     sys.exit(main())
