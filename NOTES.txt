@@ -2,7 +2,7 @@
 
 
 Command to convert docstrings to google format:
-pyment -o google -w ../frameoverframe/autotrace.py 
+pyment -o google -w ../frameoverframe/autotrace.py
 
 
 
@@ -19,4 +19,11 @@ sphinx-apidoc -f -o . ../frameoverframe
 
 make clean html
 
-open ./_build/html/index.html 
+open ./_build/html/index.html
+
+
+
+
+pre-commit goot hooks
+  isort --profile black .
+  black --line-length 100 .
