@@ -1,8 +1,8 @@
 import codecs
-import os.path
+
 
 import setuptools
-
+import os.path
 
 def read(rel_path):
     here = os.path.abspath(os.path.dirname(__file__))
