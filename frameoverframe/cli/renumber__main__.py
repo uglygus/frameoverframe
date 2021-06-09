@@ -17,14 +17,15 @@ docstring for more.
 
 """
 
-import os
-import shutil
-import uuid
 import argparse
-import sys
+import os
 import re
+import shutil
+import sys
+import uuid
 
 from frameoverframe.renumber import renumber
+
 
 def collect_args():
     """ collect commandline arguments """

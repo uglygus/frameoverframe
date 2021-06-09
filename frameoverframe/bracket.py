@@ -1,32 +1,32 @@
 #!/usr/bin/env python3
+"""Manipulate image sequences based on bracketing.
+
+bracket.py
+
+split:  Split files from one folder into several
+        evenly distribute files one to each brackets dir alphabetically
+
+merge:   Merge files from several folders into one
+        number them sequentially in the final output.
+
+can be run from the commandline or used as a python module
 """
-    bracket.py
 
-    split:  Split files from one folder into several
-            evenly distribute files one to each brackets dir alphabetically
-
-    merge:   Merge files from several folders into one
-            number them sequentially in the final output.
-
-    can be run from the commandline or used as a python module
-"""
-
-import argparse
 import os
 import shutil
 import sys
 
 from . import renumber
 
+
 def split(brackets, input_dir):
-    """
-        Split files from one folder into several
-        evenly distribute files one to each brackets dir alphabetically
+    """Split files from one folder into several.
 
-        brackets : number of directories to split the folder into
-        input_dir : dir with files to split
-    """
+    Evenly distribute files one to each brackets dir alphabetically.
 
+    brackets : number of directories to split the folder into
+    input_dir : dir with files to split
+    """
     if brackets < 2:
         print('There needs to be at least 2 brackets. I got ',
               brackets, ' brackets.')
@@ -37,7 +37,7 @@ def split(brackets, input_dir):
         os.makedirs(input_dir + '_' + str(i+1), exist_ok=True)
 
     allfiles = []
-    for root, dirs, files in os.walk(input_dir, topdown=True):
+    for root, dirs, files in os.walk(input_dir, topdown=True):  # pylint: disable=unused-variable
         for name in files:
             allfiles.append((root, name))
 
@@ -62,15 +62,13 @@ def split(brackets, input_dir):
 
 
 def merge(input_dirs):
+    """Merge files from several folders into one.
+
+    Number them sequentially in the final output.
+
+    input_dirs : a list of directory paths
+    returns : the new merged directory
     """
-        Merge files from several folders into one
-        number them sequentially in the final output.
-
-       input_dirs : a list of directory paths
-       returns : the new merged directory
-
-    """
-
     input_dirs.sort()
 
     print('\ninput_dirs=', input_dirs)
@@ -92,11 +90,10 @@ def merge(input_dirs):
 
         thisdirlist = []
 
-        for f in os.listdir(input_dir):
-            if f == '.DS_Store':
+        for file in os.listdir(input_dir):
+            if file == '.DS_Store':
                 continue
-
-            thisdirlist.append(f)
+            thisdirlist.append(file)
 
         thisdirlist.sort()
 
@@ -135,7 +132,7 @@ def merge(input_dirs):
 
             counter += 1
 
-    for d in input_dirs:
+    for d in input_dirs:  # pylint: disable=invalid-name
         shutil.rmtree(d)
 
     return outdir

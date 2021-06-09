@@ -21,13 +21,14 @@ becomes:
 ignores .DS_Store files
 
 """
-import os
-import shutil
 import argparse
-import sys
+import os
 import re
+import shutil
+import sys
 
-import  frameoverframe.utils as utils
+import frameoverframe.utils as utils
+
 
 def new_dirname(src_dir, ext):
     """ returns a new dirname based on ext of a file

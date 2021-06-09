@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
-import time
 import multiprocessing
+import time
 
 import numpy
-from moviepy.editor import VideoFileClip
-from moviepy.editor import VideoClip
-from moviepy.editor import ImageSequenceClip
+from moviepy.editor import ImageSequenceClip, VideoClip, VideoFileClip
 from PIL import Image
 
 from .autotrace import autotrace

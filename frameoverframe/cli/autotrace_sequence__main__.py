@@ -1,22 +1,18 @@
 #!/usr/bin/env python3
 
+import argparse
+import multiprocessing
 import os
 import sys
-import argparse
 import time
-import multiprocessing
-
 
 import numpy
-from moviepy.editor import VideoFileClip
-from moviepy.editor import VideoClip
-from moviepy.editor import ImageSequenceClip
+from moviepy.editor import ImageSequenceClip, VideoClip, VideoFileClip
 from PIL import Image
 
 import frameoverframe.autotrace
-
-
 import frameoverframe.autotrace_sequence
+
 
 def collect_args():
     parser = argparse.ArgumentParser(

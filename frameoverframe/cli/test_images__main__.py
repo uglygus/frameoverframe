@@ -10,6 +10,7 @@ import argparse
 
 from frameoverframe.test_images import test_images
 
+
 def collect_args():
     """ collect commandline arguments """
 

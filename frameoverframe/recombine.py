@@ -9,15 +9,14 @@
 """
 
 
-import os
-import shutil
 import argparse
-import sys
-import re
 import math
-from time import sleep
-from time import strftime
+import os
+import re
+import shutil
+import sys
 from pathlib import Path
+from time import sleep, strftime
 
 from .renumber import renumber
 from .utils import sorted_listdir, test_one_extension

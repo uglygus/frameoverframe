@@ -1,30 +1,26 @@
 #!/usr/bin/env python3
-"""
-    A small tool for deflickering images for time lapse videos.
-    The brightness of the images are adjusted to a rolling mean above <N> images
-    For the calculation of the image brightness, outliers are discarded via
-    sigma clipping if the --sigma option is given
+"""Deflicker image sequences for timelapse videos.
 
-    forked from timelapse-deflicker by Maximilian Nöthe
-    https://github.com/MaxNoe/timelapse-deflicker
+The brightness of the images are adjusted to a rolling mean above <N> images
+For the calculation of the image brightness, outliers are discarded via
+sigma clipping if the --sigma option is given
+
+forked from timelapse-deflicker by Maximilian Nöthe
+https://github.com/MaxNoe/timelapse-deflicker
 """
 
 
 import logging
-import numpy as np
 import os
 import warnings
-from progressbar import ProgressBar
-from skimage import io
-from skimage import img_as_ubyte, img_as_uint, img_as_float
 
-import pkg_resources
-#__version__ = pkg_resources.require('deflicker')[0].version
+import numpy as np
+from progressbar import ProgressBar
+from skimage import img_as_float, img_as_ubyte, img_as_uint, io
 
 
 def rolling_mean(data, window):
-    ''' compute the rolling mean of the data over the given window '''
-
+    """Compute the rolling mean of the data over the given window."""
     result = np.full_like(data, np.nan)
 
     conv = np.convolve(data, np.ones(window)/window, mode='valid')
@@ -48,13 +44,11 @@ def find_images(directory, extensions=['.jpg', '.png', '.tiff', '.tif']):
     # walk just the parent dir, reuturn empty list of nothing found
     root, _, files = next(os.walk(directory), (None, None, []))
     for f in files:
-        name, extension = os.path.splitext(f)
+        extension = os.path.splitext(f)[1]
         if extension.lower() in extensions:
             images.append(os.path.join(root, f))
 
-    logger.info(
-        'Found {} images in directory {}'.format(len(images), directory)
-    )
+    logger.info('Found %s images in directory %s', len(images), directory)
     return sorted(images)
 
 
@@ -63,7 +57,7 @@ def calc_brightness(images, sigma=2.5):
     logger.info('Calculating brightness of the images')
 
     brightness = []
-   # prog = getProgressBar(logger)
+    # prog = getProgressBar(logger)
     for filename in images:
         image = io.imread(filename)
         mask = np.ones_like(image[:, :, 0], dtype=bool)
@@ -83,7 +77,7 @@ def calc_brightness(images, sigma=2.5):
 
 
 def scale_image_brightness(image, scale):
-    ''' scale image brightness by a factor '''
+    """ scale image brightness by a factor """
     adjusted_image = scale * img_as_float(image)
     # handle overflow:
     adjusted_image[adjusted_image >= 1.0] = 1.0
@@ -100,7 +94,8 @@ def scale_image_brightness(image, scale):
 
 
 def deflicker(images, window, outdir, fmt='png', sigma=2.5):
-    ''' Deflicker images
+    """ Deflicker image sequence.
+
     Image brightness is scaled to match a rolling mean to avoid flickering
 
     Parameters
@@ -113,7 +108,7 @@ def deflicker(images, window, outdir, fmt='png', sigma=2.5):
         The directory where the adjusted images are saved
     fmt: string
         Output format. One of png, tiff, jpg
-    '''
+    """
     logger = logging.getLogger()
     brightness = calc_brightness(images, sigma=sigma)
 

@@ -6,18 +6,19 @@
 """
 
 
-import os
-import shutil
 import argparse
-import sys
-import re
 import math
+import os
+import re
+import shutil
+import sys
 from pathlib import Path
 
+from frameoverframe.recombine import recombine
 from frameoverframe.renumber import renumber
+
 #from rename_uniq import rename_uniq_dir
 
-from frameoverframe.recombine import recombine
 
 
 def dir_path(path):

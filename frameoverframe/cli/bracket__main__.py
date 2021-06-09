@@ -8,7 +8,7 @@ import argparse
 import os
 import sys
 
-from frameoverframe.bracket import split, merge
+from frameoverframe.bracket import merge, split
 
 
 def collect_args():

@@ -8,14 +8,15 @@ Timelapses we end up using at 10x or 20x speed should be thinned.
 
 """
 
-import os
-import shutil
-import uuid
 import argparse
-import sys
+import os
 import re
+import shutil
+import sys
+import uuid
 
 from frameoverframe.thin import thin
+
 
 def collect_args():
     """ collect commandline arguments """

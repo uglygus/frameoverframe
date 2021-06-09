@@ -5,17 +5,18 @@ Takes a video file and createws a folder of still images
 
 '''
 
-import subprocess
 import os
 import shutil
+import subprocess
 import sys
-from PIL import Image
 import tempfile
 
+from PIL import Image
 from quotelib import quote
 
+import frameoverframe.utils as utils
 from frameoverframe.utils import sorted_listdir, test_one_extension
-import  frameoverframe.utils as utils
+
 
 def vid2img(input_mov, output_folder=None):
     ''' convert video file to a folder of images'''

@@ -11,12 +11,12 @@
 
 """
 
-import os
-from pathlib import Path
 import inspect
-import sys
-from subprocess import PIPE, run
+import os
 import shutil
+import sys
+from pathlib import Path
+from subprocess import PIPE, run
 
 import quotelib
 

@@ -8,17 +8,16 @@
 '''
 
 import os
-from pathlib import Path
-import sys
 import shutil
+import sys
 import time
-from subprocess import run, PIPE
-from PIL import Image
+from pathlib import Path
+from subprocess import PIPE, run
 
 import multiprocessingsimple
-
-
 import quotelib
+from PIL import Image
+
 #from .utils import *
 
 

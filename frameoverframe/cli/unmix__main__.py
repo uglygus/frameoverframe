@@ -21,11 +21,11 @@ ignores .DS_Store files
 
 """
 
-import os
-import shutil
 import argparse
-import sys
+import os
 import re
+import shutil
+import sys
 
 from frameoverframe.unmix import unmix
 

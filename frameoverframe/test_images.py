@@ -5,9 +5,9 @@ relies on identify from imagemagick
 '''
 
 
-import subprocess
 import os
 import shutil
+import subprocess
 
 from frameoverframe.utils import sorted_listdir
 

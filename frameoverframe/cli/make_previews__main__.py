@@ -7,14 +7,15 @@ given a folder check every subfolder and try to run img2vid on it.
 
 """
 
-import os
-import shutil
 import argparse
-import sys
+import os
 import re
+import shutil
+import sys
 
-from frameoverframe.utils import sorted_listdir
 from frameoverframe.img2vid import img2vid
+from frameoverframe.utils import sorted_listdir
+
 
 def collect_args():
     """ collect commandline arguments """

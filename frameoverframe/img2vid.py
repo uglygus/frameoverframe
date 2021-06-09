@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-'''
+"""Convert an image sequence to a video file.
+
 ffmpeg wrapper
 Takes any number of folders of images and conbines them to creates a video.
 Rescales videos to be a max width of 1920 but keeps the original aspect ratio.
@@ -11,35 +12,36 @@ preview: (default)
     encoding = h264, fast encode, medium bitrate
     fps = 23.976
     dimensions = max 1080p if image is over 1080 in one dimension shrink it to fit in a
-    1080x1080 box. Does not change images under 1080x1080.
+    1920x1080 box. Does not change images under 1080x1080.
 
 best:
     encoding = DNxHR HQ
     fps = 23.976
     dimensions = original
 
-'''
+"""
 
-import subprocess
 import os
 import shutil
+import subprocess
 import sys
-from PIL import Image
-Image.MAX_IMAGE_PIXELS = 244022272
 import tempfile
 
+from PIL import Image
 from quotelib import quote
 
+import frameoverframe.utils as utils
 from frameoverframe.utils import sorted_listdir, test_one_extension
-import  frameoverframe.utils as utils
+
+Image.MAX_IMAGE_PIXELS = 244022272  # for PIL fo allow it to work very large images
+
 
 def img2vid(input_dirs, output_file, profile='preview', framenumber=False):
-    ''' convert multiple image_dirs to a single video file '''
+    """ Convert multiple image_dirs to a single video file. """
 
+    print(' top of img2vid input_dirs=', input_dirs)
 
-    print(' top of img2vid input_dirs=',input_dirs)
-
-    if not isinstance(input_dirs,list):
+    if not isinstance(input_dirs, list):
         input_dirs = [input_dirs]
 
     input_dirs.sort()
@@ -47,55 +49,51 @@ def img2vid(input_dirs, output_file, profile='preview', framenumber=False):
     # if any dir has more than one extension in it ERROR out
     for _dir in input_dirs:
         if not test_one_extension(_dir, fatal=False):
-            print ('SKIPPING: Directory contails more than one extension. ', _dir)
+            print('SKIPPING: Directory contails more than one extension. ', _dir)
             return
 
+
 #     profileff=''
-                         ## these need a space at the end!  #y=h-(2*lh): "
-
-
+# these need a space at the end!  #y=h-(2*lh): "
 
     print(f'--------------ddd {framenumber=}')
 
-
     if framenumber:
-        fnumber_filter =  (","
-                           "drawtext=fontfile=Arial.ttf:"
-                           "text='%{frame_num}':"
-                           "start_number=1:"
-                           "x=w*0.9-tw: y=h*0.85:"
-                           "fontcolor=white:"
-                           "fontsize=100:"
-                           "box=0:"
-                           "boxcolor=white:"
-                           "boxborderw=5")
+        fnumber_filter = (","
+                          "drawtext=fontfile=Arial.ttf:"
+                          "text='%{frame_num}':"
+                          "start_number=1:"
+                          "x=w*0.9-tw: y=h*0.85:"
+                          "fontcolor=white:"
+                          "fontsize=100:"
+                          "box=0:"
+                          "boxcolor=white:"
+                          "boxborderw=5")
     else:
-        framenumber=''
+        framenumber = ''
 
     if profile == 'preview':
 
         suffix = '_preview'
         outfile_ext = '.mp4'
 
-#ffmpeg -i input -vf "drawtext=fontfile=System/Library/Fonts/Supplemental/Arial.ttf: text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=200: box=1: boxcolor=white: boxborderw=5" -c:a copy output
+        # ffmpeg -i input -vf "drawtext=fontfile=System/Library/Fonts/Supplemental/Arial.ttf: text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=200: box=1: boxcolor=white: boxborderw=5" -c:a copy output
 
-
-
+        # yapf: disable
         ffmpeg_settings = [
-                '-r', "24000/1001",
-                '-vcodec', 'libx264',
-                '-pix_fmt', 'yuv420p',
-                '-preset', 'veryfast',
-               # '-vf', "scale=1920:-1:",
-                '-vf', "scale=1920:-2" + fnumber_filter # largest size is 1920x? DOES NOT CROP    These need a SPACE after them
+            '-r', "24000/1001",
+            '-vcodec', 'libx264',
+            '-pix_fmt', 'yuv420p',
+            '-preset', 'veryfast',
+            # '-vf', "scale=1920:-1:",
+            # largest size is 1920x? DOES NOT CROP    These need a SPACE after them
+            '-vf', "scale=1920:-2" + fnumber_filter
 
-            ]
-
+        ]
+        # yapf: enable
 
     #    ffmpeg_settings.append("-vf",  "drawtext=fontfile=Arial.ttf: text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=200: box=1: boxcolor=white: boxborderw=5",
-                             #  ])
-
-
+    #  ])
 
     elif profile == 'best_h264':
 
@@ -103,13 +101,20 @@ def img2vid(input_dirs, output_file, profile='preview', framenumber=False):
         outfile_ext = '.mp4'
 
         ffmpeg_settings = [
-            '-r', "24000/1001",
-            '-vcodec', 'libx264',
-            '-crf', "17",
-            '-pix_fmt', 'yuv422p',
-            '-preset', 'veryslow',
-            '-vf', "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" + fnumber_filter,  # fit in UHD4k and crop as needed
-           # '-vf', "scale=3840:2160:force_original_aspect_ratio=decrease,pad=3840:2160:-1:-1:color=black",  # fit in UHD4k and pad
+            '-r',
+            "24000/1001",
+            '-vcodec',
+            'libx264',
+            '-crf',
+            "17",
+            '-pix_fmt',
+            'yuv422p',
+            '-preset',
+            'veryslow',
+            '-vf',
+            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" +
+            fnumber_filter,  # fit in UHD4k and crop as needed
+            # '-vf', "scale=3840:2160:force_original_aspect_ratio=decrease,pad=3840:2160:-1:-1:color=black",  # fit in UHD4k and pad
         ]
 
     elif profile == 'best_mxf':
@@ -117,23 +122,25 @@ def img2vid(input_dirs, output_file, profile='preview', framenumber=False):
         suffix = '_best_mxf_sq'
         outfile_ext = '.mxf'
 
+        # yapf: disable
         ffmpeg_settings = [
             '-r', "24000/1001",
             '-vcodec', 'dnxhd',
             '-profile:v', "dnxhr_sq",
             '-pix_fmt', 'yuv422p',
-            '-vf', "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" + fnumber_filter,  # fit in UHD4k and crop as needed
-           # '-vf', "scale=3840:2160:force_original_aspect_ratio=decrease,pad=3840:2160:-1:-1:color=black",  # fit in UHD4k and pad
+            '-vf', "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" +
+            fnumber_filter,  # fit in UHD4k and crop as needed
         ]
-
+        # yapf: enable
     else:
-        print('ERRROR: img2vid profile not supported: allowed values are "preview", "best" supplied: ', profile)
+        print('ERRROR: img2vid profile not supported: allowed values are "preview", "best" supplied: ',
+              profile)
         raise
 
     if output_file is None:
         print('setting output_filepath')
-        out_filepath = os.path.join( os.path.dirname(input_dirs[0]),
-                       os.path.basename(os.path.normpath(input_dirs[0])) + suffix + outfile_ext )
+        out_filepath = os.path.join(os.path.dirname(input_dirs[0]),
+                                    os.path.basename(os.path.normpath(input_dirs[0])) + suffix + outfile_ext)
     else:
         print('NOT setting output_filepath')
         out_filepath = output_file
@@ -141,7 +148,7 @@ def img2vid(input_dirs, output_file, profile='preview', framenumber=False):
     try:
         im = Image.open(sorted_listdir(input_dirs[0])[0])
     except DecompressionBombError:
-        print('Image is too large fro PIL to open. ' \
+        print('Image is too large fro PIL to open. '
               ' Change this line: PIL.Image.MAX_IMAGE_PIXELS = 244022272" in img2vid.py'
               )
 
@@ -175,23 +182,30 @@ def img2vid(input_dirs, output_file, profile='preview', framenumber=False):
                 print('ERROR: CR2 is not a recognized image format for ffmeg.', image)
                 sys.exit(1)
 
-           # print('making link: {} --> {}'.format(image, os.path.join(tmp_link_dir, '{:08}{}'.format(counter, ext))))
+        # print('making link: {} --> {}'.format(image, os.path.join(tmp_link_dir, '{:08}{}'.format(counter, ext))))
             os.symlink(image, os.path.join(tmp_link_dir, '{:08}{}'.format(counter, ext)))
             counter += 1
 
     ffmpeg_bin = shutil.which('ffmpeg')
 
     if ffmpeg_bin:
-        sys_call = [ffmpeg_bin,
-                    '-i', tmp_link_dir + '/' + '%08d' + ext,
-                    ]
+        sys_call = [
+            ffmpeg_bin,
+            '-i',
+            tmp_link_dir + '/' + '%08d' + ext,
+        ]
         sys_call.extend(ffmpeg_settings)
         sys_call.append(out_filepath)
 
         print('\ncalling : ', ' '.join(quote(sys_call)), '\n')
         subprocess.call(sys_call)
 
-     #   shutil.rmtree(tmp_link_dir)
+    #   shutil.rmtree(tmp_link_dir)
     else:
         print('ERROR: ffmpeg is required and is not intstalled. ')
         sys.exit(1)
+        print('this line has 79 characte', ffmpeg_bin, ffmpeg_bin, ffmpeg_bin)
+        print('this line has 89 characters. xxxxxx', ffmpeg_bin, ffmpeg_bin, ffmpeg_bin)
+        print('this line has 99 characters. xxxxxxxxxxxxxxxx', ffmpeg_bin, ffmpeg_bin, ffmpeg_bin)
+        print('this line has 101 characters. xxxxxxxxxxxxxxxxx', ffmpeg_bin, ffmpeg_bin, ffmpeg_bin)
+        print('this line has 102 characters. xxxxxxxxxxxxxxxxxx', ffmpeg_bin, ffmpeg_bin, ffmpeg_bin)

@@ -15,16 +15,15 @@ specify the start number of sequence etc. Please read through the renumber()
 docstring for more.
 
 """
-import os
-import shutil
-import uuid
 import argparse
-import sys
+import os
 import re
-
+import shutil
+import sys
+import uuid
 from datetime import datetime
 
-import  frameoverframe.utils as utils
+import frameoverframe.utils as utils
 
 
 def thin(src_dir, every, dst_dir=None, inplace=False):

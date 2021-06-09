@@ -9,11 +9,12 @@
 
 import argparse
 
+import frameoverframe.cli
+
 #from frameoverframe.img2vid import collect_args as img
 
 #import frameoverframe.img2vid
 
-import frameoverframe.cli 
 
 
 print( 'dir(frameoverframe.cli) = ', dir(frameoverframe.cli))
