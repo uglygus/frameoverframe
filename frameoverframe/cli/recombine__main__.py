@@ -20,7 +20,6 @@ from frameoverframe.renumber import renumber
 # from rename_uniq import rename_uniq_dir
 
 
-
 def dir_path(path):
     """for argparse directory type test.
 

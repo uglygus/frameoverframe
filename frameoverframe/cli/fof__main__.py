@@ -16,7 +16,6 @@ import frameoverframe.cli
 # import frameoverframe.img2vid
 
 
-
 print("dir(frameoverframe.cli) = ", dir(frameoverframe.cli))
 # print( 'dir(img2vid) = ', dir(img2vid))
 
