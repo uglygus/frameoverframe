@@ -11,14 +11,13 @@
 
 
 import logging
-import numpy as np
 import os
 import warnings
-from progressbar import ProgressBar
-from skimage import io
-from skimage import img_as_ubyte, img_as_uint, img_as_float
 
+import numpy as np
 import pkg_resources
+from progressbar import ProgressBar
+from skimage import img_as_float, img_as_ubyte, img_as_uint, io
 
 # __version__ = pkg_resources.require('deflicker')[0].version
 

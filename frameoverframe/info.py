@@ -8,14 +8,12 @@ getbrightness()
 
 """
 
-from datetime import datetime
 import math
+from datetime import datetime
 
-
-from PIL import Image
-from PIL import ImageStat
-import matplotlib.pyplot as plt
 import exifread
+import matplotlib.pyplot as plt
+from PIL import Image, ImageStat
 
 import frameoverframe.utils as utils
 

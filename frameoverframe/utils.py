@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 
 import os
+import re
+import shutil
+import sys
 from pathlib import Path
 from subprocess import PIPE, run
-import sys
-import re
-
-import shutil
-
-import quotelib
 
 import exifread
+import quotelib
 
 
 def exif_creation_date(filename):

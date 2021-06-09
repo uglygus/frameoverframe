@@ -20,10 +20,11 @@ best:
 
 """
 
-import subprocess
 import os
 import shutil
+import subprocess
 import sys
+
 from PIL import Image
 
 Image.MAX_IMAGE_PIXELS = 244022272
@@ -31,8 +32,8 @@ import tempfile
 
 from quotelib import quote
 
-from frameoverframe.utils import sorted_listdir, test_one_extension
 import frameoverframe.utils as utils
+from frameoverframe.utils import sorted_listdir, test_one_extension
 
 
 def img2vid(input_dirs, output_file, profile="preview", framenumber=False):
