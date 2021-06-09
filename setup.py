@@ -1,8 +1,8 @@
 import os.path
 
-import      setuptools
+import  setuptools
 
-import codecs
+import      codecs
 
 
 
