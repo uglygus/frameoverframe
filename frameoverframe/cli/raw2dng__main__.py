@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-'''
+"""
     ffmpeg wrapper
     takes a folder of images creates a video
 
-'''
+"""
 
 
 import argparse
@@ -12,21 +12,23 @@ from frameoverframe.raw2dng import raw2dng
 
 
 def collect_args():
-    ''' collect commandline arguments '''
+    """collect commandline arguments"""
 
     parser = argparse.ArgumentParser(
         description='Wrapper for "Adobe DNG Converter" \
-                     Accepts a directory instead of individual files.')
+                     Accepts a directory instead of individual files.'
+    )
 
-    parser.add_argument('input_dirs', nargs='+', help='directory of images...')
-    parser.add_argument('-o', '--output_dir', action="store", default=None,
-                        help='outputdirectory for the DNG files')
+    parser.add_argument("input_dirs", nargs="+", help="directory of images...")
+    parser.add_argument(
+        "-o", "--output_dir", action="store", default=None, help="outputdirectory for the DNG files"
+    )
 
     return parser
 
 
 def main():
-    ''' commandline setup img2vid'''
+    """commandline setup img2vid"""
 
     parser = collect_args()
     args = parser.parse_args()
@@ -36,5 +38,5 @@ def main():
     print("DONE.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -16,16 +16,19 @@ import re
 from frameoverframe.utils import sorted_listdir
 from frameoverframe.img2vid import img2vid
 
+
 def collect_args():
-    """ collect commandline arguments """
+    """collect commandline arguments"""
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('src_dir',
+    parser.add_argument(
+        "src_dir",
         help="Source directory. ",
     )
 
     return parser
+
 
 def main():
     """
@@ -39,14 +42,14 @@ def main():
 
     for _dir in sorted_listdir(args.src_dir):
 
-        print('\n' + f'{_dir=}')
+        print("\n" + f"{_dir=}")
 
         if os.path.isdir(_dir):
-            if os.path.isfile(_dir + '.mp4'):
-                print(f'Video file for {args.src_dir}/{_dir} already exists.')
+            if os.path.isfile(_dir + ".mp4"):
+                print(f"Video file for {args.src_dir}/{_dir} already exists.")
             else:
-                print(f'Need to make video for {_dir}.')
-                img2vid(_dir, _dir + '.mp4')
+                print(f"Need to make video for {_dir}.")
+                img2vid(_dir, _dir + ".mp4")
 
 
 if __name__ == "__main__":

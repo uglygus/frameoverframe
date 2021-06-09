@@ -12,19 +12,20 @@ import quotelib
 
 import exifread
 
+
 def exif_creation_date(filename):
-    """ given an image file return the creation time: EXIF DateTimeOriginal. """
+    """given an image file return the creation time: EXIF DateTimeOriginal."""
 
     # Open image file for reading in binary mode
     try:
-        fh = open(filename, 'rb')
+        fh = open(filename, "rb")
     except FileNotFoundError:
-        return()
+        return ()
 
-    tags = exifread.process_file(fh, stop_tag='DateTimeOriginal', details=False)
+    tags = exifread.process_file(fh, stop_tag="DateTimeOriginal", details=False)
 
     try:
-        exifdate=tags['EXIF DateTimeOriginal'].printable
+        exifdate = tags["EXIF DateTimeOriginal"].printable
     except KeyError:
         exifdate = None
 
@@ -45,20 +46,22 @@ def file_not_exist(filepath):
 
 
 def test_one_extension(src_dir, fatal=True):
-    """ make sure the directory only has one extension type otherwise error out
+    """make sure the directory only has one extension type otherwise error out
 
-        return: True if there is only one extension in the directorypath
-                False if there is more then one extension and fatal is set to False
-                ERROR sys.exit(1) if there is more than one extension and fatil is set to True
+    return: True if there is only one extension in the directorypath
+            False if there is more then one extension and fatal is set to False
+            ERROR sys.exit(1) if there is more than one extension and fatil is set to True
     """
 
-    #print('test_one_extension(): src_dir=',src_dir)
-
+    # print('test_one_extension(): src_dir=',src_dir)
 
     if len(ext_list(src_dir)) > 1:
         if fatal:
-            print('ERROR: Directory contains '
-            	  'files with more than one extension. Consider running \'unmix\' ', src_dir)
+            print(
+                "ERROR: Directory contains "
+                "files with more than one extension. Consider running 'unmix' ",
+                src_dir,
+            )
             sys.exit(1)
         else:
             return False
@@ -66,7 +69,7 @@ def test_one_extension(src_dir, fatal=True):
 
 
 def ext_list(directorypath):
-    """ returns a list of extensions in the directorypath
+    """returns a list of extensions in the directorypath
 
     Args:
         filepath (path-like object): directorypath
@@ -77,7 +80,7 @@ def ext_list(directorypath):
 
     dirlist = sorted_listdir(directorypath)
 
-    extlist=[]
+    extlist = []
 
     for item in dirlist:
         ext = os.path.splitext(os.path.split(item)[1])[1]
@@ -85,6 +88,7 @@ def ext_list(directorypath):
             extlist.append(ext)
 
     return extlist
+
 
 def sorted_listdir(directory, ignore_hidden=True):
     """returns a list : the full path to every file in a directory sorted alphanumerically.
@@ -100,22 +104,21 @@ def sorted_listdir(directory, ignore_hidden=True):
 
     names = os.listdir(directory)
     names.sort()
-    fullpaths=[]
+    fullpaths = []
 
-   # print('sorted_listdir directory=', directory)
+    # print('sorted_listdir directory=', directory)
 
     for filename in names:
-        if ignore_hidden and filename.startswith('.'):
+        if ignore_hidden and filename.startswith("."):
             continue
         else:
-            fullpaths.append(os.path.join(directory,filename))
+            fullpaths.append(os.path.join(directory, filename))
 
-  #  print(' sorted_listdir returning fullpaths == ', fullpaths)
+    #  print(' sorted_listdir returning fullpaths == ', fullpaths)
     return fullpaths
 
 
-
-def create_workdir(filename, action='', nested=True):
+def create_workdir(filename, action="", nested=True):
     """creates and returns the workingdir for a given video file and module
     example
     =======
@@ -140,19 +143,18 @@ def create_workdir(filename, action='', nested=True):
     filenameonly = Path(filename).stem
 
     if nested:
-        outdir = directory + '/' + filenameonly + '/' + action
+        outdir = directory + "/" + filenameonly + "/" + action
     else:
-        outdir = directory + '/' + filenameonly + '-' + action
+        outdir = directory + "/" + filenameonly + "-" + action
 
-    #print('making outdir - ', outdir)
+    # print('making outdir - ', outdir)
     try:
         os.makedirs(outdir, exist_ok=True)
     except OSError as e:
-        print('ERROR: creating folder {} \n {} '.format(filename, e) )
+        print("ERROR: creating folder {} \n {} ".format(filename, e))
         sys.exit()
 
     return outdir
-
 
 
 def open_eps(filename, width=None):
@@ -169,27 +171,28 @@ def open_eps(filename, width=None):
         PIL Image object :
     """
 
-    print('width=', width)
+    print("width=", width)
     original = [float(d) for d in Image.open(filename).size]
-    print('original=', original)
+    print("original=", original)
     scale = width / original[0]
-    print('scale=', scale)
+    print("scale=", scale)
     im = Image.open(filename)
 
-    print('new im size = ', im.size)
+    print("new im size = ", im.size)
 
     if width is not None:
-        print('scaling-loading')
+        print("scaling-loading")
         im.load(scale=math.ceil(scale))
-        print('new im size after scaling = ', im.size)
+        print("new im size after scaling = ", im.size)
     if scale != 1:
-        print('scaling-thumbnail')
+        print("scaling-thumbnail")
         im.thumbnail([int(scale * d) for d in original], Image.ANTIALIAS)
-        print('new im size after thumbnail = ', im.size)
+        print("new im size after thumbnail = ", im.size)
 
-    print('sleeping 60...')
+    print("sleeping 60...")
     time.sleep(60)
     return im
+
 
 def get_eps_size(epsfile):
     """
@@ -201,21 +204,22 @@ def get_eps_size(epsfile):
 
     """
 
-    width=None
-    height=None
+    width = None
+    height = None
 
     pattern = re.compile("%%BoundingBox: (\d*) (\d*) (\d+) (\d+)")
 
-    for i, line in enumerate(open(epsfile, 'r')):
+    for i, line in enumerate(open(epsfile, "r")):
         m = re.search(pattern, line)
 
         if m:
-            width=int(m.groups()[2]) - int(m.groups()[0])
-            height=int(m.groups()[3]) - int(m.groups()[1])
+            width = int(m.groups()[2]) - int(m.groups()[0])
+            height = int(m.groups()[3]) - int(m.groups()[1])
             break
 
-   # print('get_eps_size({}) returning: ({}x{})'.format(epsfile,width,height))
-    return (width,height)
+    # print('get_eps_size({}) returning: ({}x{})'.format(epsfile,width,height))
+    return (width, height)
+
 
 def _split_name_number(name):
     # Splits a given string into name and number where number is the at the end
@@ -223,14 +227,15 @@ def _split_name_number(name):
     # 'foo2bar003baz', '001'
     #
 
-    regex='^(.*?)(\d*)$'
+    regex = "^(.*?)(\d*)$"
     m = re.search(regex, name)
     name_part = m.group(1)
     num_part = m.group(2)
 
     return name_part, num_part
 
-def calculate_scale_factor( orig_tup, new_tup, allow_crop=False):
+
+def calculate_scale_factor(orig_tup, new_tup, allow_crop=False):
 
     """Calculate the scale factor to apply to make one rect fit another rect.
         Will not stretch. Returns a float to be applied to both dimensions.
@@ -255,18 +260,19 @@ def calculate_scale_factor( orig_tup, new_tup, allow_crop=False):
     """
 
     # +1 so that we are always erring oversize
-    x_ratio = round( new_tup[0] / orig_tup[0], 1 )
-    y_ratio = round( new_tup[1] / orig_tup[1], 1 )
+    x_ratio = round(new_tup[0] / orig_tup[0], 1)
+    y_ratio = round(new_tup[1] / orig_tup[1], 1)
 
-    print('x_ratio=', x_ratio)
-    print('y_ratio=', x_ratio)
+    print("x_ratio=", x_ratio)
+    print("y_ratio=", x_ratio)
 
     if allow_crop:
         return min(x_ratio, y_ratio)
     else:
         return max(x_ratio, y_ratio)
 
-def replace_eps_bounding_box(newx,newy, filepath):
+
+def replace_eps_bounding_box(newx, newy, filepath):
     """replaces this
        - %%BoundingBox: 0 0 3840 2153
        - %%HiResBoundingBox: 0.00 0.00 3840.00 2152.90
@@ -286,8 +292,8 @@ def replace_eps_bounding_box(newx,newy, filepath):
 
     """
 
-    bounding_box = '%%BoundingBox:'
-    hires_bounding_box = '%%HiResBoundingBox:'
+    bounding_box = "%%BoundingBox:"
+    hires_bounding_box = "%%HiResBoundingBox:"
     new_bounding_box = "{} 0 0 {} {}".format(bounding_box, newx, newy)
     new_highres_bounding_box = "{} 0.00 0.00 {:4.2f} {:4.2f}".format(bounding_box, newx, newy)
 
@@ -296,13 +302,13 @@ def replace_eps_bounding_box(newx,newy, filepath):
         s = f.read()
         if bounding_box not in s:
             print('"{}" not found in {}.'.format(bounding_box, filepath))
-            #return
+            # return
         if hires_bounding_box not in s:
             print('"{}" not found in {}.'.format(highres_bounding_box, filepath))
-            #return
+            # return
 
     # Safely write the changed content, if found in the file
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         for line in s:
             if bounding_box in line:
                 f.write(new_bounding_box)
@@ -326,50 +332,57 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
 
     """
 
-    print('resize_eps(', 'infile=', infile, ', outfile=', outfile, ', newsize=', newsize, ')')
+    print("resize_eps(", "infile=", infile, ", outfile=", outfile, ", newsize=", newsize, ")")
 
-    print('orig_sizze=', get_eps_size(infile))
-    print('newsize=', newsize)
-    scale =  calculate_scale_factor( get_eps_size(infile), newsize)
-    print('scale=', scale)
+    print("orig_sizze=", get_eps_size(infile))
+    print("newsize=", newsize)
+    scale = calculate_scale_factor(get_eps_size(infile), newsize)
+    print("scale=", scale)
 
-    gs_bin = shutil.which('gs')
+    gs_bin = shutil.which("gs")
 
     if not gs_bin:
-        print(f'ERROR: ABORTING:  Cannot find executable \'gs\' {gs_bin=}')
+        print(f"ERROR: ABORTING:  Cannot find executable 'gs' {gs_bin=}")
 
         sys.exit(1)
 
-    print(f' ------##---- {gs_bin=}')
-    call_list = [gs_bin,
-                 '-q',      # quiet
-                 '-dBATCH',  # exit after last file
-                 '-o', outfile, #   quotelib.quote(outfile),
-                 '-sDEVICE=eps2write',
-                 '-dDEVICEWIDTHPOINTS={}'.format(newsize[0]), '-dDEVICEHEIGHTPOINTS={}'.format(newsize[1]),
-                 '-c', '\"<</Install {{ {:4.2f} {:4.2f} scale }}>> setpagedevice\"'.format(scale, scale),
-                 '-f', infile,
-                 ]
+    print(f" ------##---- {gs_bin=}")
+    call_list = [
+        gs_bin,
+        "-q",  # quiet
+        "-dBATCH",  # exit after last file
+        "-o",
+        outfile,  #   quotelib.quote(outfile),
+        "-sDEVICE=eps2write",
+        "-dDEVICEWIDTHPOINTS={}".format(newsize[0]),
+        "-dDEVICEHEIGHTPOINTS={}".format(newsize[1]),
+        "-c",
+        '"<</Install {{ {:4.2f} {:4.2f} scale }}>> setpagedevice"'.format(scale, scale),
+        "-f",
+        infile,
+    ]
 
-    print('before')
-    print('calling : ', ' '.join( quotelib.quote(call_list)))
-    print('after')
+    print("before")
+    print("calling : ", " ".join(quotelib.quote(call_list)))
+    print("after")
 
     result = run(call_list, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-    print('gs returncode={}, stdout={}, stderr={}'.format(
-        result.returncode, result.stdout, result.stderr))
+    print(
+        "gs returncode={}, stdout={}, stderr={}".format(
+            result.returncode, result.stdout, result.stderr
+        )
+    )
 
     if result.returncode:
-        print('FAILED: ', gs_bin)
-        print('returncode = ', result.returncode)
-        print('stdout = ', result.stderr)
-        print('stderr = ', result.stderr)
+        print("FAILED: ", gs_bin)
+        print("returncode = ", result.returncode)
+        print("stdout = ", result.stderr)
+        print("stderr = ", result.stderr)
         sys.exit(1)
 
     # If the eps does not fill the box the new box will be smaller then desired
     # even when setting size explicitly
     # This will force the Bounding Box to be full size which will result in a
     # fullsize image once it is rasterized to png etc.
-
 
     sys.exit()

@@ -15,7 +15,8 @@ import math
 from pathlib import Path
 
 from frameoverframe.renumber import renumber
-#from rename_uniq import rename_uniq_dir
+
+# from rename_uniq import rename_uniq_dir
 
 from frameoverframe.recombine import recombine
 
@@ -37,31 +38,55 @@ def dir_path(path):
 
 def collect_args():
 
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
 
-    parser.add_argument('src_dirs', nargs='+', type=dir_path,
-                        help="Source directories. ",
-                        )
+    parser.add_argument(
+        "src_dirs",
+        nargs="+",
+        type=dir_path,
+        help="Source directories. ",
+    )
 
-    parser.add_argument("-m", "--max_files", type=int, default=10000,
-                        help="Max number of files per directory. (default 10000)",
-                        )
+    parser.add_argument(
+        "-m",
+        "--max_files",
+        type=int,
+        default=10000,
+        help="Max number of files per directory. (default 10000)",
+    )
 
-    parser.add_argument("-o", "--dst_dir", type=str, default=None,
-                        help="Destination directory",
-                        )
+    parser.add_argument(
+        "-o",
+        "--dst_dir",
+        type=str,
+        default=None,
+        help="Destination directory",
+    )
 
-    parser.add_argument("--copy_files", action="store_true", default=False,
-                        help="Copy files to a new direcotory otherwise they are moved. Default: False",
-                        )
+    parser.add_argument(
+        "--copy_files",
+        action="store_true",
+        default=False,
+        help="Copy files to a new direcotory otherwise they are moved. Default: False",
+    )
 
-    parser.add_argument("-x", "--prefix", type=str, default=':folder',
-                        help="Prefix. (default no prefix). '' empty string will strip any existing prefix. The special word :folder will use the enclosing first folder's name as the prefix. default :folder",
-                        )
+    parser.add_argument(
+        "-x",
+        "--prefix",
+        type=str,
+        default=":folder",
+        help="Prefix. (default no prefix). '' empty string will strip any existing prefix. The special word :folder will use the enclosing first folder's name as the prefix. default :folder",
+    )
 
-    parser.add_argument("-p", "--padding", type=int, default=5,
-                        help="How many digits for number. (default 5) eg. 00001.jpg",
-                        )
+    parser.add_argument(
+        "-p",
+        "--padding",
+        type=int,
+        default=5,
+        help="How many digits for number. (default 5) eg. 00001.jpg",
+    )
 
     return parser
 
@@ -79,7 +104,7 @@ def main():
     parser = collect_args()
     args = parser.parse_args()
 
-   # print('args=', args)
+    # print('args=', args)
 
     recombine(
         args.src_dirs,

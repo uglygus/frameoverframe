@@ -46,52 +46,50 @@ def autotrace(img, filename, framenumber, centerline, save_png=False):
         PIL Image or None
     """
 
-
-    autotrace_bin = shutil.which('autotrace')
+    autotrace_bin = shutil.which("autotrace")
     if not autotrace_bin:
-        print('ERROR: The autotrace binary is not in your PATH')
+        print("ERROR: The autotrace binary is not in your PATH")
         sys.exit(1)
-
 
     filenameonly = Path(filename).stem
     # the inspect returns this functions name
     myname = inspect.currentframe().f_code.co_name
 
-    indir = create_workdir(filename, myname + '-1-in')
-    epsdir = create_workdir(filename, myname + '-2-eps')
-    epsdir_big = create_workdir(filename, myname + '-4-eps_big')
-    pngdir = create_workdir(filename, myname + '-3-png')
+    indir = create_workdir(filename, myname + "-1-in")
+    epsdir = create_workdir(filename, myname + "-2-eps")
+    epsdir_big = create_workdir(filename, myname + "-4-eps_big")
+    pngdir = create_workdir(filename, myname + "-3-png")
 
-    infile = indir + '/' + filenameonly + '_{0:06d}'.format(framenumber) + ".tga"
-    epsfile = epsdir + '/' + filenameonly + '_{0:06d}'.format(framenumber) + ".eps"
-    epsfile_big = epsdir_big + '/' + filenameonly + '_{0:06d}'.format(framenumber) + ".eps"
-    pngfile = pngdir + '/' + filenameonly + '_{0:06d}'.format(framenumber) + ".png"
+    infile = indir + "/" + filenameonly + "_{0:06d}".format(framenumber) + ".tga"
+    epsfile = epsdir + "/" + filenameonly + "_{0:06d}".format(framenumber) + ".eps"
+    epsfile_big = epsdir_big + "/" + filenameonly + "_{0:06d}".format(framenumber) + ".eps"
+    pngfile = pngdir + "/" + filenameonly + "_{0:06d}".format(framenumber) + ".png"
 
     if file_not_exist(infile):
-        #print('file not exist writing:', infile)
+        # print('file not exist writing:', infile)
         # can give any format you like base on extentions .tga
         img.save(infile)
 
     if file_not_exist(epsfile):
-        call_list = [ autotrace_bin,
-                      infile,
-                      '--output-file', epsfile,
-                      '--despeckle-level', '20'
-                    ]
+        call_list = [autotrace_bin, infile, "--output-file", epsfile, "--despeckle-level", "20"]
 
         if centerline:
-            call_list.append('--centerline')
+            call_list.append("--centerline")
 
-        print('calling : ', ' '.join( quotelib.quote(call_list)))
-     #   input('xxx abcd ...')
+        print("calling : ", " ".join(quotelib.quote(call_list)))
+        #   input('xxx abcd ...')
         result = run(call_list, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-        print('autotrace returncode={}, stdout={}, stderr={}'.format(result.returncode, result.stdout, result.stderr))
+        print(
+            "autotrace returncode={}, stdout={}, stderr={}".format(
+                result.returncode, result.stdout, result.stderr
+            )
+        )
 
         if result.returncode:
-            print('FAILED: ', myname)
-            print('returncode = ', result.returncode)
-            print('stdout = ', result.stderr)
-            print('stderr = ', result.stderr)
+            print("FAILED: ", myname)
+            print("returncode = ", result.returncode)
+            print("stdout = ", result.stderr)
+            print("stderr = ", result.stderr)
             sys.exit(1)
     #
     # Premiere can read eps files directly so we do not need to save these
@@ -105,11 +103,11 @@ def autotrace(img, filename, framenumber, centerline, save_png=False):
             im = open_eps(epsfile, 3840)
             im.save(pngfile)
 
-    print('about to consider upressing eps', epsfile_big)
+    print("about to consider upressing eps", epsfile_big)
     if file_not_exist(epsfile_big):
-        print('upressing eps')
+        print("upressing eps")
         resize_eps(epsfile, epsfile_big)
     else:
-        print('upressed eps already exists!')
+        print("upressed eps already exists!")
 
     return im or None

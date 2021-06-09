@@ -16,20 +16,17 @@ from frameoverframe.rename_uniq import rename_uniq_file, rename_uniq_dir
 
 
 def collect_args():
-    ''' collect commandline arguments '''
+    """collect commandline arguments"""
 
-    parser = argparse.ArgumentParser(
-        description='commandline file processor python template ')
+    parser = argparse.ArgumentParser(description="commandline file processor python template ")
 
-    parser.add_argument("input", nargs='*',
-                        default=None, help="folder(s) of files to rename")
+    parser.add_argument("input", nargs="*", default=None, help="folder(s) of files to rename")
 
     return parser
 
 
-
 def main():
-    ''' do the main thing '''
+    """do the main thing"""
 
     parser = collect_args()
     args = parser.parse_args()
@@ -39,14 +36,13 @@ def main():
         return 0
 
     for single_input in args.input:
-        if not  os.path.isdir(single_input):
-            print('ERROR: input is not a directory: ' + single_input)
+        if not os.path.isdir(single_input):
+            print("ERROR: input is not a directory: " + single_input)
             parser.print_help()
             return 1
 
         if os.path.isdir(single_input):
             rename_uniq_dir(single_input)
-
 
     return 0
 
