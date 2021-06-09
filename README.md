@@ -15,6 +15,22 @@ A collection of scripts for working with image sequences, timelapse's or just st
 
 ***thin.py*** - reduce files from a folder by keeping 1 file and skip a number of files, does not recurse into sum folder.
 
+***deflicker.py*** - adjust brightness of images to reduce flickering.
+
+***img2vid.py*** - combine image frames to create a video.
+
+***vid2img.py*** - extract image frames from a video.
+
+***raw2dng.py*** - convert raw format images to dng format.
+
+***recombine.py*** - recombine a list of directories to be combined and renumbered.
+
+***rename_uniq.py*** - rename individual files so they have a prefix matching the enclosing folder.
+
+***test_image.py*** - test image in every input folder.
+
+***unmix.py*** - rename images with their extensions to separate images that have different formats. 
+
 
 # tracer.py
 
