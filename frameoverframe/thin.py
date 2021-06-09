@@ -104,7 +104,6 @@ def thin(src_dir, every, dst_dir=None, inplace=False):
 
             print(f"{src_dir=}, {src_name=}")
 
-            input("ccc")
             src = os.path.join(src_dir, src_name)
             dst = os.path.join(dst_dir, dst_name)
 

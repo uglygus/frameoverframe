@@ -19,9 +19,7 @@ def exif_creation_date(filename):
         fh = open(filename, "rb")
     except FileNotFoundError:
         return ()
-
     tags = exifread.process_file(fh, stop_tag="DateTimeOriginal", details=False)
-
     try:
         exifdate = tags["EXIF DateTimeOriginal"].printable
     except KeyError:

@@ -165,7 +165,8 @@ def renumber(
                 os.path.basename(src_dir), "renumbered", uuid.uuid4().hex[:8]
             )
 
-            dst_dir = os.path.join(os.path.dirname(src_dir), renumbered_dir_name)
+            dst_dir = os.path.join(os.path.dirname(src_dir),
+                                   renumbered_dir_name)
             if not os.path.exists(dst_dir):
                 os.makedirs(dst_dir)
 
