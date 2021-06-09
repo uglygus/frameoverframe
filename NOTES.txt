@@ -24,6 +24,6 @@ open ./_build/html/index.html
 
 
 
-pre-commit goot hooks
+pre-commit boot hooks
   isort --profile black .
   black --line-length 100 .
