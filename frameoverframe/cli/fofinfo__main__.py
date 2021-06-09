@@ -8,8 +8,7 @@ import argparse
 import os
 import sys
 
-from PIL import Image
-from PIL import ImageStat
+from PIL import Image, ImageStat
 
 import frameoverframe.info as info
 import frameoverframe.utils as utils

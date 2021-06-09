@@ -16,9 +16,8 @@ docstring for more.
 """
 import os
 import shutil
-import uuid
 import sys
-
+import uuid
 
 import frameoverframe.utils as utils
 

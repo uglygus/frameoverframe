@@ -6,8 +6,8 @@ option to run recursively
 """
 
 import argparse
-import os
 import errno
+import os
 import subprocess
 import sys
 

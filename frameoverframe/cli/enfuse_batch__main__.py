@@ -9,17 +9,16 @@
     brew cask install hugin
 """
 
-from subprocess import run, PIPE
-import os
 import argparse
-import sys
+import multiprocessing
+import os
 import random
 import shutil
+import sys
 from pathlib import Path
-import multiprocessing
+from subprocess import PIPE, run
 
 from PIL import Image
-
 
 from frameoverframe.enfuse_batch import process_dir
 

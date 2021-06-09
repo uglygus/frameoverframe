@@ -4,17 +4,16 @@ Adobe DNG Converter wrapper
 
 """
 
-import subprocess
 import os
 import shutil
+import subprocess
 import sys
-from PIL import Image
 import tempfile
 
-
+from PIL import Image
 from quotelib import quote
 
-from frameoverframe.utils import sorted_listdir, test_one_extension
+import frameoverframe.utils as utils
 from frameoverframe.unmix import unmix
 import frameoverframe.utils as utils
 

@@ -20,11 +20,12 @@ Options:
     https://github.com/MaxNoe/timelapse-deflicker
 """
 
-import sys
-import os
 import logging
-from docopt import docopt, DocoptExit
-from schema import Schema, And, Or, Use, SchemaError
+import os
+import sys
+
+from docopt import DocoptExit, docopt
+from schema import And, Or, Schema, SchemaError, Use
 
 from frameoverframe.deflicker import deflicker, find_images
 from frameoverframe.utils import create_workdir

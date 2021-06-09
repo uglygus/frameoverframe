@@ -4,9 +4,9 @@
 
 """
 
+import argparse
 import os
 import sys
-import argparse
 
 from frameoverframe.align_image_stack_sequence import align_image_stack_sequence
 
