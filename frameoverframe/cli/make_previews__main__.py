@@ -17,7 +17,6 @@ from frameoverframe.img2vid import img2vid
 from frameoverframe.utils import sorted_listdir
 
 
-
 def collect_args():
     """collect commandline arguments"""
 
