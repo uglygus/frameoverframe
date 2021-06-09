@@ -17,49 +17,76 @@ docstring for more.
 
 """
 
-import os
-import shutil
-import uuid
 import argparse
-import sys
+import os
 import re
+import shutil
+import sys
+import uuid
 
 from frameoverframe.renumber import renumber
 
+
 def collect_args():
-    """ collect commandline arguments """
+    """collect commandline arguments"""
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('src_dir',
+    parser.add_argument(
+        "src_dir",
         help="Source directory. ",
     )
 
-    parser.add_argument( "-o", "--dst_dir", type=str, default=None,
+    parser.add_argument(
+        "-o",
+        "--dst_dir",
+        type=str,
+        default=None,
         help="Destination directory",
     )
 
-    parser.add_argument( "--safe", action="store_true", default=False,
+    parser.add_argument(
+        "--safe",
+        action="store_true",
+        default=False,
         help="Copy files to a new direcotory otherwise they are renamed inplace. (default False)",
     )
 
-    parser.add_argument( "-s", "--sort-method", type=str, default=None, choices = ['name', 'exif_date'],
+    parser.add_argument(
+        "-s",
+        "--sort-method",
+        type=str,
+        default=None,
+        choices=["name", "exif_date"],
         help="Method to use when sorting files: 'name' or 'exif_date' ",
     )
 
-    parser.add_argument( "-S", "--start_at", type=int, default=0,
+    parser.add_argument(
+        "-S",
+        "--start_at",
+        type=int,
+        default=0,
         help="Start number for renaming sequence. (default 0)",
     )
 
-    parser.add_argument( "-x", "--prefix", type=str, default=None,
+    parser.add_argument(
+        "-x",
+        "--prefix",
+        type=str,
+        default=None,
         help="Prefix. (default no prefix). '' empty string will strip any existing prefix. The special word :folder will use the enclosing folder's name as the prefix.",
     )
 
-    parser.add_argument( "-p", "--padding", type=int, default=5,
+    parser.add_argument(
+        "-p",
+        "--padding",
+        type=int,
+        default=5,
         help="How many digits for number. (default 5) eg. 00001.jpg",
     )
 
     return parser
+
 
 def main():
     """
@@ -71,19 +98,20 @@ def main():
     parser = collect_args()
     args = parser.parse_args()
 
-    if args.prefix == ':folder':
-        prefix = os.path.basename( os.path.normpath(args.src_dir))
+    if args.prefix == ":folder":
+        prefix = os.path.basename(os.path.normpath(args.src_dir))
         args.prefix = prefix
 
     renumber(
         args.src_dir,
-        dst_dir = args.dst_dir,
-        inplace = not args.safe,
-        sort_method = args.sort_method,
-        start_at = args.start_at,
-        prefix = args.prefix,
-        padding = args.padding,
+        dst_dir=args.dst_dir,
+        inplace=not args.safe,
+        sort_method=args.sort_method,
+        start_at=args.start_at,
+        prefix=args.prefix,
+        padding=args.padding,
     )
+
 
 if __name__ == "__main__":
     sys.exit(main())

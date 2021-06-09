@@ -21,38 +21,38 @@ becomes:
 ignores .DS_Store files
 
 """
-import os
-import shutil
 import argparse
-import sys
+import os
 import re
+import shutil
+import sys
 
-import  frameoverframe.utils as utils
+import frameoverframe.utils as utils
+
 
 def new_dirname(src_dir, ext):
-    """ returns a new dirname based on ext of a file
-        takes into account any trailing digits and keeps them trailing
+    """returns a new dirname based on ext of a file
+    takes into account any trailing digits and keeps them trailing
 
-        src_dir  the original dir
-        ext      the extension of one of the files in src_dir
+    src_dir  the original dir
+    ext      the extension of one of the files in src_dir
 
-        eg: new_dirname(/path/to/final_01, 'JPG')
+    eg: new_dirname(/path/to/final_01, 'JPG')
 
-        Returns(str):
-            /path/to/final_JPG_01
+    Returns(str):
+        /path/to/final_JPG_01
     """
 
- 	# does it end in numbers _01 ? If so keep the numbers at the end.
- 	
-    m = re.search("_[0-9]+$", os.path.basename(src_dir))
- 
-    if m:
-        stripped = re.sub("_[0-9]+$", '',  os.path.basename(src_dir))
-        newdir = stripped + '_' + ext + m[0]        
-    else:
-        newdir=os.path.basename(src_dir) + '_' + ext 
-    return os.path.join(os.path.dirname(src_dir), newdir )
+    # does it end in numbers _01 ? If so keep the numbers at the end.
 
+    m = re.search("_[0-9]+$", os.path.basename(src_dir))
+
+    if m:
+        stripped = re.sub("_[0-9]+$", "", os.path.basename(src_dir))
+        newdir = stripped + "_" + ext + m[0]
+    else:
+        newdir = os.path.basename(src_dir) + "_" + ext
+    return os.path.join(os.path.dirname(src_dir), newdir)
 
 
 def unmix(src_dir):
@@ -70,27 +70,26 @@ def unmix(src_dir):
 
     file_list = []
     ext_list = utils.ext_list(src_dir)
-    
-    if len(ext_list) <= 1 :
-        print('unmix: Looks good folder is already unmixed.', src_dir)
+
+    if len(ext_list) <= 1:
+        print("unmix: Looks good folder is already unmixed.", src_dir)
         return
 
     for ext in ext_list:
-        ext = ext.lstrip('.')
+        ext = ext.lstrip(".")
         try:
-            os.mkdir( new_dirname(src_dir, ext) )
+            os.mkdir(new_dirname(src_dir, ext))
         except FileExistsError:
-            print('ERROR: Directory already exists. ', new_dirname(src_dir, ext) )
+            print("ERROR: Directory already exists. ", new_dirname(src_dir, ext))
             return
 
-
     for item in os.listdir(src_dir):
-        if item == '.DS_Store':
+        if item == ".DS_Store":
             continue
 
         ext = os.path.splitext(os.path.split(item)[1])[1]
-        ext = ext.lstrip('.')
+        ext = ext.lstrip(".")
 
-        shutil.move(os.path.join(src_dir,item), new_dirname(src_dir, ext))
+        shutil.move(os.path.join(src_dir, item), new_dirname(src_dir, ext))
 
     shutil.rmtree(src_dir)

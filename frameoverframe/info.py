@@ -8,54 +8,57 @@ getbrightness()
 
 """
 
-from datetime import datetime
 import math
+from datetime import datetime
 
-
-from PIL import Image
-from PIL import ImageStat
-import matplotlib.pyplot as plt
 import exifread
+import matplotlib.pyplot as plt
+from PIL import Image, ImageStat
 
-import  frameoverframe.utils as utils
+import frameoverframe.utils as utils
+
 
 def print_exif_tags(filename, alltags=False):
 
     # Open image file for reading (binary mode)
-    f = open(filename, 'rb')
+    f = open(filename, "rb")
     tags = exifread.process_file(f)
- 
+
     if not tags:
-        print(f'No EXIF tags : {filename}') 
-    else: 
-        print(f'{filename}') 
+        print(f"No EXIF tags : {filename}")
+    else:
+        print(f"{filename}")
 
-
-    
     for tag in tags.keys():
 
         if alltags:
-            if tag not in ('JPEGThumbnail', 'TIFFThumbnail'):
+            if tag not in ("JPEGThumbnail", "TIFFThumbnail"):
                 print(f"{tag} == {tags[tag]}")
-        else:            
-            if tag in ('Image Model', 'EXIF ExifImageWidth', 'EXIF ExifImageLength', 
-                       'EXIF ExposureTime', 'EXIF FNumber', 'Image DateTime', 
-                       'LensModel', 'MakerNote WhiteBalance'):
+        else:
+            if tag in (
+                "Image Model",
+                "EXIF ExifImageWidth",
+                "EXIF ExifImageLength",
+                "EXIF ExposureTime",
+                "EXIF FNumber",
+                "Image DateTime",
+                "LensModel",
+                "MakerNote WhiteBalance",
+            ):
                 print(f"{tag} :  {tags[tag]}")
 
 
 def get_brightness(filename):
-    ''' Average pixels, then transform to "perceived brightness".
-        sourced from here:
-        https://stackoverflow.com/questions/3490727/what-are-some-methods-to-analyze-image-brightness-using-python
-    '''
+    """Average pixels, then transform to "perceived brightness".
+    sourced from here:
+    https://stackoverflow.com/questions/3490727/what-are-some-methods-to-analyze-image-brightness-using-python
+    """
     im = Image.open(filename)
     stat = ImageStat.Stat(im)
-    print(filename, ' stat= ', stat)
+    print(filename, " stat= ", stat)
     r, g, b = stat.mean
 
-    return math.sqrt(0.241*(r**2) + 0.691*(g**2) + 0.068*(b**2))
-
+    return math.sqrt(0.241 * (r ** 2) + 0.691 * (g ** 2) + 0.068 * (b ** 2))
 
 
 def fps_single(img1, img2):
@@ -73,18 +76,17 @@ def fps_single(img1, img2):
 
     """
 
-
     ## todo turn these into epochs so we can do some math
 
     img1date = utils.exif_creation_date(img1)
     img2date = utils.exif_creation_date(img2)
-    
+
     # these will be None if there is no date in the exif
     if not img1date or not img2date:
         return 0
-    
-    img1date = datetime.strptime(img1date, '%Y:%m:%d %H:%M:%S')
-    img2date = datetime.strptime(img2date, '%Y:%m:%d %H:%M:%S')
+
+    img1date = datetime.strptime(img1date, "%Y:%m:%d %H:%M:%S")
+    img2date = datetime.strptime(img2date, "%Y:%m:%d %H:%M:%S")
 
     diff = img2date - img1date
 
@@ -105,7 +107,7 @@ def fps_dir(input_dir):
     """
 
     files = utils.sorted_listdir(input_dir)
-    prev = ''
+    prev = ""
     prev = files[0]
 
     diffs = []
@@ -113,17 +115,17 @@ def fps_dir(input_dir):
 
         diff = fps_single(prev, f)
         diffs.append(diff)
-        #print(diff)
+        # print(diff)
         prev = f
 
-    avg = sum(diffs)/len(diffs)
-    print("The average is fps as shot is ", round(avg,2), "seconds between frames.")
+    avg = sum(diffs) / len(diffs)
+    print("The average is fps as shot is ", round(avg, 2), "seconds between frames.")
 
     plt.plot(diffs)
     plt.title(input_dir)
-    plt.ylabel('seconds')
-    plt.xlabel('frame #')
+    plt.ylabel("seconds")
+    plt.xlabel("frame #")
     plt.show()
 
 
-#def info(input_dir)
+# def info(input_dir)
