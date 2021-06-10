@@ -5,11 +5,7 @@ python template to process command line files and folders
 option to run recursively
 """
 
-import argparse
-import errno
 import os
-import subprocess
-import sys
 
 
 def already_renamed(filename):
@@ -35,7 +31,7 @@ def rename_uniq_file(filename):
 
     directory = os.path.split(filename)[0]
     file = os.path.split(filename)[1]
-    ext = os.path.splitext(os.path.split(filename)[1])[1]
+    # ext = os.path.splitext(os.path.split(filename)[1])[1]
     enc_dirname = os.path.basename(os.path.split(filename)[0])
 
     #     print('rename_uniq_file::')

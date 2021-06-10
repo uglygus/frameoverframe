@@ -27,13 +27,13 @@ import sys
 
 from PIL import Image
 
-Image.MAX_IMAGE_PIXELS = 244022272
+
 import tempfile
 
 from quotelib import quote
-
-import frameoverframe.utils as utils
 from frameoverframe.utils import sorted_listdir, test_one_extension
+
+Image.MAX_IMAGE_PIXELS = 244022272
 
 
 def img2vid(input_dirs, output_file, profile="preview", framenumber=False):
@@ -53,7 +53,7 @@ def img2vid(input_dirs, output_file, profile="preview", framenumber=False):
             return
 
     #     profileff=''
-    ## these need a space at the end!  #y=h-(2*lh): "
+    # these need a space at the end!  #y=h-(2*lh): "
 
     print(f"--------------ddd {framenumber=}")
 
@@ -78,7 +78,9 @@ def img2vid(input_dirs, output_file, profile="preview", framenumber=False):
         suffix = "_preview"
         outfile_ext = ".mp4"
 
-        # ffmpeg -i input -vf "drawtext=fontfile=System/Library/Fonts/Supplemental/Arial.ttf: text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=200: box=1: boxcolor=white: boxborderw=5" -c:a copy output
+        # ffmpeg -i input -vf "drawtext=fontfile=System/Library/Fonts/Supplemental/Arial.ttf: " \
+        # "text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: " \
+        # "fontsize=200: box=1: boxcolor=white: boxborderw=5" -c:a copy output
 
         ffmpeg_settings = [
             "-r",
@@ -92,10 +94,12 @@ def img2vid(input_dirs, output_file, profile="preview", framenumber=False):
             # '-vf', "scale=1920:-1:",
             "-vf",
             "scale=1920:-2"
-            + fnumber_filter,  # largest size is 1920x? DOES NOT CROP    These need a SPACE after them
+            + fnumber_filter,  # largest size is 1920x? DOES NOT CROP. Needs a SPACE after them?
         ]
 
-    #    ffmpeg_settings.append("-vf",  "drawtext=fontfile=Arial.ttf: text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=200: box=1: boxcolor=white: boxborderw=5",
+    #    ffmpeg_settings.append("-vf",  "drawtext=fontfile=Arial.ttf: text='%{frame_num}'" \
+    #     ": start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=200: box=1:" \
+    #     "boxcolor=white: boxborderw=5",
     #  ])
 
     elif profile == "best_h264":
@@ -117,7 +121,8 @@ def img2vid(input_dirs, output_file, profile="preview", framenumber=False):
             "-vf",
             "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
             + fnumber_filter,  # fit in UHD4k and crop as needed
-            # '-vf', "scale=3840:2160:force_original_aspect_ratio=decrease,pad=3840:2160:-1:-1:color=black",  # fit in UHD4k and pad
+            # '-vf', "scale=3840:2160:force_original_aspect_ratio=decrease," \
+            # "pad=3840:2160:-1:-1:color=black",  # fit in UHD4k and pad
         ]
 
     elif profile == "best_mxf":
@@ -137,12 +142,13 @@ def img2vid(input_dirs, output_file, profile="preview", framenumber=False):
             "-vf",
             "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
             + fnumber_filter,  # fit in UHD4k and crop as needed
-            # '-vf', "scale=3840:2160:force_original_aspect_ratio=decrease,pad=3840:2160:-1:-1:color=black",  # fit in UHD4k and pad
+            # '-vf', "scale=3840:2160:force_original_aspect_ratio=decrease," \
+            # "pad=3840:2160:-1:-1:color=black",  # fit in UHD4k and pad
         ]
 
     else:
         print(
-            'ERRROR: img2vid profile not supported: allowed values are "preview", "best" supplied: ',
+            'ERROR: img2vid profile not supported: allowed values are "preview", "best" supplied: ',
             profile,
         )
         raise
@@ -159,7 +165,7 @@ def img2vid(input_dirs, output_file, profile="preview", framenumber=False):
 
     try:
         im = Image.open(sorted_listdir(input_dirs[0])[0])
-    except DecompressionBombError:
+    except Image.DecompressionBombError:
         print(
             "Image is too large fro PIL to open. "
             ' Change this line: PIL.Image.MAX_IMAGE_PIXELS = 244022272" in img2vid.py'
@@ -183,7 +189,7 @@ def img2vid(input_dirs, output_file, profile="preview", framenumber=False):
 
     ext = os.path.splitext(sorted_listdir(input_dirs[0])[0])[1]
 
-    images = []
+    # images = []
     counter = 0
     for input_dir in input_dirs:
         this_dir_images = sorted_listdir(input_dir)
@@ -195,7 +201,6 @@ def img2vid(input_dirs, output_file, profile="preview", framenumber=False):
                 print("ERROR: CR2 is not a recognized image format for ffmeg.", image)
                 sys.exit(1)
 
-            # print('making link: {} --> {}'.format(image, os.path.join(tmp_link_dir, '{:08}{}'.format(counter, ext))))
             os.symlink(image, os.path.join(tmp_link_dir, "{:08}{}".format(counter, ext)))
             counter += 1
 

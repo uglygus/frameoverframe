@@ -15,9 +15,7 @@ specify the start number of sequence etc. Please read through the renumber()
 docstring for more.
 
 """
-import argparse
 import os
-import re
 import shutil
 import sys
 import uuid
@@ -71,10 +69,10 @@ def thin(src_dir, every, dst_dir=None, inplace=False):
             if inplace:
                 dst_dir = one_src_dir
             else:
-                dateTimeObj = datetime.now()
+                # dateTimeObj = datetime.now()
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S)")
                 print("Current Timestamp : ", timestamp)
-                dir_only = os.path.basename(one_src_dir)
+                # dir_only = os.path.basename(one_src_dir)
                 thinned_dir_name = "{0}_{1}_{2}".format(
                     os.path.basename(one_src_dir), "thinned", timestamp
                 )
@@ -93,7 +91,7 @@ def thin(src_dir, every, dst_dir=None, inplace=False):
 
         file_name, ext = os.path.splitext(file_list[0])
         name_part, num_part = utils._split_name_number(file_name)
-        prefix = name_part
+        # prefix = name_part
 
         for f in file_list:
             #  file_name, ext = os.path.splitext(file_list[0])

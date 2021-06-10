@@ -6,6 +6,9 @@ import shutil
 import sys
 from pathlib import Path
 from subprocess import PIPE, run
+from PIL import Image
+import math
+import time
 
 import exifread
 import quotelib
@@ -82,7 +85,7 @@ def ext_list(directorypath):
 
     for item in dirlist:
         ext = os.path.splitext(os.path.split(item)[1])[1]
-        if not ext in extlist:
+        if ext not in extlist:
             extlist.append(ext)
 
     return extlist
@@ -205,7 +208,7 @@ def get_eps_size(epsfile):
     width = None
     height = None
 
-    pattern = re.compile("%%BoundingBox: (\d*) (\d*) (\d+) (\d+)")
+    pattern = re.compile(r"%%BoundingBox: (\d*) (\d*) (\d+) (\d+)")
 
     for i, line in enumerate(open(epsfile, "r")):
         m = re.search(pattern, line)
@@ -225,7 +228,7 @@ def _split_name_number(name):
     # 'foo2bar003baz', '001'
     #
 
-    regex = "^(.*?)(\d*)$"
+    regex = r"^(.*?)(\d*)$"
     m = re.search(regex, name)
     name_part = m.group(1)
     num_part = m.group(2)
@@ -296,21 +299,21 @@ def replace_eps_bounding_box(newx, newy, filepath):
     new_highres_bounding_box = "{} 0.00 0.00 {:4.2f} {:4.2f}".format(bounding_box, newx, newy)
 
     # Safely read the input filename using 'with'
-    with open(filename) as f:
+    with open(filepath) as f:
         s = f.read()
         if bounding_box not in s:
             print('"{}" not found in {}.'.format(bounding_box, filepath))
             # return
         if hires_bounding_box not in s:
-            print('"{}" not found in {}.'.format(highres_bounding_box, filepath))
+            print('"{}" not found in {}.'.format(hires_bounding_box, filepath))
             # return
 
     # Safely write the changed content, if found in the file
-    with open(filename, "w") as f:
+    with open(filepath, "w") as f:
         for line in s:
             if bounding_box in line:
                 f.write(new_bounding_box)
-            elif highres_bounding_box in line:
+            elif hires_bounding_box in line:
                 f.write(new_highres_bounding_box)
             else:
                 f.write(line)
@@ -350,7 +353,7 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
         "-q",  # quiet
         "-dBATCH",  # exit after last file
         "-o",
-        outfile,  #   quotelib.quote(outfile),
+        outfile,  # quotelib.quote(outfile),
         "-sDEVICE=eps2write",
         "-dDEVICEWIDTHPOINTS={}".format(newsize[0]),
         "-dDEVICEHEIGHTPOINTS={}".format(newsize[1]),

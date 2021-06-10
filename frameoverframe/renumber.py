@@ -123,7 +123,8 @@ def renumber(
     if sort_method is None:
         if file_list_name != file_list_date:
             print(
-                f"STOPPING: Alphanumeric order and exif date order do not match!. Specify a --sort_method on the commandline. For dir: {src_dir}"
+                f"STOPPING: Alphanumeric order and exif date order do not match!. "
+                f"Specify a --sort_method on the commandline. For dir: {src_dir}"
             )
 
             for i in enumerate(file_list_name):  # range(len(file_list_name)):

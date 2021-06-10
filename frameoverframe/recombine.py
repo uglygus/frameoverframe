@@ -161,7 +161,7 @@ def recombine(
     # remove = 20200810_132823
     # ~recombined_20200810_133221
     # ~recombined_dddddddd_dddddd
-    p = re.compile("(.+)~recombined_\d\d\d\d\d\d\d\d_\d\d\d\d\d\d")
+    p = re.compile(r"(.+)~recombined_\d\d\d\d\d\d\d\d_\d\d\d\d\d\d")
     for directory in dst_dirs:
         m = p.search(directory)
         if m is None:

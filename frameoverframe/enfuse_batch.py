@@ -233,7 +233,8 @@ def process_dir(num, hardmask, shuffle_frames, skip_frames, method, input_dir, o
 
             if method == "enfuse":
                 enfuse(image_path, output_file, counter, hardmask)
-            #                     p = multiprocessing.Process(target=enfuse, args=(image_path, output_file, counter, hardmask))
+            #                     p = multiprocessing.Process(target=enfuse,
+            #                         args=(image_path, output_file, counter, hardmask))
             #                     input('a...')
             #                     jobs.append(p)
             #                     input('b...')
@@ -242,13 +243,15 @@ def process_dir(num, hardmask, shuffle_frames, skip_frames, method, input_dir, o
 
             elif method == "convert":
                 convert(image_path, output_file, counter)
-            #                     p = multiprocessing.Process(target=convert, args=(image_path, output_file, counter))
+            #                     p = multiprocessing.Process(target=convert,
+            #                         args=(image_path, output_file, counter))
             #                     jobs.append(p)
             #                     p.start()
 
             elif method == "pil":
                 pil(image_path, output_file, counter)
-            #                     p = multiprocessing.Process(target=pil, args=(image_path, output_file, counter))
+            #                     p = multiprocessing.Process(target=pil,
+            #                     args=(image_path, output_file, counter))
             #                     jobs.append(p)
             #                     p.start()
 

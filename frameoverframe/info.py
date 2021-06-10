@@ -76,7 +76,7 @@ def fps_single(img1, img2):
 
     """
 
-    ## todo turn these into epochs so we can do some math
+    # todo turn these into epochs so we can do some math
 
     img1date = utils.exif_creation_date(img1)
     img2date = utils.exif_creation_date(img2)
@@ -126,6 +126,3 @@ def fps_dir(input_dir):
     plt.ylabel("seconds")
     plt.xlabel("frame #")
     plt.show()
-
-
-# def info(input_dir)

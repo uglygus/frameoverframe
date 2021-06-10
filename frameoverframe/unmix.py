@@ -21,11 +21,9 @@ becomes:
 ignores .DS_Store files
 
 """
-import argparse
 import os
 import re
 import shutil
-import sys
 
 import frameoverframe.utils as utils
 
@@ -68,7 +66,6 @@ def unmix(src_dir):
 
     """
 
-    file_list = []
     ext_list = utils.ext_list(src_dir)
 
     if len(ext_list) <= 1:

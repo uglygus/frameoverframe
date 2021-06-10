@@ -11,7 +11,6 @@
     can be run from the commandline or used as a python module
 """
 
-import argparse
 import os
 import shutil
 import sys

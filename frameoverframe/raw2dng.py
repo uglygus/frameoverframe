@@ -4,13 +4,10 @@ Adobe DNG Converter wrapper
 
 """
 
-import os
 import shutil
 import subprocess
 import sys
-import tempfile
 
-from PIL import Image
 from quotelib import quote
 
 import frameoverframe.utils as utils
@@ -46,7 +43,7 @@ def raw2dng(input_dirs, output_dir):
     input_dirs.sort()
 
     for _dir in input_dirs:
-        for file in sorted_listdir(_dir):
+        for file in utils.sorted_listdir(_dir):
             winfile = WSL_path_converter(file)
             sys_call = [Adobe_DNG_Converter_exe, "-c", winfile]
             print("calling - RAW==", sys_call)

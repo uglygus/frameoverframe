@@ -9,13 +9,11 @@ import os
 import shutil
 import subprocess
 import sys
-import tempfile
 
-from PIL import Image
 from quotelib import quote
 
-import frameoverframe.utils as utils
-from frameoverframe.utils import sorted_listdir, test_one_extension
+# import frameoverframe.utils as utils
+# from frameoverframe.utils import sorted_listdir, test_one_extension
 
 
 def vid2img(input_mov, output_folder=None):
