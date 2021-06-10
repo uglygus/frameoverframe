@@ -19,7 +19,7 @@ from subprocess import PIPE, run
 
 import quotelib
 
-from .utils import resize_eps, create_workdir, file_not_exist, open_eps
+from .utils import create_workdir, file_not_exist, open_eps, resize_eps
 
 
 def autotrace(img, filename, framenumber, centerline, save_png=False):

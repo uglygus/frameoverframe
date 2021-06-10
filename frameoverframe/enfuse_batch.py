@@ -13,11 +13,12 @@ import multiprocessing
 import os
 import random
 import shutil
-import sys
 import subprocess
-# from subprocess import PIPE, run, call
+import sys
 
 from PIL import Image
+
+# from subprocess import PIPE, run, call
 
 
 def enfuse(infiles, output_file, counter, hardmask=False):
@@ -64,7 +65,13 @@ def enfuse(infiles, output_file, counter, hardmask=False):
         sys_call.append(item)
 
     print("calling :" + " ".join(sys_call))
-    result = subprocess.run(sys_call, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, check=False)
+    result = subprocess.run(
+        sys_call,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+        check=False,
+    )
 
     print(("returncode=", result.returncode))
 
@@ -73,7 +80,13 @@ def enfuse(infiles, output_file, counter, hardmask=False):
         while result.returncode != 0:
             print(("enfuse FAILED!!!=", result.returncode, times, " times"))
             print("!!-->" + " ".join(sys_call))
-            result = subprocess.run(sys_call, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, check=False)
+            result = subprocess.run(
+                sys_call,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
+                check=False,
+            )
             times += 1
 
 

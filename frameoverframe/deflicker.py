@@ -39,6 +39,7 @@ def getProgressBar(logger, level=logging.INFO, **kwargs):
         # prog = lambda x: x
         def prog(x):
             return x
+
     return prog
 
 
