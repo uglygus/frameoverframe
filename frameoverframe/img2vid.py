@@ -50,11 +50,6 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
             print("SKIPPING: Directory contails more than one extension. ", _dir)
             return
 
-    #     profileff=''
-    # these need a space at the end!  #y=h-(2*lh): "
-
-    print(f"--------------ddd {framenumber=}")
-
     if framenumber:
         fnumber_filter = (
             ","
@@ -69,87 +64,74 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
             "boxborderw=5"
         )
     else:
-        framenumber = ""
+        fnumber_filter = ""
 
     if profile == "preview":
 
         suffix = "_preview"
         outfile_ext = ".mp4"
 
-        # ffmpeg -i input -vf "drawtext=fontfile=System/Library/Fonts/Supplemental/Arial.ttf: " \
-        # "text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: " \
-        # "fontsize=200: box=1: boxcolor=white: boxborderw=5" -c:a copy output
+        # largest size is 1920x? DOES NOT CROP.
+        video_filter = "scale=1920:-2" + fnumber_filter
 
+        # fmt: off
         ffmpeg_settings = [
-            "-r",
-            "24000/1001",
-            "-vcodec",
-            "libx264",
-            "-pix_fmt",
-            "yuv420p",
-            "-preset",
-            "veryfast",
-            # '-vf', "scale=1920:-1:",
-            "-vf",
-            "scale=1920:-2"
-            + fnumber_filter,  # largest size is 1920x? DOES NOT CROP. Needs a SPACE after them?
+            "-loglevel", "error", '-stats',
+            "-r", "24000/1001",
+            "-vcodec", "libx264",
+            "-pix_fmt", "yuv420p",
+            "-preset", "veryfast",
+            "-vf", video_filter,
         ]
-
-    #    ffmpeg_settings.append("-vf",  "drawtext=fontfile=Arial.ttf: text='%{frame_num}'" \
-    #     ": start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=200: box=1:" \
-    #     "boxcolor=white: boxborderw=5",
-    #  ])
+        # fmt: on
 
     elif profile == "best_h264":
 
         suffix = "_best_h264"
         outfile_ext = ".mp4"
 
-        ffmpeg_settings = [
-            "-r",
-            "24000/1001",
-            "-vcodec",
-            "libx264",
-            "-crf",
-            "17",
-            "-pix_fmt",
-            "yuv422p",
-            "-preset",
-            "veryslow",
-            "-vf",
+        video_filter = (
             "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
-            + fnumber_filter,  # fit in UHD4k and crop as needed
-            # '-vf', "scale=3840:2160:force_original_aspect_ratio=decrease," \
-            # "pad=3840:2160:-1:-1:color=black",  # fit in UHD4k and pad
+            + fnumber_filter
+        )
+
+        # fmt: off
+        ffmpeg_settings = [
+            "-r", "24000/1001",
+            "-vcodec", "libx264",
+            "-crf", "17",
+            "-pix_fmt", "yuv422p",
+            "-preset", "veryslow",
+            "-vf", video_filter
         ]
+        # fmt: on
 
     elif profile == "best_mxf":
 
         suffix = "_best_mxf_sq"
         outfile_ext = ".mxf"
 
-        ffmpeg_settings = [
-            "-r",
-            "24000/1001",
-            "-vcodec",
-            "dnxhd",
-            "-profile:v",
-            "dnxhr_sq",
-            "-pix_fmt",
-            "yuv422p",
-            "-vf",
+        # fit in UHD4k and pad
+        video_filter = (
             "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
-            + fnumber_filter,  # fit in UHD4k and crop as needed
-            # '-vf', "scale=3840:2160:force_original_aspect_ratio=decrease," \
-            # "pad=3840:2160:-1:-1:color=black",  # fit in UHD4k and pad
+            + fnumber_filter
+        )
+        # fmt: off
+        ffmpeg_settings = [
+            "-r", "24000/1001",
+            "-vcodec", "dnxhd",
+            "-profile:v", "dnxhr_sq",
+            "-pix_fmt", "yuv422p",
+            "-vf", video_filter,
         ]
+        # fmt: on
 
     else:
         print(
             'ERROR: img2vid profile not supported: allowed values are "preview", "best" supplied: ',
             profile,
         )
-        raise
+        raise ValueError
 
     if output_file is None:
         print("setting output_filepath")
@@ -165,7 +147,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         im = Image.open(sorted_listdir(input_dirs[0])[0])
     except Image.DecompressionBombError:
         print(
-            "Image is too large fro PIL to open. "
+            "Image is too large for PIL to open. "
             ' Change this line: PIL.Image.MAX_IMAGE_PIXELS = 244022272" in img2vid.py'
         )
 
@@ -199,7 +181,9 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
                 print("ERROR: CR2 is not a recognized image format for ffmeg.", image)
                 sys.exit(1)
 
-            os.symlink(image, os.path.join(tmp_link_dir, "{:08}{}".format(counter, ext)))
+            os.symlink(
+                image, os.path.join(tmp_link_dir, "{:08}{}".format(counter, ext))
+            )
             counter += 1
 
     ffmpeg_bin = shutil.which("ffmpeg")
