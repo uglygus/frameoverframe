@@ -67,6 +67,7 @@ def unmix(src_dir):
     """
 
     ext_list = utils.ext_list(src_dir)
+
     ext_list.sort()
 
     if len(ext_list) <= 1:
@@ -83,7 +84,8 @@ def unmix(src_dir):
             os.mkdir(new_dir)
         except FileExistsError:
             print("ERROR: Directory already exists. ", new_dir)
-            return
+            raise
+
         new_dirs.append(new_dir)
 
     for item in os.listdir(src_dir):
