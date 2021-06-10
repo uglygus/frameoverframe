@@ -34,7 +34,7 @@ from frameoverframe.utils import sorted_listdir, test_one_extension
 Image.MAX_IMAGE_PIXELS = 244022272
 
 
-def img2vid(input_dirs, output_file, profile="preview", framenumber=False):
+def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
     """convert multiple image_dirs to a single video file"""
 
     print(" top of img2vid input_dirs=", input_dirs)
