@@ -97,4 +97,8 @@ def unmix(src_dir):
 
     shutil.rmtree(src_dir)
 
+    # new dirs is in alphabetical order so for both
+    # Canon and Sony cameras the JPG folder is second.
+    # Sony ['indir_ARW', 'indir_JPG']
+    # Canon ['indir_CR2, 'indir_JPG']
     return new_dirs
