@@ -97,4 +97,4 @@ def unmix(src_dir):
 
     shutil.rmtree(src_dir)
 
-    return (new_dirs)
+    return new_dirs
