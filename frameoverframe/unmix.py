@@ -55,30 +55,36 @@ def new_dirname(src_dir, ext):
 
 def unmix(src_dir):
     """
-    unmix's images that are stored in the same folder. This helps with Canon folders
-    which store the CR2 and JPG files in the same folder.
+    unmix's images that are stored in the same folder.
+    Canon puts CR2 and JPG together. Sony puts ARW and JPG together.
 
     Args:
         src_dir (str): Path to source directory containing the image sequences
 
     Returns():
-        none
+        new_dirs (list): newly created directories (in alphabetical order)
 
     """
 
     ext_list = utils.ext_list(src_dir)
+    ext_list.sort()
 
     if len(ext_list) <= 1:
         print("unmix: Looks good folder is already unmixed.", src_dir)
         return
 
+    new_dirs = []
+
     for ext in ext_list:
         ext = ext.lstrip(".")
+
+        new_dir = new_dirname(src_dir, ext)
         try:
-            os.mkdir(new_dirname(src_dir, ext))
+            os.mkdir(new_dir)
         except FileExistsError:
-            print("ERROR: Directory already exists. ", new_dirname(src_dir, ext))
+            print("ERROR: Directory already exists. ", new_dir)
             return
+        new_dirs.append(new_dir)
 
     for item in os.listdir(src_dir):
         if item == ".DS_Store":
@@ -90,3 +96,5 @@ def unmix(src_dir):
         shutil.move(os.path.join(src_dir, item), new_dirname(src_dir, ext))
 
     shutil.rmtree(src_dir)
+
+    return (new_dirs)
