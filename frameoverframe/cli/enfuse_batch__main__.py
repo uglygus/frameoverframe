@@ -27,7 +27,7 @@ def collect_args():
         "method",
         type=str,
         help="Method of averaging: 'convert' : ImageMagick -average, "
-             "'enfuse' : Hugin's enfuse, 'pil', python Pillow library.",
+        "'enfuse' : Hugin's enfuse, 'pil', python Pillow library.",
     )
 
     parser.add_argument("num", type=int, help="Number of images to combine per frame.")
@@ -38,7 +38,7 @@ def collect_args():
         type=int,
         default=1,
         help="Number of images to skip. Ususally for doing HDR "
-             "set this to the number of images in each set.",
+        "set this to the number of images in each set.",
     )
 
     parser.add_argument(
@@ -48,7 +48,7 @@ def collect_args():
         type=int,
         default=0,
         help="shuffle frames by XXX frames (default = 1000000). "
-             "Large default to get a completely random shuffle.",
+        "Large default to get a completely random shuffle.",
     )
 
     parser.add_argument(

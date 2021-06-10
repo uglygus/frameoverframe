@@ -70,8 +70,8 @@ def collect_args():
         type=str,
         default=":folder",
         help="Prefix. (default no prefix). '' empty string will "
-             "strip any existing prefix. The special word :folder will "
-             "use the enclosing first folder's name as the prefix. default :folder",
+        "strip any existing prefix. The special word :folder will "
+        "use the enclosing first folder's name as the prefix. default :folder",
     )
 
     parser.add_argument(
