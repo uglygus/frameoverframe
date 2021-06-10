@@ -112,8 +112,7 @@ def sorted_listdir(directory, ignore_hidden=True):
     for filename in names:
         if ignore_hidden and filename.startswith("."):
             continue
-        else:
-            fullpaths.append(os.path.join(directory, filename))
+        fullpaths.append(os.path.join(directory, filename))
 
     #  print(' sorted_listdir returning fullpaths == ', fullpaths)
     return fullpaths
@@ -151,8 +150,8 @@ def create_workdir(filename, action="", nested=True):
     # print('making outdir - ', outdir)
     try:
         os.makedirs(outdir, exist_ok=True)
-    except OSError as e:
-        print("ERROR: creating folder {} \n {} ".format(filename, e))
+    except OSError as error:
+        print("ERROR: creating folder {} \n {} ".format(filename, error))
         sys.exit()
 
     return outdir
@@ -177,22 +176,22 @@ def open_eps(filename, width=None):
     print("original=", original)
     scale = width / original[0]
     print("scale=", scale)
-    im = Image.open(filename)
+    img = Image.open(filename)
 
-    print("new im size = ", im.size)
+    print("new im size = ", img.size)
 
     if width is not None:
         print("scaling-loading")
-        im.load(scale=math.ceil(scale))
-        print("new im size after scaling = ", im.size)
+        img.load(scale=math.ceil(scale))
+        print("new im size after scaling = ", img.size)
     if scale != 1:
         print("scaling-thumbnail")
-        im.thumbnail([int(scale * d) for d in original], Image.ANTIALIAS)
-        print("new im size after thumbnail = ", im.size)
+        img.thumbnail([int(scale * d) for d in original], Image.ANTIALIAS)
+        print("new img_np size after thumbnail = ", img.size)
 
     print("sleeping 60...")
     time.sleep(60)
-    return im
+    return img
 
 
 def get_eps_size(epsfile):
@@ -358,7 +357,7 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
         "-dDEVICEWIDTHPOINTS={}".format(newsize[0]),
         "-dDEVICEHEIGHTPOINTS={}".format(newsize[1]),
         "-c",
-        '"<</Install {{ {:4.2f} {:4.2f} scale }}>> setpagedevice"'.format(scale, scale),
+        f'"<</Install {{ {scale:4.2f} {scale:4.2f} scale }}>> setpagedevice"',
         "-f",
         infile,
     ]
