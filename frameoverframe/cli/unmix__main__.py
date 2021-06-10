@@ -22,9 +22,6 @@ ignores .DS_Store files
 """
 
 import argparse
-import os
-import re
-import shutil
 import sys
 
 from frameoverframe.unmix import unmix
@@ -34,7 +31,8 @@ def collect_args():
     """collect commandline arguments"""
 
     parser = argparse.ArgumentParser(
-        description="Unmix's images that are stored in the same folder. This helps with Canon folders which store the CR2 and JPG files in the same folder."
+        description="Unmix's images that are stored in the same folder. "
+        "This helps with Canon folders which store the CR2 and JPG files in the same folder."
     )
 
     parser.add_argument(

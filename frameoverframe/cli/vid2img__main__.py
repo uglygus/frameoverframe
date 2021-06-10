@@ -27,7 +27,8 @@ def collect_args():
         default=None,
         help="output folder, default is the name of name_of_input_video",
     )
-    #    parser.add_argument('-p', '--profile', action='store', default='preview', choices={'preview', 'best'},
+    #    parser.add_argument('-p', '--profile', action='store', default='preview',
+    #                        choices={'preview', 'best'},
     #                        help='video file dimensions will be half the full dimentions.')
 
     return parser

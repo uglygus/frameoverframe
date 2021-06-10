@@ -9,11 +9,7 @@ Timelapses we end up using at 10x or 20x speed should be thinned.
 """
 
 import argparse
-import os
-import re
-import shutil
 import sys
-import uuid
 
 from frameoverframe.thin import thin
 

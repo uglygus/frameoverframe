@@ -19,10 +19,7 @@ docstring for more.
 
 import argparse
 import os
-import re
-import shutil
 import sys
-import uuid
 
 from frameoverframe.renumber import renumber
 
@@ -74,7 +71,9 @@ def collect_args():
         "--prefix",
         type=str,
         default=None,
-        help="Prefix. (default no prefix). '' empty string will strip any existing prefix. The special word :folder will use the enclosing folder's name as the prefix.",
+        help="Prefix. (default no prefix). '' empty string will strip any "
+        "existing prefix. The special word :folder will use the enclosing "
+        "folder's name as the prefix.",
     )
 
     parser.add_argument(
