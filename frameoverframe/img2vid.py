@@ -24,13 +24,11 @@ import os
 import shutil
 import subprocess
 import sys
-
-from PIL import Image
-
-
 import tempfile
 
+from PIL import Image
 from quotelib import quote
+
 from frameoverframe.utils import sorted_listdir, test_one_extension
 
 Image.MAX_IMAGE_PIXELS = 244022272

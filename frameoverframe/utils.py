@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
+import math
 import os
 import re
 import shutil
 import sys
+import time
 from pathlib import Path
 from subprocess import PIPE, run
-from PIL import Image
-import math
-import time
 
 import exifread
 import quotelib
+from PIL import Image
 
 
 def exif_creation_date(filename):
