@@ -15,7 +15,6 @@ import os
 import warnings
 
 import numpy as np
-import pkg_resources
 from progressbar import ProgressBar
 from skimage import img_as_float, img_as_ubyte, img_as_uint, io
 
@@ -37,7 +36,9 @@ def getProgressBar(logger, level=logging.INFO, **kwargs):
     if logger.getEffectiveLevel() <= level:
         prog = ProgressBar(**kwargs)
     else:
-        prog = lambda x: x
+        # prog = lambda x: x
+        def prog(x):
+            return x
     return prog
 
 

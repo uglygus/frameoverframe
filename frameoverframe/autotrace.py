@@ -12,7 +12,6 @@
 """
 
 import inspect
-import os
 import shutil
 import sys
 from pathlib import Path
@@ -20,7 +19,7 @@ from subprocess import PIPE, run
 
 import quotelib
 
-from .utils import *
+from .utils import resize_eps, create_workdir, file_not_exist, open_eps
 
 
 def autotrace(img, filename, framenumber, centerline, save_png=False):

@@ -9,14 +9,13 @@
     brew cask install hugin
 """
 
-import argparse
 import multiprocessing
 import os
 import random
 import shutil
 import sys
-from pathlib import Path
-from subprocess import PIPE, run
+import subprocess
+# from subprocess import PIPE, run, call
 
 from PIL import Image
 
@@ -65,16 +64,16 @@ def enfuse(infiles, output_file, counter, hardmask=False):
         sys_call.append(item)
 
     print("calling :" + " ".join(sys_call))
-    result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=False)
+    result = subprocess.run(sys_call, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, check=False)
 
     print(("returncode=", result.returncode))
 
     if result.returncode == -11:
         times = 1
-        while returncode != 0:
-            print(("enfuse FAILED!!!=", returncode, times, " times"))
+        while result.returncode != 0:
+            print(("enfuse FAILED!!!=", result.returncode, times, " times"))
             print("!!-->" + " ".join(sys_call))
-            result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=False)
+            result = subprocess.run(sys_call, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, check=False)
             times += 1
 
 
@@ -109,8 +108,6 @@ def pil(image_path, output_file, counter):
     print("counter=", counter)
     print("image_path=", image_path)
 
-    images = []
-
     count = 0
 
     img_master = Image.open(image_path[0])
@@ -118,9 +115,6 @@ def pil(image_path, output_file, counter):
     for image in image_path:
 
         alpha = len(image_path) * count / 2 / 100
-
-        print("image=", image)
-        print("alpha=", alpha)
 
         image_as_pill = Image.open(image)
         img_master = Image.blend(img_master, image_as_pill, alpha)
@@ -154,7 +148,8 @@ def process_dir(num, hardmask, shuffle_frames, skip_frames, method, input_dir, o
     num : int, number of images to merge
     hardmask : bool, hardmask flag for enfuse
     shuffle_frames : int how far apart frames are allowed to be from their original locations
-    skip_frames : number of frames to skip -- when working with brackets num and skipframes should be the same
+    skip_frames : number of frames to skip. When working with brackets num and skipframes
+                  should be the same.
     method : str, 'enfuse', 'convert', maybe more.
     input_dir :
     output_dir :
@@ -175,8 +170,6 @@ def process_dir(num, hardmask, shuffle_frames, skip_frames, method, input_dir, o
         images.sort()
         print("sorted images")
 
-    # print 'images=', images
-
     # align images with align_image_stack
     #     for counter in range(0, len(images) - num + 1, num):
     #
@@ -190,23 +183,19 @@ def process_dir(num, hardmask, shuffle_frames, skip_frames, method, input_dir, o
     #         align_image_stack_sequence(image_path_list, skip_frames)
     #
 
-    #  input('hi mom')
-
     jobs = []
     max_jobs = multiprocessing.cpu_count() - 2  # leave two cores free
     print("Using {} or {} cores.".format(max_jobs, multiprocessing.cpu_count()))
 
     print("jobs active = ", len(jobs))
 
-    waiting_to_place_job = True
+    # waiting_to_place_job = True
 
     # call enfuse/convert/pil on the stack
     for counter in range(0, len(images) - num + 1, skip_frames):
 
         print("counter ==", counter)
         print("jobs active = ", len(jobs))
-
-        ##        input('going...')
 
         image_path = []
         for n in range(num):
@@ -259,7 +248,6 @@ def process_dir(num, hardmask, shuffle_frames, skip_frames, method, input_dir, o
 
 #             else:
 #                 dots+=1
-#                # print('all job slots are full sleeping...',str(dots), 'seconds', end='\r', flush=True)
 #                 print('all job slots are full sleeping...')
 #                 time.sleep(10)
 #

@@ -82,8 +82,7 @@ def align_image_stack(infiles, out_dir="", prefix="aligned-"):
         "-a",
         prefix,
         # '-v',
-        # -g number of grids to search for points defauilt=5 higher is slower. Sometimes it can;t find points. Increasing solves it
-        "-g",
+        "-g",  # -g number of grids to search for points defauilt=5 higher is slower.
         str(8),
         "--align-to-first",
     ]
@@ -94,10 +93,6 @@ def align_image_stack(infiles, out_dir="", prefix="aligned-"):
     print("calling : " + " ".join(quotelib.quote(sys_call)))
 
     result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=False)
-    # print('autotrace returncode={}, stdout={}, stderr={}'.format(result.returncode, result.stdout, result.stderr))
-
-    # input('goo..')
-    # returncode = subprocess.call(sys_call)
 
     if result.returncode != 0:
         print("align_image_stack FAILED returncode = ", result.returncode)
@@ -159,7 +154,6 @@ def align_image_stack_sequence(infiles, bracket, out_dir="", prefix="aligned-"):
             # test if this stack has already been processed on a previous run.
             already_processed = 0
             for i in range(0, bracket):
-                #    print('i=', i, ' global_counter=', global_counter, 'index=', global_counter-i+1 )
 
                 an_orig_filename = os.path.splitext(os.path.basename(infiles[global_counter - i]))[
                     0
