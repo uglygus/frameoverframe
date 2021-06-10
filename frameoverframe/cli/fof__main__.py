@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
     fof = frameoverframe = Frame Over Frame
-    
+
     helper app which lists the subcommands an commandline tools of frameoverframe
 
 """
@@ -24,7 +24,7 @@ def collect_args():
     """collect commandline arguments"""
 
     parser = argparse.ArgumentParser(
-        description="fof, frameoverframe \n\ "
+        description="fof, frameoverframe \n "
         "helper app which lists the subcommands an commandline tools of frameoverframe"
     )
 
@@ -39,7 +39,7 @@ def main():
 
     #    split('hi mom')
 
-    # parser.print_help()
+    args.print_help()
 
     print(frameoverframe.cli.img2vid__main__.collect_args())
 

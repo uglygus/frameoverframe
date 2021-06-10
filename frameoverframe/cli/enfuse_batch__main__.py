@@ -10,15 +10,7 @@
 """
 
 import argparse
-import multiprocessing
 import os
-import random
-import shutil
-import sys
-from pathlib import Path
-from subprocess import PIPE, run
-
-from PIL import Image
 
 from frameoverframe.enfuse_batch import process_dir
 
@@ -34,7 +26,8 @@ def collect_args():
     parser.add_argument(
         "method",
         type=str,
-        help="Method of averaging: 'convert' : ImageMagick -average, 'enfuse' : Hugin's enfuse, 'pil', python Pillow library.",
+        help="Method of averaging: 'convert' : ImageMagick -average, "
+             "'enfuse' : Hugin's enfuse, 'pil', python Pillow library.",
     )
 
     parser.add_argument("num", type=int, help="Number of images to combine per frame.")
@@ -44,7 +37,8 @@ def collect_args():
         "--skip-frames",
         type=int,
         default=1,
-        help="Number of images to skip. Ususally for doing HDR set this to the number of images in each set.",
+        help="Number of images to skip. Ususally for doing HDR "
+             "set this to the number of images in each set.",
     )
 
     parser.add_argument(
@@ -53,7 +47,8 @@ def collect_args():
         const=1000000,
         type=int,
         default=0,
-        help="shuffle frames by XXX frames (default = 1000000) Large default to get a completely random shuffle.",
+        help="shuffle frames by XXX frames (default = 1000000). "
+             "Large default to get a completely random shuffle.",
     )
 
     parser.add_argument(

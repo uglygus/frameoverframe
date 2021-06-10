@@ -9,8 +9,6 @@ given a folder check every subfolder and try to run img2vid on it.
 
 import argparse
 import os
-import re
-import shutil
 import sys
 
 from frameoverframe.img2vid import img2vid

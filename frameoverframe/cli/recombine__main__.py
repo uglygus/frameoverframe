@@ -7,17 +7,10 @@
 
 
 import argparse
-import math
 import os
-import re
-import shutil
 import sys
-from pathlib import Path
 
 from frameoverframe.recombine import recombine
-from frameoverframe.renumber import renumber
-
-# from rename_uniq import rename_uniq_dir
 
 
 def dir_path(path):
@@ -76,7 +69,9 @@ def collect_args():
         "--prefix",
         type=str,
         default=":folder",
-        help="Prefix. (default no prefix). '' empty string will strip any existing prefix. The special word :folder will use the enclosing first folder's name as the prefix. default :folder",
+        help="Prefix. (default no prefix). '' empty string will "
+             "strip any existing prefix. The special word :folder will "
+             "use the enclosing first folder's name as the prefix. default :folder",
     )
 
     parser.add_argument(
@@ -91,14 +86,7 @@ def collect_args():
 
 
 def main():
-    """Can be called from the commmandline:
-    usage: renumber.py [-h] [-o DST_DIR] [-i] [-s START_AT] [-x PREFIX] [-p PADDING] src_dir src_dir src_dir ...
-
-    Args:
-
-    Returns:
-
-    """
+    """Renumber Can be called from the commmandline."""
 
     parser = collect_args()
     args = parser.parse_args()

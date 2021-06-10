@@ -1,14 +1,8 @@
 #!/usr/bin/env python3
 
 import argparse
-import multiprocessing
 import os
 import sys
-import time
-
-import numpy
-from moviepy.editor import ImageSequenceClip, VideoClip, VideoFileClip
-from PIL import Image
 
 import frameoverframe.autotrace
 import frameoverframe.autotrace_sequence

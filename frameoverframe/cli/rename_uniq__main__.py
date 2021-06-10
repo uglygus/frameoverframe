@@ -7,12 +7,11 @@ commandline interface
 """
 
 import argparse
-import errno
 import os
-import subprocess
 import sys
 
-from frameoverframe.rename_uniq import rename_uniq_dir, rename_uniq_file
+from frameoverframe.rename_uniq import rename_uniq_dir
+# , rename_uniq_file
 
 
 def collect_args():
