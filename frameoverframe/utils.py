@@ -107,14 +107,11 @@ def sorted_listdir(directory, ignore_hidden=True):
     names.sort()
     fullpaths = []
 
-    # print('sorted_listdir directory=', directory)
-
     for filename in names:
         if ignore_hidden and filename.startswith("."):
             continue
         fullpaths.append(os.path.join(directory, filename))
 
-    #  print(' sorted_listdir returning fullpaths == ', fullpaths)
     return fullpaths
 
 
@@ -222,10 +219,11 @@ def get_eps_size(epsfile):
 
 
 def _split_name_number(name):
-    # Splits a given string into name and number where number is the at the end
-    # of the string, e.g. 'foo2bar003baz001' will be split into:
-    # 'foo2bar003baz', '001'
-    #
+    """Splits a given string into name and number. Where number is at the end
+    of the string, e.g. 'foo2bar003baz001' will be split into:
+    'foo2bar003baz', '001'
+
+    """
 
     regex = r"^(.*?)(\d*)$"
     m = re.search(regex, name)
@@ -236,7 +234,6 @@ def _split_name_number(name):
 
 
 def calculate_scale_factor(orig_tup, new_tup, allow_crop=False):
-
     """Calculate the scale factor to apply to make one rect fit another rect.
         Will not stretch. Returns a float to be applied to both dimensions.
 
@@ -289,13 +286,14 @@ def replace_eps_bounding_box(newx, newy, filepath):
     Returns:
         nothing
 
-
     """
 
     bounding_box = "%%BoundingBox:"
     hires_bounding_box = "%%HiResBoundingBox:"
     new_bounding_box = "{} 0 0 {} {}".format(bounding_box, newx, newy)
-    new_highres_bounding_box = "{} 0.00 0.00 {:4.2f} {:4.2f}".format(bounding_box, newx, newy)
+    new_highres_bounding_box = "{} 0.00 0.00 {:4.2f} {:4.2f}".format(
+        bounding_box, newx, newy
+    )
 
     # Safely read the input filename using 'with'
     with open(filepath) as f:
@@ -332,7 +330,16 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
 
     """
 
-    print("resize_eps(", "infile=", infile, ", outfile=", outfile, ", newsize=", newsize, ")")
+    print(
+        "resize_eps(",
+        "infile=",
+        infile,
+        ", outfile=",
+        outfile,
+        ", newsize=",
+        newsize,
+        ")",
+    )
 
     print("orig_sizze=", get_eps_size(infile))
     print("newsize=", newsize)

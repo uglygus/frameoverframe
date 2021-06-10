@@ -91,8 +91,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         outfile_ext = ".mp4"
 
         video_filter = (
-            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
-            + fnumber_filter
+            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" + fnumber_filter
         )
 
         # fmt: off
@@ -113,8 +112,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
 
         # fit in UHD4k and pad
         video_filter = (
-            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
-            + fnumber_filter
+            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" + fnumber_filter
         )
         # fmt: off
         ffmpeg_settings = [
@@ -181,9 +179,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
                 print("ERROR: CR2 is not a recognized image format for ffmeg.", image)
                 sys.exit(1)
 
-            os.symlink(
-                image, os.path.join(tmp_link_dir, "{:08}{}".format(counter, ext))
-            )
+            os.symlink(image, os.path.join(tmp_link_dir, "{:08}{}".format(counter, ext)))
             counter += 1
 
     ffmpeg_bin = shutil.which("ffmpeg")
