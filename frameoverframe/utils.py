@@ -291,9 +291,7 @@ def replace_eps_bounding_box(newx, newy, filepath):
     bounding_box = "%%BoundingBox:"
     hires_bounding_box = "%%HiResBoundingBox:"
     new_bounding_box = "{} 0 0 {} {}".format(bounding_box, newx, newy)
-    new_highres_bounding_box = "{} 0.00 0.00 {:4.2f} {:4.2f}".format(
-        bounding_box, newx, newy
-    )
+    new_highres_bounding_box = "{} 0.00 0.00 {:4.2f} {:4.2f}".format(bounding_box, newx, newy)
 
     # Safely read the input filename using 'with'
     with open(filepath) as f:
