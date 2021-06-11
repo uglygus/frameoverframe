@@ -104,6 +104,7 @@ def sorted_listdir(directory, ignore_hidden=True):
     """
 
     names = os.listdir(directory)
+
     names.sort()
     fullpaths = []
 
@@ -218,7 +219,7 @@ def get_eps_size(epsfile):
     return (width, height)
 
 
-def _split_name_number(name):
+def split_name_number(name):
     """Splits a given string into name and number. Where number is at the end
     of the string, e.g. 'foo2bar003baz001' will be split into:
     'foo2bar003baz', '001'

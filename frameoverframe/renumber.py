@@ -147,7 +147,7 @@ def renumber(
     # get prefix if it is not assigned
     if prefix is None:
         file_name, ext = os.path.splitext(file_list[0])
-        name_part = utils._split_name_number(file_name)[0]
+        name_part = utils.split_name_number(file_name)[0]
         prefix = name_part
 
     print(f"{prefix=}")

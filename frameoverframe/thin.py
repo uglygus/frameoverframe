@@ -90,7 +90,7 @@ def thin(src_dir, every, dst_dir=None, inplace=False):
         # sys.exit()
 
         file_name, ext = os.path.splitext(file_list[0])
-        name_part, num_part = utils._split_name_number(file_name)
+        name_part, num_part = utils.split_name_number(file_name)
         # prefix = name_part
 
         for f in file_list:
@@ -205,7 +205,7 @@ def renumber(
     # get prefix if it is not assigned
     if prefix == None:
         file_name, ext = os.path.splitext(file_list[0])
-        name_part, num_part = _split_name_number(file_name)
+        name_part, num_part = split_name_number(file_name)
         prefix = name_part
 
     print(f"{prefix=}")

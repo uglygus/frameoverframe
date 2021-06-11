@@ -19,7 +19,7 @@ from pathlib import Path
 from time import sleep, strftime
 
 from .renumber import renumber
-from .utils import sorted_listdir, test_one_extension
+from .utils import sorted_listdir, test_one_extension, split_name_number
 
 
 def strip_bad_ending(string):
@@ -32,26 +32,6 @@ def strip_bad_ending(string):
 
     """
     return string.rstrip(" _-")
-
-
-def _split_name_number(name):
-    """Splits a given string into name and number where number is at the end
-        of the string, e.g. 'foo2bar003baz_001' will be split into 'foo2bar003baz_'
-        and '001'
-
-    Args:
-      name:
-
-    Returns:
-
-    """
-
-    regex = r"^(.*?)(\d*)$"
-    m = re.search(regex, name)
-    name_part = m.group(1)
-    num_part = m.group(2)
-
-    return name_part, num_part
 
 
 def recombine(
@@ -75,7 +55,7 @@ def recombine(
     src_dirs.sort()
 
     if dst_dir is None:
-        new_basename = _split_name_number(os.path.basename(src_dirs[0]))[0]
+        new_basename = split_name_number(os.path.basename(src_dirs[0]))[0]
         # print('new_basename = ', new_basename)
         new_basename = strip_bad_ending(new_basename)
         # print('new_basename = ', new_basename)
