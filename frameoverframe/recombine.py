@@ -19,7 +19,7 @@ from pathlib import Path
 from time import sleep, strftime
 
 from .renumber import renumber
-from .utils import sorted_listdir, test_one_extension, split_name_number
+from .utils import sorted_listdir, split_name_number, test_one_extension
 
 
 def strip_bad_ending(string):
