@@ -11,19 +11,18 @@
 """
 
 import argparse
-import sys
 import os
-import shutil
 import re
-
-from itertools import takewhile
+import shutil
+import sys
 from functools import reduce
+from itertools import takewhile
 
-from frameoverframe.unmix import unmix
-from frameoverframe.recombine import recombine
-from frameoverframe.img2vid import img2vid
-from frameoverframe.utils import sorted_listdir, split_name_number
 from frameoverframe.config import extensions
+from frameoverframe.img2vid import img2vid
+from frameoverframe.recombine import recombine
+from frameoverframe.unmix import unmix
+from frameoverframe.utils import sorted_listdir, split_name_number
 
 
 def dumpcard(directory, dst_dir):
