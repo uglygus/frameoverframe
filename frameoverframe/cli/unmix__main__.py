@@ -31,7 +31,7 @@ def collect_args():
     """collect commandline arguments"""
 
     parser = argparse.ArgumentParser(
-        description="Unmix's images that are stored in the same folder. "
+        description="Unmix's images that are stored in the same folder."
         "This helps with Canon folders which store the CR2 and JPG files in the same folder."
     )
 
