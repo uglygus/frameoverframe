@@ -45,10 +45,12 @@ def sort_without_suffix(items):
     suffixlen = -1 * len(csuffix)
 
     trimmed_items = [d[:suffixlen] for d in items]
-    # print(f"{trimmed_items=}")
+    print(f"{trimmed_items=}")
     trimmed_items.sort()
     trimmed_items = [d + csuffix for d in trimmed_items]  # add the suffix back
-    # print(f"{trimmed_items=}")
+    print(f"{trimmed_items=}")
+
+    return trimmed_items
 
 
 def recombine(
@@ -66,12 +68,17 @@ def recombine(
       padding:  (Default value = 5)
 
     Returns:
-
+        out_dir (list): List of directories that things were combined into. or None
     """
     print("len(src_dirs)= ", len(src_dirs))
     if len(src_dirs) < 2:
         print("recombine returning. len(src_dirs)= ", len(src_dirs))
-        return
+        print(f"{src_dirs=}")
+        return src_dirs
+
+    print("recombine: src_dirs=", src_dirs)
+    src_dirs = sort_without_suffix(src_dirs)
+    print("recombine: src_dirs=", src_dirs)
 
     if dst_dir is None:
         new_basename = split_name_number(os.path.basename(src_dirs[0]))[0]
@@ -148,10 +155,10 @@ def recombine(
         item_dest = dst + "/" + os.path.basename(Path(item).parent) + "-" + os.path.basename(item)
 
         if copy_files:
-            print("recombine copying : ", item, " -->", item_dest)
+            # print("recombine copying : ", item, " -->", item_dest)
             shutil.copyfile(item, item_dest)
         else:
-            print("recombine moving : ", item, " -->", item_dest)
+            # print("recombine moving : ", item, " -->", item_dest)
             shutil.move(item, item_dest)
         count += 1
 
@@ -214,6 +221,9 @@ def recombine(
         if prefix == ":folder":
             prefix = os.path.basename(os.path.normpath(one_dst_dir))
         renumber(one_dst_dir, inplace=True, prefix=prefix, sort_method="name", padding=padding)
+
+    print(f"recombine returning 2 == {dst_dirs=}")
+    return dst_dirs
 
 
 def dir_path(path):

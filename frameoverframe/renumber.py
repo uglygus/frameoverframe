@@ -180,10 +180,10 @@ def renumber(
         dst = os.path.join(dst_dir, dst_file_name)
 
         if inplace:
-            print("moving file: ", src, "->", dst)
+            # print("moving file: ", src, "->", dst)
             shutil.move(src, dst)
         else:
-            print("copying file: ", src, "->", dst)
+            # print("copying file: ", src, "->", dst)
             try:
                 shutil.copy2(src, dst)
             except OSError as error:
