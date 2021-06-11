@@ -13,6 +13,9 @@ import exifread
 import quotelib
 from PIL import Image
 
+from itertools import takewhile
+from functools import reduce
+
 
 def exif_creation_date(filename):
     """given an image file return the creation time: EXIF DateTimeOriginal."""
@@ -217,6 +220,19 @@ def get_eps_size(epsfile):
 
     # print('get_eps_size({}) returning: ({}x{})'.format(epsfile,width,height))
     return (width, height)
+
+
+def common_suffix(xs):
+    """Longest suffix shared by all strings in xs."""
+
+    def allSame(cs):
+        h = cs[0]
+        return all(h == c for c in cs[1:])
+
+    def firstCharPrepended(s, cs):
+        return cs[0] + s
+
+    return reduce(firstCharPrepended, takewhile(allSame, zip(*(reversed(x) for x in xs))), "")
 
 
 def split_name_number(name):
