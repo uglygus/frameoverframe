@@ -6,15 +6,14 @@ import re
 import shutil
 import sys
 import time
+from functools import reduce
+from itertools import takewhile
 from pathlib import Path
 from subprocess import PIPE, run
 
 import exifread
 import quotelib
 from PIL import Image
-
-from itertools import takewhile
-from functools import reduce
 
 
 def exif_creation_date(filename):
