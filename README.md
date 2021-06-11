@@ -30,3 +30,7 @@ A collection of scripts for working with image sequences, timelapse's or just st
 ***test_image*** - test image in every input folder.
 
 ***unmix*** - rename images with their extensions to separate images that have different formats.
+
+
+
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
