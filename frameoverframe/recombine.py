@@ -19,7 +19,7 @@ from pathlib import Path
 from time import sleep, strftime
 
 from .renumber import renumber
-from .utils import sorted_listdir, split_name_number, test_one_extension
+from .utils import sorted_listdir, split_name_number, test_one_extension, common_suffix
 
 
 def strip_bad_ending(string):
@@ -32,6 +32,23 @@ def strip_bad_ending(string):
 
     """
     return string.rstrip(" _-")
+
+
+def sort_without_suffix(items):
+    """Sort a list after removing the common suffix.
+    We need this because:
+    ["A-2_ARW", "A_ARW", "A-1_ARW"].sort() produces ["A-1_ARW", "A-2_ARW", "A_ARW"]
+    we want: ["A_ARW", "A-1_ARW", "A-2_ARW"]
+    """
+
+    csuffix = common_suffix(items)
+    suffixlen = -1 * len(csuffix)
+
+    trimmed_items = [d[:suffixlen] for d in items]
+    # print(f"{trimmed_items=}")
+    trimmed_items.sort()
+    trimmed_items = [d + csuffix for d in trimmed_items]  # add the suffix back
+    # print(f"{trimmed_items=}")
 
 
 def recombine(
@@ -51,15 +68,19 @@ def recombine(
     Returns:
 
     """
-
-    src_dirs.sort()
+    print("len(src_dirs)= ", len(src_dirs))
+    if len(src_dirs) < 2:
+        print("recombine returning. len(src_dirs)= ", len(src_dirs))
+        return
 
     if dst_dir is None:
         new_basename = split_name_number(os.path.basename(src_dirs[0]))[0]
-        # print('new_basename = ', new_basename)
+        print("new_basename = ", new_basename)
         new_basename = strip_bad_ending(new_basename)
-        # print('new_basename = ', new_basename)
+        print("new_basename = ", new_basename)
         dst_dir = os.path.join(os.path.dirname(src_dirs[0]), new_basename)
+
+    print(f"{dst_dir=}")
 
     if prefix == ":folder":
         prefix = os.path.basename(os.path.normpath(src_dirs[0]))
@@ -74,12 +95,16 @@ def recombine(
 
     dst_dirs = []
 
+    print(f"{dirs_needed=}")
+
     # only append a number to destination dirs if there is more than one
     for i in range(0, dirs_needed):
         if dirs_needed > 1:
             dst_dirs.append("{}_{:02d}".format(dst_dir, i))
         else:
             dst_dirs.append(dst_dir)
+
+    print(f"{dst_dirs=}")
 
     all_files = []
 
@@ -97,6 +122,7 @@ def recombine(
             all_files.append(os.path.join(directory, item))
 
     tmp_dst_dirs = []
+    print(f"{dst_dir=}")
     for dst_dir in dst_dirs:
         if os.path.exists(dst_dir):
             print("WARNING: Output directory already exists.", dst_dir)
