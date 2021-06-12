@@ -15,6 +15,7 @@ import os
 import re
 import shutil
 import sys
+import time
 from functools import reduce
 from itertools import takewhile
 
@@ -44,7 +45,27 @@ def dumpcard(directory, dst_dir):
     # print("directory=", directory)
     #
     # input("should I start copy.....")
-    shutil.copytree(directory, dst_dir, dirs_exist_ok=True)
+    i = 0
+    again = True
+    try:
+        print("shutil.move(", directory, ", ", dst_dir)
+        shutil.copytree(directory, dst_dir, dirs_exist_ok=True)
+        print("AFTER")
+        again = False
+    except Exception as e:  # (PermissionError, FileExistsError)
+        print(e)
+        print("type-e  = ", type(e))
+        print("dir-e = ", dir(e))
+        # print('e.strerror=', e.strerror)
+        print("e.__doc__=", e.__doc__)
+        print("e.filename2=", e.filename2)
+        print("caught error: ", e)
+        if i >= 20:
+            print("failed 20 times, exiting.")
+            sys.exit(100)
+        print("Permission Error occured retrying in 1s...")
+        time.sleep(1)
+        i = i + 1
 
     # input(".done copy.....")
 
@@ -68,9 +89,9 @@ def dumpcard(directory, dst_dir):
     shotname = split_name_number(os.path.basename(dst_dir))[0]
     shotname = shotname.rstrip(" -")
 
-    #    print("shot_name=", shotname)
+    print("shot_name=", shotname)
 
-    #    input("unmix finished")
+    # input("unmix finished")
 
     #
     # recombine
@@ -82,17 +103,21 @@ def dumpcard(directory, dst_dir):
 
     print("Recombining images...")
     for ext in extensions:
+        print("current ext=", ext)
+
+        print("sorted_listdir(os.path.dirname(dst_dir))=", sorted_listdir(os.path.dirname(dst_dir)))
+
         to_recombine = []
         for item in sorted_listdir(os.path.dirname(dst_dir)):
-            # print("\nitem=", item)
-            # print("os.path.basename(dst_dir)=", os.path.basename(dst_dir))
+            print("\nitem=", item)
+            print("os.path.basename(dst_dir)=", os.path.basename(dst_dir))
             item_shotname = os.path.basename(item)
 
             regex = rf"^{shotname}(.*?)_{ext}$"
             if re.match(regex, item_shotname):
                 to_recombine.append(item)
 
-        #        print("to_recombine=", to_recombine)
+                print("to_recombine=", to_recombine)
         dest_dirs = recombine(to_recombine)
         if ext == "JPG":
             jpg_dirs = dest_dirs
@@ -103,6 +128,8 @@ def dumpcard(directory, dst_dir):
     # img2vid()
 
     # alldirs = sorted_listdir(dests)
+
+    print("jpg_dirs=", jpg_dirs)
 
     if jpg_dirs is None:
         print(" dest_dirs =None quitting dumpcard()")
@@ -141,7 +168,13 @@ def main():
     args = parser.parse_args()
 
     print(f"{args=}")
-    #
+
+    if args.dst_dir == os.path.dirname(args.src_dir):
+        print("Source: ", src_dir)
+        print("Destination: ", dst_dir)
+        print("Source dir cannot be inside destination directory.")
+        return 1
+
     # for directory in args.src_dirs:
     if args.dst_dir is None:
         dst_dir = os.path.dirname(args.src_dir)
@@ -149,6 +182,8 @@ def main():
         dst_dir = args.dst_dir
 
     dumpcard(args.src_dir, dst_dir)
+
+    return 0
 
 
 if __name__ == "__main__":

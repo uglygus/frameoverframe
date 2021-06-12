@@ -25,6 +25,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from colorama import init, Fore, Style
 
 from PIL import Image
 from quotelib import quote
@@ -37,7 +38,10 @@ Image.MAX_IMAGE_PIXELS = 244022272
 def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
     """convert multiple image_dirs to a single video file"""
 
-    print(" top of img2vid input_dirs=", input_dirs)
+    # TODO: this should have a verbose flag and print this...
+    # print(f"img2vid: {input_dirs=}, {output_file=}, {profile=}, {framenumber=}")
+
+    init()  # for colorama
 
     if not isinstance(input_dirs, list):
         input_dirs = [input_dirs]
@@ -47,7 +51,9 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
     # if any dir has more than one extension in it ERROR out
     for _dir in input_dirs:
         if not test_one_extension(_dir, fatal=False):
-            print("SKIPPING: Directory contails more than one extension. ", _dir)
+            print(
+                f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Directory contails more than one extension. "
+            )
             return
 
     if framenumber:
@@ -132,16 +138,17 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         raise ValueError
 
     if output_file is None:
-        print("setting output_filepath")
+        # print("setting output_filepath")
         out_filepath = os.path.join(
             os.path.dirname(input_dirs[0]),
             os.path.basename(os.path.normpath(input_dirs[0])) + suffix + outfile_ext,
         )
     else:
-        print("NOT setting output_filepath")
+        # print("NOT setting output_filepath")
         out_filepath = output_file
 
     try:
+        print("openning-->", sorted_listdir(input_dirs[0])[0])
         im = Image.open(sorted_listdir(input_dirs[0])[0])
     except Image.DecompressionBombError:
         print(
@@ -156,14 +163,14 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         im = Image.open(sorted_listdir(input_dir)[0])
 
         new_width, new_height = im.size
-        print(new_width, "x", new_height, sorted_listdir(input_dir)[0])
+        # print(new_width, "x", new_height, sorted_listdir(input_dir)[0])
 
         if new_width != width or new_height != height:
             print("ERROR: All images must be the same dimensions.")
             return False
 
     tmp_link_dir = tempfile.mkdtemp(prefix="img2vid_")
-    print("tmp_link_dir=", tmp_link_dir)
+    # print("tmp_link_dir=", tmp_link_dir)
 
     ext = os.path.splitext(sorted_listdir(input_dirs[0])[0])[1]
 
@@ -176,10 +183,16 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
             if image.endswith(".DS_Store"):
                 continue
             if image.endswith(".CR2"):
-                print("ERROR: CR2 is not a recognized image format for ffmeg.", image)
+                print("ERROR: CR2 is not a recognized image format for ffmpeg.", image)
                 sys.exit(1)
 
-            os.symlink(image, os.path.join(tmp_link_dir, "{:08}{}".format(counter, ext)))
+            tmp_link = os.path.join(tmp_link_dir, f"{counter:08}{ext}")
+            os.symlink(os.path.abspath(image), os.path.abspath(tmp_link))
+
+            # test the symlink
+            #    print(f"{image=}")
+            #    print(f"{tmp_link=}")
+
             counter += 1
 
     ffmpeg_bin = shutil.which("ffmpeg")
@@ -196,7 +209,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         print("\ncalling : ", " ".join(quote(sys_call)), "\n")
         subprocess.call(sys_call)
 
-    #   shutil.rmtree(tmp_link_dir)
+        shutil.rmtree(tmp_link_dir)
     else:
         print("ERROR: ffmpeg is required and is not intstalled. ")
         sys.exit(1)
