@@ -1,35 +1,39 @@
 # frameoverframe
 
-A collection of scripts for working with image sequences, timelapse's or just straight video.
+A collection of scripts for working with image sequences, timelapses or just straight video.
 
 
-***tracer*** vector based tracing of frames
+***align\_image\_stack_sequence*** - Wrapper for align\_image\_stack that allows it to be run against a folder of bracketed images.
 
-***renumber*** - renumber imge sequences in folders
+***bracket*** - Organize images in folders by either splitting or merging folders of images shot as brackets in camera. This moves the actual files it does not create new ones.
 
-***bracket*** - organize images in folders by either splitting or merging folders of hdr images. This moves the actual files it does not creat new ones.
+***deflicker*** - Adjust brightness of images to reduce flickering.
 
-***enfuse_batch*** - combine multiple images together to create new ones. Either for hdr images or just to make overlays.
+***enfuse_batch*** - Combine multiple images together to create new ones. Either for hdr images or just to make overlays.
 
-***align\_image\_stack_sequence*** - wrapper for align image stack that allows it to be run against a folder of timelapse bracketed images.
+***img2vid*** - Combine image frames to create a video.
 
-***thin*** - reduce files from a folder by keeping 1 file and skip a number of files, does not recurse into sum folder.
+***renumber*** - Renumber image sequences.
 
-***deflicker*** - adjust brightness of images to reduce flickering.
+***raw2dng*** - Convert raw format images to dng format.
 
-***img2vid*** - combine image frames to create a video.
+***recombine*** - Recombine a list of directories to be combined and renumbered.
 
-***vid2img*** - extract image frames from a video.
+***rename_uniq*** - Rename individual files so they have a prefix matching the enclosing folder.
 
-***raw2dng*** - convert raw format images to dng format.
+***test_image*** - Test image in every input folder.
 
-***recombine*** - recombine a list of directories to be combined and renumbered.
+***thin*** - Reduce files from a folder by keeping 1 file and skip a number of files, does not recurse into sum folder.
 
-***rename_uniq*** - rename individual files so they have a prefix matching the enclosing folder.
+***tracer*** Vector based tracing of frames.
 
-***test_image*** - test image in every input folder.
+***unmix*** - Rename images with their extensions to separate images that have different
+formats.
 
-***unmix*** - rename images with their extensions to separate images that have different formats.
+***vid2img*** - Convert a video to an image sequence.
+
+
+
 
 
 
