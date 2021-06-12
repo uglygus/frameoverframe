@@ -10,6 +10,7 @@ given a folder check every subfolder and try to run img2vid on it.
 import argparse
 import os
 import sys
+
 from colorama import Fore, Style, init
 
 from frameoverframe.img2vid import img2vid
