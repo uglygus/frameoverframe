@@ -210,7 +210,7 @@ def recombine(
                 print("Permission Error occured retrying in 1s...")
                 sleep(1)
                 i = i + 1
-            print("bottom of WHIL:E UP UP UP")
+            print("bottom of WHILE UP UP UP")
 
         new_dst_dirs.append(new_dir)
     dst_dirs = new_dst_dirs

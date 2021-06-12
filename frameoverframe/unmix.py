@@ -79,9 +79,9 @@ def unmix(src_dir):
 
     if len(ext_list) == 1:
         print("unmix: Looks good folder is already unmixed.", src_dir)
-        print('ext_list[0]=', ext_list[0])
-        ext = ext_list[0].lstrip('.')
-        os.rename(src_dir, src_dir + '_' + ext)
+        print("ext_list[0]=", ext_list[0])
+        ext = ext_list[0].lstrip(".")
+        os.rename(src_dir, src_dir + "_" + ext)
         return
 
     if len(ext_list) == 0:
