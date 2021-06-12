@@ -24,6 +24,7 @@ ignores .DS_Store files
 import os
 import re
 import shutil
+import sys
 
 import frameoverframe.utils as utils
 
@@ -68,11 +69,34 @@ def unmix(src_dir):
 
     ext_list = utils.ext_list(src_dir)
 
+    print(f"{ext_list=}")
+
+    if ext_list == [""]:
+        print("Directory has no files with extensions. Stopping.")
+        sys.exit()
+
     ext_list.sort()
 
-    if len(ext_list) <= 1:
+    if len(ext_list) == 1:
         print("unmix: Looks good folder is already unmixed.", src_dir)
+        print('ext_list[0]=', ext_list[0])
+        ext = ext_list[0].lstrip('.')
+        os.rename(src_dir, src_dir + '_' + ext)
         return
+
+    if len(ext_list) == 0:
+        print("unmix: Not sure if we can even get here?", src_dir)
+        ext_list[0]
+        return
+
+    if len(ext_list) > 2:
+        print("unmix: This folder has more than two extensions. Stopping.", src_dir)
+        return
+
+    for d in ext_list:
+        if d == "":
+            print("unmix: This folder has other folders in it. Stopping.", src_dir)
+            return
 
     new_dirs = []
 
