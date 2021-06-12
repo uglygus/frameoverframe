@@ -37,7 +37,7 @@ def process_file(filename, args):
 
     print("max_jobs=", max_jobs)
 
-    print("Using {} or {} cores.".format(max_jobs, multiprocessing.cpu_count()))
+    print("Using {} of {} cores.".format(max_jobs, multiprocessing.cpu_count()))
     dots = 2  # number of dots to print on the waiting to start job line
 
     for frame in clip.iter_frames():
@@ -93,9 +93,7 @@ def process_file(filename, args):
 
             else:
                 dots += 1
-                print(
-                    "all job slots are full sleeping...", str(dots), "seconds", end="\r", flush=True
-                )
+                print("all job slots are full sleeping...", str(dots), "seconds", end="\r", flush=True)
                 time.sleep(1)
 
                 for job in jobs:
@@ -108,4 +106,4 @@ def process_file(filename, args):
 
     if SAVE_OUTPUT_MOV:
         outclip = ImageSequenceClip(images_list, fps=24)
-        outclip.write_videofile("xxxmovie.mp4", fps=24)
+        outclip.write_videofile(basename(filename) + .mp4, fps=24)

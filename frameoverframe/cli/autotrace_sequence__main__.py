@@ -9,7 +9,7 @@ import frameoverframe.autotrace_sequence
 
 
 def collect_args():
-    parser = argparse.ArgumentParser(description="process videos frame by frame")
+    parser = argparse.ArgumentParser(description="process videos frame by frame.")
     parser.add_argument("input", default=None, nargs="*", help="video file, mov,mp4,m4a etc")
     parser.add_argument(
         "-c",
@@ -17,7 +17,7 @@ def collect_args():
         action="store_true",
         default=False,
         dest="centerline",
-        help="recurse into directories",
+        help="Trace the centerline of blobs. Produces lines only. ",
     )
     parser.add_argument(
         "-s",
@@ -26,8 +26,7 @@ def collect_args():
         default=50,
         help="resize the image size before autotracing. \
                         Scale is a percentage. 50=half size, defalut = 50. \
-                        4k images must be scaled down. Autotrace will crash \
-                        on large images.",
+                        4k images must be scaled down or autotrace will crash.",
     )
     parser.add_argument(
         "-j",
