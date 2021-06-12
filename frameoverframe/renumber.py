@@ -135,7 +135,7 @@ def renumber(
         else:
             sort_method = "name"
 
-    print(f" sort method: {sort_method}")
+    # print(f" sort method: {sort_method}")
     if sort_method == "name":
         file_list = sort_by_name(file_list)
     elif sort_method == "exif_date":

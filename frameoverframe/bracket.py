@@ -36,7 +36,7 @@ def split(brackets, input_dir):
         os.makedirs(input_dir + "_" + str(i + 1), exist_ok=True)
 
     allfiles = []
-    for root, dirs, files in os.walk(input_dir, topdown=True):
+    for root, _dirs, files in os.walk(input_dir, topdown=True):
         for name in files:
             allfiles.append((root, name))
 
@@ -46,13 +46,13 @@ def split(brackets, input_dir):
 
     for root, name in allfiles:
 
-        print(
-            "counter=",
-            counter,
-            " MV ",
-            root + "/" + name,
-            input_dir + "_" + str(counter) + "/" + name,
-        )
+        # print(
+        #     "counter=",
+        #     counter,
+        #     " MV ",
+        #     root + "/" + name,
+        #     input_dir + "_" + str(counter) + "/" + name,
+        # )
 
         shutil.move(root + "/" + name, input_dir + "_" + str(counter) + "/" + name)
         counter += 1
@@ -85,7 +85,7 @@ def merge(input_dirs):
         os.makedirs(outdir)
         print("made outdir")
     except FileExistsError:
-        print("Output direcotry already exists.", outdir)
+        print("ERROR: Output directory already exists:", outdir)
         sys.exit()
 
     dir_lists = []
@@ -118,12 +118,12 @@ def merge(input_dirs):
     while keepgoing:
         for dir_list in dir_lists:
 
-            print("current dir_list == ", dir_list)
+            # print("current dir_list == ", dir_list)
 
             try:
                 orig_file_path = dir_list.pop(0)
-                print("POP done, orig_file_path=", orig_file_path)
-                print("after pop current dir_list == ", dir_list)
+            #    print("POP done, orig_file_path=", orig_file_path)
+            #    print("after pop current dir_list == ", dir_list)
 
             except IndexError:
                 print("Empty directory breaking.")
@@ -132,9 +132,7 @@ def merge(input_dirs):
 
             orig_file = os.path.split(orig_file_path)[1]
 
-            print(
-                "shutil.move(", orig_file_path, ", ", outdir + "/" + str(counter) + "_" + orig_file
-            )
+            # print()"shutil.move(", orig_file_path, ", ", outdir + "/" + str(counter) + "_" + orig_file)
             shutil.move(orig_file_path, outdir + "/" + str(counter) + "_" + orig_file)
 
             counter += 1
