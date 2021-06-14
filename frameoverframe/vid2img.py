@@ -31,8 +31,6 @@ def vid2img(input_mov, output_folder=None):
 
     ffmpeg_bin = shutil.which("ffmpeg")
 
-    input(" calling ffmpeg ...")
-
     if ffmpeg_bin:
         print("got here")
         sys_call = [
