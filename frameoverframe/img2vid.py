@@ -30,6 +30,7 @@ from colorama import Fore, Style, init
 from PIL import Image
 from quotelib import quote
 
+from frameoverframe.config import RAW_EXTENSIONS
 from frameoverframe.utils import sorted_listdir, test_one_extension
 
 Image.MAX_IMAGE_PIXELS = 244022272
@@ -52,9 +53,16 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
     for _dir in input_dirs:
         if not test_one_extension(_dir, fatal=False):
             print(
-                f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Directory contails more than one extension. "
+                f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Directory contains more than one extension. "
             )
-            return
+            return 1
+        print("_dir[0][0] = ", _dir[0][0])
+        print("RAW_EXTENSONS=", RAW_EXTENSIONS)
+        if _dir[0][0] in RAW_EXTENSIONS:
+            print(
+                f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Directory contains raw file with extension, {_dir[0][0]} "
+            )
+            return 1
 
     if framenumber:
         fnumber_filter = (
