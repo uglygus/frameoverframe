@@ -21,7 +21,7 @@ A collection of scripts for working with image sequences, timelapses or just str
 
 ***rename_uniq*** - Rename individual files so they have a prefix matching the enclosing folder.
 
-***test_image*** - Test image in every input folder.
+***test_image*** - Takes one or more folders of images and tests each image using ffmpeg's identify. Reports bad images to stdout.
 
 ***thin*** - Reduce files from a folder by keeping 1 file and skip a number of files, does not recurse into sum folder.
 
