@@ -9,6 +9,8 @@ import os
 import shutil
 import subprocess
 
+from quotelib import quote
+
 from frameoverframe.utils import sorted_listdir
 
 vid_exts = ["mov", "mp4", "avi"]
@@ -28,13 +30,14 @@ def test_image(image):
        a string containing an error message otherwise
     """
 
-    # print(image)
+    print(image)
+
     ext = os.path.splitext(image)[1]
 
     image_error = None
 
     if not os.path.isfile(image):
-        print("skipping : ", image)
+        print("skipping (not a file): ", image)
         return None
 
     if ext in vid_exts:
@@ -45,7 +48,6 @@ def test_image(image):
 
     sys_call = [identify_bin, image]
 
-    #   print('\ncalling : ', ' '.join(quote(sys_call)), '\n')
     result = subprocess.run(sys_call, capture_output=True)
 
     concat_result = str(result.stdout + result.stderr)
@@ -67,7 +69,6 @@ def test_image(image):
         if error_string in concat_result:
             image_error = "BAD image:" + image + " -- " + error_string
 
-    # print('.')
     return image_error
 
 
@@ -87,4 +88,4 @@ def test_images(input_dirs):
         for image in sorted_listdir(image_dir):
             result = test_image(image)
             if result is not None:
-                print("hi mom", result)
+                print(result)
