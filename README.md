@@ -6,7 +6,7 @@
 
 # frameoverframe
 
-A collection of scripts for organizing, converting and manipulating image sequences. This has been written to solve my personal workflow needs but I will gladly accept issues and pull requests.
+A collection of scripts for organizing, converting and manipulating image sequences. This has been written to solve my personal workflow needs but I will gladly accept issues and pull requests. As of 2021 it is being actively developed and is still riddled with issues. Good Luck! 
 
 
 ### Organization scripts
@@ -18,12 +18,11 @@ A collection of scripts for organizing, converting and manipulating image sequen
 
 ***rename_uniq*** - Rename individual files so they have a prefix matching the enclosing folder.
 
-***thin*** - Reduce files from a folder by keeping 1 file and skip a number of files, does not recurse into sum folder.
+***thin*** - Reduce files from a folder by keeping 1 file and skip a number of files, does not recurse into sub folders.
 
-***unmix*** - Rename images with their extensions to separate images that have different
-formats.
+***unmix*** - Given a folder sort images by extension and place each extension into its own folder.
 
-***test_image*** - Test image in every input folder.
+***test_images*** - Test images in every input folder using ffmpeg's 'identify'.
 
 
 ### File format conversion scripts
