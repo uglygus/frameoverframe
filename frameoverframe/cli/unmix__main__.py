@@ -22,7 +22,15 @@ ignores .DS_Store files
 """
 
 import argparse
+import logging.config
 import sys
+
+#   logging.getLogger() has to come before importing any frameoverframe modules
+#   except frameoverframe.config that must come before (careful isort might move imports)
+from frameoverframe.config import LOGGING_CONFIG
+
+logging.config.dictConfig(LOGGING_CONFIG)
+log = logging.getLogger("frameoverframe")
 
 from frameoverframe.unmix import unmix
 
@@ -41,7 +49,30 @@ def collect_args():
         help="Source directory. ",
     )
 
-    return parser
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--quiet",
+        "-q",
+        action="store_const",
+        const=logging.WARN,
+        dest="loglevel",
+        help="Only output when necessary.",
+    )
+    group.add_argument(
+        "--verbose",
+        "-v",
+        action="store_const",
+        const=logging.DEBUG,
+        dest="loglevel",
+        help="Increase output verbosity.",
+    )
+
+    args = parser.parse_args()
+
+    if args.loglevel is None:
+        args.loglevel = logging.INFO
+
+    return args
 
 
 def main():
@@ -51,12 +82,19 @@ def main():
 
     """
 
-    parser = collect_args()
-    args = parser.parse_args()
+    args = collect_args()
+    log.setLevel(args.loglevel)
+
+    log.debug(f"args= {args}")
 
     for directory in args.src_dirs:
-        print("unmixing", directory, "...")
-        unmix(directory)
+        log.info(f"unmixing {directory} ...")
+        try:
+            unmix(directory)
+        except FileNotFoundError as e:
+            log.warn(e)
+            return 1
+    return 0
 
 
 if __name__ == "__main__":

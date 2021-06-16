@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+"""Frameoverframe configurations."""
 
 # extensions = ["JPG", "ARW", "CR2"]  # not sure if this ever gets used??
 
@@ -11,22 +11,26 @@ logfile = "fof.log"
 LOGGING_CONFIG = {
     "version": 1,
     "formatters": {
-        "default": {
+        "simple": {
+            "format": "%(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+        "detailed": {
             "format": "%(asctime)s -  %(levelname)s - %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
-        }
+        },
     },
     "handlers": {
         "console": {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
-            "formatter": "default",
+            "formatter": "simple",
             "stream": "ext://sys.stdout",
         },
         "file": {
             "level": "DEBUG",
             "class": "logging.handlers.RotatingFileHandler",
-            "formatter": "default",
+            "formatter": "detailed",
             "filename": logfile,
             "maxBytes": 10485760,  # 10MB
             "backupCount": 3,
@@ -34,9 +38,8 @@ LOGGING_CONFIG = {
     },
     # include "file" in the list of handlers to log to the file too.
     "loggers": {
-        #    "": {"level": "WARN", "handlers": ["console"]},  # root Logger
         "frameoverframe": {
-            "level": "WARN",
+            "level": "INFO",
             "handlers": [
                 "console",
             ],
