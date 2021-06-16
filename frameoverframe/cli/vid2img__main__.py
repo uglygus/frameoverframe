@@ -7,6 +7,14 @@
 
 
 import argparse
+import logging.config
+
+#   logging.getLogger() has to come before importing any frameoverframe modules
+#   except frameoverframe.config that must come before (careful isort might move imports)
+from frameoverframe.config import LOGGING_CONFIG
+
+logging.config.dictConfig(LOGGING_CONFIG)
+log = logging.getLogger("frameoverframe")
 
 from frameoverframe.vid2img import vid2img
 
@@ -27,18 +35,19 @@ def collect_args():
         default=None,
         help="output folder, default is the name of name_of_input_video",
     )
-    #    parser.add_argument('-p', '--profile', action='store', default='preview',
-    #                        choices={'preview', 'best'},
-    #                        help='video file dimensions will be half the full dimentions.')
 
-    return parser
+    args = parser.parse_args()
+
+    return args
 
 
 def main():
     """commandline setup vid2img"""
 
-    parser = collect_args()
-    args = parser.parse_args()
+    args = collect_args()
+    log.setLevel(logging.INFO)
+
+    log.debug(f"args= {args}")
 
     vid2img(args.input_mov, args.output_folder)
 
