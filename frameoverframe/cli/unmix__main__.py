@@ -49,8 +49,8 @@ def collect_args():
         help="Source directory. ",
     )
 
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument(
+    verbosity = parser.add_mutually_exclusive_group()
+    verbosity.add_argument(
         "--quiet",
         "-q",
         action="store_const",
@@ -58,7 +58,7 @@ def collect_args():
         dest="loglevel",
         help="Only output when necessary.",
     )
-    group.add_argument(
+    verbosity.add_argument(
         "--verbose",
         "-v",
         action="store_const",
@@ -67,10 +67,8 @@ def collect_args():
         help="Increase output verbosity.",
     )
 
+    parser.set_defaults(loglevel=logging.INFO)
     args = parser.parse_args()
-
-    if args.loglevel is None:
-        args.loglevel = logging.INFO
 
     return args
 
@@ -85,7 +83,7 @@ def main():
     args = collect_args()
     log.setLevel(args.loglevel)
 
-    log.debug(f"args= {args}")
+    log.debug(f"args= {args} -- {log.level=}")
 
     for directory in args.src_dirs:
         log.info(f"unmixing {directory} ...")
