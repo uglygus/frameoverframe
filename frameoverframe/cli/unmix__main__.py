@@ -67,10 +67,9 @@ def collect_args():
         help="Increase output verbosity.",
     )
 
+    parser.set_defaults(loglevel=logging.INFO)
     args = parser.parse_args()
-
-    if args.loglevel is None:
-        args.loglevel = logging.INFO
+    log.setLevel(args.loglevel)
 
     return args
 
