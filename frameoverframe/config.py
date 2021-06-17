@@ -5,8 +5,7 @@
 # These should be case insensitive. Hopefully.
 RAW_EXTENSIONS = [".CR2", ".ARW", ".NEF", ".DNG"]
 
-
-logfile = "fof.log"
+LOGFILE = "frameoverframe.log"
 
 LOGGING_CONFIG = {
     "version": 1,
@@ -31,7 +30,7 @@ LOGGING_CONFIG = {
             "level": "DEBUG",
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "detailed",
-            "filename": logfile,
+            "filename": LOGFILE,
             "maxBytes": 10485760,  # 10MB
             "backupCount": 3,
         },
