@@ -108,6 +108,11 @@ def sorted_listdir(directory, ignore_hidden=True):
         list (str): List of filenames in the directory sorted alphanumerically.
 
     """
+    # print("top of sorted_listdir()")
+    # print(f"{log.level=}")
+    # log.debug(f"debug")
+    # log.info(f"info")
+    # log.warning(f"warn")
 
     try:
         names = os.listdir(directory)
