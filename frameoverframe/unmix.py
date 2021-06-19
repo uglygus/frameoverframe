@@ -21,7 +21,7 @@ becomes:
 ignores .DS_Store files
 
 """
-import logging.config
+import logging
 import os
 import re
 import shutil
