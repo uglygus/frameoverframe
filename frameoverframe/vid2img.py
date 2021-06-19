@@ -5,6 +5,8 @@ Takes a video file and createws a folder of still images
 
 """
 
+import logging
+
 import os
 import shutil
 import subprocess
@@ -13,7 +15,8 @@ import sys
 from quotelib import quote
 
 # import frameoverframe.utils as utils
-# from frameoverframe.utils import sorted_listdir, test_one_extension
+
+log = logging.getLogger("frameoverframe")
 
 
 def vid2img(input_mov, output_folder=None):
@@ -31,18 +34,26 @@ def vid2img(input_mov, output_folder=None):
 
     ffmpeg_bin = shutil.which("ffmpeg")
 
-    if ffmpeg_bin:
-        print("got here")
-        sys_call = [
-            ffmpeg_bin,
+    if ffmpeg_bin == None:
+        raise FileNotFoundError("FFMPEG binary not found in your $PATH.")
+
+    if log.level <= logging.DEBUG:
+        ff_logflags = []
+    elif log.level == logging.INFO:
+        ff_logflags = ["-loglevel", "error", "-stats"]
+    elif log.level >= logging.WARN:
+        ff_logflags = ["-loglevel", "error", "-nostats"]
+
+    sys_call = [ffmpeg_bin]
+    sys_call.extend(ff_logflags)
+    sys_call.extend(
+        [
             "-i",
             input_mov,
             output_folder + "/" + filename + "_" + "%08d" + ".png",
         ]
+    )
 
-        print("\ncalling : ", " ".join(quote(sys_call)), "\n")
-        subprocess.call(sys_call)
-
-    else:
-        print("ERROR: ffmpeg is required and is not intstalled. ")
-        sys.exit(1)
+    calling_log = "Calling : " + " ".join(quote(sys_call))
+    log.info(calling_log)
+    subprocess.call(sys_call)

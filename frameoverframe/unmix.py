@@ -21,6 +21,7 @@ becomes:
 ignores .DS_Store files
 
 """
+
 import logging
 import os
 import re

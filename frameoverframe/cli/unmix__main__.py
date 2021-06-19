@@ -25,12 +25,15 @@ import argparse
 import logging.config
 import sys
 
+
 #   logging.config.dictConfig() and logging.getLogger()
 #   must come after importing LOGGING_CONFIG
 #   but before any other frameoverframe modules.
 from frameoverframe.config import LOGGING_CONFIG
 
 logging.config.dictConfig(LOGGING_CONFIG)
+log = logging.getLogger("frameoverframe")
+
 
 from frameoverframe.unmix import unmix
 
@@ -51,6 +54,7 @@ def collect_args():
 
     verbosity = parser.add_mutually_exclusive_group()
     verbosity.add_argument(
+
         "--quiet",
         "-q",
         action="store_const",
@@ -58,6 +62,7 @@ def collect_args():
         dest="loglevel",
         help="Only output when necessary.",
     )
+
     verbosity.add_argument(
         "--verbose",
         "-v",
