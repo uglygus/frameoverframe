@@ -160,7 +160,6 @@ def create_workdir(filename, action="", nested=True):
     else:
         outdir = directory + "/" + filenameonly + "-" + action
 
-    # print('making outdir - ', outdir)
     try:
         os.makedirs(outdir, exist_ok=True)
     except OSError as error:
