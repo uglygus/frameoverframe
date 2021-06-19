@@ -9,7 +9,16 @@ Timelapses we end up using at 10x or 20x speed should be thinned.
 """
 
 import argparse
+import logging.config
 import sys
+
+#   logging.config.dictConfig() and logging.getLogger()
+#   must come after importing LOGGING_CONFIG
+#   but before any other frameoverframe modules.
+from frameoverframe.config import LOGGING_CONFIG
+
+logging.config.dictConfig(LOGGING_CONFIG)
+log = logging.getLogger("frameoverframe")
 
 from frameoverframe.thin import thin
 
@@ -19,9 +28,11 @@ def collect_args():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("src_dir", nargs="+", help="Source directory. ")
+    parser.add_argument("src_dirs", nargs="+", help="Source directory. ")
 
-    parser.add_argument("-e", "--every", type=int, required=True, help="copy every nth file")
+    parser.add_argument(
+        "-e", "--every", type=int, required=True, help="copy every nth file. Discard the rest."
+    )
 
     parser.add_argument("-o", "--dst_dir", type=str, default=None, help="Destination directory")
 
@@ -32,7 +43,29 @@ def collect_args():
         help="Copy files to a new direcotory otherwise they are renamed inplace. (default False)",
     )
 
-    return parser
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--quiet",
+        "-q",
+        action="store_const",
+        const=logging.WARN,
+        dest="loglevel",
+        help="Only output when necessary.",
+    )
+    group.add_argument(
+        "--verbose",
+        "-v",
+        action="store_const",
+        const=logging.DEBUG,
+        dest="loglevel",
+        help="Increase output verbosity.",
+    )
+
+    parser.set_defaults(loglevel=logging.INFO)
+    args = parser.parse_args()
+    log.setLevel(args.loglevel)
+
+    return args
 
 
 def main():
@@ -42,18 +75,24 @@ def main():
 
     """
 
-    parser = collect_args()
-    args = parser.parse_args()
+    args = collect_args()
+    log.setLevel(args.loglevel)
 
-    print(f"{args=}")
+    log.debug(f"{args=}")
 
-    thin(
-        args.src_dir,
-        args.every,
-        dst_dir=args.dst_dir,
-        inplace=args.inplace,
-    )
+    args.src_dirs.sort()
+
+    for single_dir in args.src_dirs:
+        thin(
+            single_dir,
+            args.every,
+            dst_dir=args.dst_dir,
+            inplace=args.inplace,
+        )
 
 
 if __name__ == "__main__":
+
+    result = main()
+    print("result=", result)
     sys.exit(main())
