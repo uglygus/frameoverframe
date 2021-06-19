@@ -8,6 +8,7 @@
 """
 
 import os
+import shlex
 import shutil
 import sys
 import time
@@ -17,8 +18,6 @@ from subprocess import PIPE, run
 import multiprocessingsimple
 import quotelib
 from PIL import Image
-
-# from .utils import *
 
 
 def convert_to_png(infile, outfile="", delete_original=True):
@@ -67,6 +66,14 @@ def align_image_stack(infiles, out_dir="", prefix="aligned-"):
     """
 
     align_image_stack_bin = shutil.which("align_image_stack")
+    if align_image_stack_bin is None:
+        raise FileNotFoundError(
+            f"Cannot find binary for 'align_image_stack' in your $PATH.\n"
+            "It is part of hugin. To install:\n"
+            "on MacOS 'brew install hugin' ; export PATH=/Applications/Hugin/tools_mac:$PATH\n"
+            "on linux https://ubuntuhandbook.org/index.php/2020/12/install-hugin-2020-ubuntu-20-04/\n"
+            "on Windows or others: http://hugin.sourceforge.net/"
+        )
 
     original_cwd = os.getcwd()
 
@@ -87,10 +94,13 @@ def align_image_stack(infiles, out_dir="", prefix="aligned-"):
         "--align-to-first",
     ]
 
+    quoted_sys_call = []
     for item in infiles:
         sys_call.append(item)
+        quoted_sys_call.append(shlex.quote(item))
+    quoted_sys_call = []
 
-    print("calling : " + " ".join(quotelib.quote(sys_call)))
+    log.info("calling : ", " ".join(quoted_sys_call))
 
     result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=False)
 
