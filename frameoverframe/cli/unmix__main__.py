@@ -25,12 +25,15 @@ import argparse
 import logging.config
 import sys
 
-#   logging.getLogger() has to come before importing any frameoverframe modules
-#   except frameoverframe.config that must come before (careful isort might move imports)
+
+#   logging.config.dictConfig() and logging.getLogger()
+#   must come after importing LOGGING_CONFIG
+#   but before any other frameoverframe modules.
 from frameoverframe.config import LOGGING_CONFIG
 
 logging.config.dictConfig(LOGGING_CONFIG)
 log = logging.getLogger("frameoverframe")
+
 
 from frameoverframe.unmix import unmix
 
@@ -61,7 +64,6 @@ def collect_args():
     )
 
     verbosity.add_argument(
-
         "--verbose",
         "-v",
         action="store_const",
@@ -86,9 +88,7 @@ def main():
     args = collect_args()
     log.setLevel(args.loglevel)
 
-
     log.debug(f"args= {args} -- {log.level=}")
-
 
     for directory in args.src_dirs:
         log.info(f"unmixing {directory} ...")
