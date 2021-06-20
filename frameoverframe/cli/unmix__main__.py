@@ -25,7 +25,6 @@ import argparse
 import logging.config
 import sys
 
-
 #   logging.config.dictConfig() and logging.getLogger()
 #   must come after importing LOGGING_CONFIG
 #   but before any other frameoverframe modules.
@@ -54,7 +53,6 @@ def collect_args():
 
     verbosity = parser.add_mutually_exclusive_group()
     verbosity.add_argument(
-
         "--quiet",
         "-q",
         action="store_const",

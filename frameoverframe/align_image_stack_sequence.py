@@ -7,7 +7,9 @@
 
 """
 
+import logging
 import os
+import shlex
 import shutil
 import sys
 import time
@@ -15,10 +17,9 @@ from pathlib import Path
 from subprocess import PIPE, run
 
 import multiprocessingsimple
-import quotelib
 from PIL import Image
 
-# from .utils import *
+log = logging.getLogger("frameoverframe")
 
 
 def convert_to_png(infile, outfile="", delete_original=True):
@@ -38,7 +39,8 @@ def convert_to_png(infile, outfile="", delete_original=True):
     try:
         Image.open(infile).save(outfile)
     except IOError:
-        print("cannot convert", infile)
+        # log.warn("Cannot convert to PNG:", infile)
+        raise IOError("Cannot convert to PNG:", infile)
 
     if delete_original:
         os.unlink(infile)
@@ -67,6 +69,14 @@ def align_image_stack(infiles, out_dir="", prefix="aligned-"):
     """
 
     align_image_stack_bin = shutil.which("align_image_stack")
+    if align_image_stack_bin is None:
+        raise FileNotFoundError(
+            f"Cannot find binary for 'align_image_stack' in your $PATH.\n"
+            "It is part of hugin. To install:\n"
+            "on MacOS 'brew install hugin' ; export PATH=/Applications/Hugin/tools_mac:$PATH\n"
+            "on linux https://ubuntuhandbook.org/index.php/2020/12/install-hugin-2020-ubuntu-20-04/\n"
+            "on Windows or others: http://hugin.sourceforge.net/"
+        )
 
     original_cwd = os.getcwd()
 
@@ -77,33 +87,38 @@ def align_image_stack(infiles, out_dir="", prefix="aligned-"):
     else:
         os.chdir(out_dir)
 
+    # fmt: off
     sys_call = [
         align_image_stack_bin,
-        "-a",
-        prefix,
-        # '-v',
-        "-g",  # -g number of grids to search for points defauilt=5 higher is slower.
-        str(8),
+        "-a", prefix,
+        "-g",  str(8), # -g number of grids to search for points default=5 higher is slower.
         "--align-to-first",
     ]
+    # fmt: on
+
+    quoted_sys_call = []
+    for i in sys_call:
+        quoted_sys_call.append(i)
 
     for item in infiles:
         sys_call.append(item)
+        quoted_sys_call.append(shlex.quote(item))
 
-    print("calling : " + " ".join(quotelib.quote(sys_call)))
+    calling_str = "Calling : ", " ".join(quoted_sys_call)
+    log.info(calling_str)
 
     result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=False)
 
     if result.returncode != 0:
-        print("align_image_stack FAILED returncode = ", result.returncode)
-        print("stdout = ", result.stdout)
-        print("stderr = ", result.stderr)
-        sys.exit(1)
+        log.warn("align_image_stack FAILED returncode = ", result.returncode)
+        log.warn("stdout = ", result.stdout)
+        log.warn("stderr = ", result.stderr)
+        raise ChildProcessError("Call to 'align_image_stack' failed.")
 
     for infile in infiles:
         aligned_images.append(os.path.join(out_dir, os.path.basename(infile)))
 
-    print("aligned_images=", aligned_images)
+    log.debug("aligned_images = f{aligned_images}")
     os.chdir(original_cwd)
 
     return aligned_images
@@ -130,9 +145,7 @@ def align_image_stack_sequence(infiles, bracket, out_dir="", prefix="aligned-"):
 
     if out_dir == "":
         parent_dir = Path(infiles[0]).absolute().parent
-        aligned_dir = str(parent_dir) + "-aligned"
-        #         print('parent_dir=',parent_dir)
-        #         print('aligned_dir=',aligned_dir)
+        aligned_dir = str(parent_dir) + "_aligned"
 
         out_dir = os.path.join(parent_dir, aligned_dir)
 
@@ -145,8 +158,6 @@ def align_image_stack_sequence(infiles, bracket, out_dir="", prefix="aligned-"):
     global_counter = 0
     images = []
     for infile in infiles:
-
-        # print('bracket_counter=', bracket_counter)
         images.append(infile)
 
         if bracket_counter >= bracket - 1:
@@ -160,10 +171,7 @@ def align_image_stack_sequence(infiles, bracket, out_dir="", prefix="aligned-"):
                 ]
 
                 an_aligned_image_name = an_orig_filename + final_ext
-
                 an_aligned_image_name = os.path.join(out_dir, an_aligned_image_name)
-
-                # print('testing for presence of: ',an_aligned_image_name)
 
                 if os.path.exists(an_aligned_image_name):
                     already_processed += 1
@@ -184,7 +192,7 @@ def align_image_stack_sequence(infiles, bracket, out_dir="", prefix="aligned-"):
 
                 while png_pool.still_working():
                     time.sleep(1)
-                    print(" waiting for png_pool to finish")
+                    log.debug("Waiting for png_pool to finish")
                     png_pool.status()
 
                 tmp_dir_list = os.listdir(tmp_dir)
