@@ -21,12 +21,16 @@ becomes:
 ignores .DS_Store files
 
 """
+
+import logging
 import os
 import re
 import shutil
 import sys
 
 import frameoverframe.utils as utils
+
+log = logging.getLogger("frameoverframe")
 
 
 def new_dirname(src_dir, ext):
@@ -69,34 +73,34 @@ def unmix(src_dir):
 
     ext_list = utils.ext_list(src_dir)
 
-    print(f"{ext_list=}")
-
     if ext_list == [""]:
-        print("Directory has no files with extensions. Stopping.")
-        sys.exit()
+        log.warn("Directory has no files with extensions. Stopping.")
+        return None
 
     ext_list.sort()
 
     if len(ext_list) == 1:
-        print("unmix: Looks good folder is already unmixed.", src_dir)
-        print("ext_list[0]=", ext_list[0])
+        log.info(f"unmix: Looks good folder is already unmixed. {src_dir}")
+        log.debug(f"{ext_list[0]=}")
         ext = ext_list[0].lstrip(".")
-        os.rename(src_dir, src_dir + "_" + ext)
-        return
+        src_dir_EXT = src_dir + "_" + ext
+        log.debug("Renaming {src_dir} to {src_dir_EXT}")
+        os.rename(src_dir, src_dir_EXT)
+        return [""]
 
     if len(ext_list) == 0:
-        print("unmix: Not sure if we can even get here?", src_dir)
-        ext_list[0]
-        return
+        log.warn(f"unmix: Not sure if we can even get here? Extension list is empty. {src_dir}")
+        return [""]
 
     if len(ext_list) > 2:
-        print("unmix: This folder has more than two extensions. Stopping.", src_dir)
-        return
+        log.warn(f"unmix: This folder has more than two extensions. Stopping. {src_dir}")
+        log.warn(f"{ext_list=}")
+        return [""]
 
     for d in ext_list:
         if d == "":
-            print("unmix: This folder has other folders in it. Stopping.", src_dir)
-            return
+            log.warn(f"unmix: This folder has other folders in it. Stopping. {src_dir}")
+            return [""]
 
     new_dirs = []
 
@@ -107,7 +111,7 @@ def unmix(src_dir):
         try:
             os.mkdir(new_dir)
         except FileExistsError:
-            print("ERROR: Directory already exists. ", new_dir)
+            log.warn(f"ERROR: Directory already exists. {new_dir}")
             raise
 
         new_dirs.append(new_dir)
@@ -118,8 +122,14 @@ def unmix(src_dir):
 
         ext = os.path.splitext(os.path.split(item)[1])[1]
         ext = ext.lstrip(".")
-
-        shutil.move(os.path.join(src_dir, item), new_dirname(src_dir, ext))
+        orig_item = os.path.join(src_dir, item)
+        new_item = new_dirname(src_dir, ext)
+        try:
+            log.debug(f"renaming {orig_item} -> {new_item}")
+            shutil.move(orig_item, new_item)
+        except FileNotFoundError as e:
+            log.warn(f"renaming {orig_item} -> {new_item}")
+            raise
 
     shutil.rmtree(src_dir)
 

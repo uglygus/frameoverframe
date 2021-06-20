@@ -22,7 +22,18 @@ ignores .DS_Store files
 """
 
 import argparse
+import logging.config
 import sys
+
+
+#   logging.config.dictConfig() and logging.getLogger()
+#   must come after importing LOGGING_CONFIG
+#   but before any other frameoverframe modules.
+from frameoverframe.config import LOGGING_CONFIG
+
+logging.config.dictConfig(LOGGING_CONFIG)
+log = logging.getLogger("frameoverframe")
+
 
 from frameoverframe.unmix import unmix
 
@@ -41,7 +52,30 @@ def collect_args():
         help="Source directory. ",
     )
 
-    return parser
+    verbosity = parser.add_mutually_exclusive_group()
+    verbosity.add_argument(
+
+        "--quiet",
+        "-q",
+        action="store_const",
+        const=logging.WARN,
+        dest="loglevel",
+        help="Only output when necessary.",
+    )
+
+    verbosity.add_argument(
+        "--verbose",
+        "-v",
+        action="store_const",
+        const=logging.DEBUG,
+        dest="loglevel",
+        help="Increase output verbosity.",
+    )
+
+    parser.set_defaults(loglevel=logging.INFO)
+    args = parser.parse_args()
+
+    return args
 
 
 def main():
@@ -51,12 +85,19 @@ def main():
 
     """
 
-    parser = collect_args()
-    args = parser.parse_args()
+    args = collect_args()
+    log.setLevel(args.loglevel)
+
+    log.debug(f"args= {args} -- {log.level=}")
 
     for directory in args.src_dirs:
-        print("unmixing", directory, "...")
-        unmix(directory)
+        log.info(f"unmixing {directory} ...")
+        try:
+            unmix(directory)
+        except FileNotFoundError as e:
+            log.warn(e)
+            return 1
+    return 0
 
 
 if __name__ == "__main__":

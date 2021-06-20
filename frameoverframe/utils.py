@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import logging
 import math
 import os
 import re
@@ -14,6 +15,8 @@ from subprocess import PIPE, run
 import exifread
 import quotelib
 from PIL import Image
+
+log = logging.getLogger("frameoverframe")
 
 
 def exif_creation_date(filename):
@@ -90,6 +93,7 @@ def ext_list(directorypath):
         if ext not in extlist:
             extlist.append(ext)
 
+    #    log.debug(f"{utils.__name__} returning {ext_list=}")
     return extlist
 
 
@@ -104,8 +108,18 @@ def sorted_listdir(directory, ignore_hidden=True):
         list (str): List of filenames in the directory sorted alphanumerically.
 
     """
+    # print("top of sorted_listdir()")
+    # print(f"{log.level=}")
+    # log.debug(f"debug")
+    # log.info(f"info")
+    # log.warning(f"warn")
 
-    names = os.listdir(directory)
+    try:
+        names = os.listdir(directory)
+    except FileNotFoundError as e:
+        if log.level == logging.DEBUG:
+            log.exception(f"sorted_listdir() : {e}")
+        raise
 
     names.sort()
     fullpaths = []
@@ -114,7 +128,6 @@ def sorted_listdir(directory, ignore_hidden=True):
         if ignore_hidden and filename.startswith("."):
             continue
         fullpaths.append(os.path.join(directory, filename))
-
     return fullpaths
 
 
@@ -147,7 +160,6 @@ def create_workdir(filename, action="", nested=True):
     else:
         outdir = directory + "/" + filenameonly + "-" + action
 
-    # print('making outdir - ', outdir)
     try:
         os.makedirs(outdir, exist_ok=True)
     except OSError as error:

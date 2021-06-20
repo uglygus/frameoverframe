@@ -1,42 +1,44 @@
-#!/usr/bin/env python3
+"""Frameoverframe configurations."""
 
 # extensions = ["JPG", "ARW", "CR2"]  # not sure if this ever gets used??
 
 # These should be case insensitive. Hopefully.
 RAW_EXTENSIONS = [".CR2", ".ARW", ".NEF", ".DNG"]
 
-
-logfile = "fof.log"
+LOGFILE = "frameoverframe.log"
 
 LOGGING_CONFIG = {
     "version": 1,
     "formatters": {
-        "default": {
+        "simple": {
+            "format": "%(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+        "detailed": {
             "format": "%(asctime)s -  %(levelname)s - %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
-        }
+        },
     },
     "handlers": {
         "console": {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
-            "formatter": "default",
+            "formatter": "simple",
             "stream": "ext://sys.stdout",
         },
         "file": {
             "level": "DEBUG",
             "class": "logging.handlers.RotatingFileHandler",
-            "formatter": "default",
-            "filename": logfile,
+            "formatter": "detailed",
+            "filename": LOGFILE,
             "maxBytes": 10485760,  # 10MB
             "backupCount": 3,
         },
     },
     # include "file" in the list of handlers to log to the file too.
     "loggers": {
-        #    "": {"level": "WARN", "handlers": ["console"]},  # root Logger
         "frameoverframe": {
-            "level": "WARN",
+            "level": "INFO",
             "handlers": [
                 "console",
             ],
