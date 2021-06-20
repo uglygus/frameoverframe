@@ -13,7 +13,8 @@ from pathlib import Path
 from subprocess import PIPE, run
 
 import exifread
-import quotelib
+
+# import quotelib
 from PIL import Image
 
 log = logging.getLogger("frameoverframe")
@@ -59,16 +60,13 @@ def test_one_extension(src_dir, fatal=True):
             ERROR sys.exit(1) if there is more than one extension and fatil is set to True
     """
 
-    # print('test_one_extension(): src_dir=',src_dir)
-
     if len(ext_list(src_dir)) > 1:
         if fatal:
-            print(
-                "ERROR: Directory contains "
-                "files with more than one extension. Consider running 'unmix' ",
-                src_dir,
+            log.warn(
+                f"ERROR: Directory contains files with more than one extension.\n"
+                f" Consider running 'unmix' {src_dir}"
             )
-            sys.exit(1)
+            raise IOError
         else:
             return False
     return True
@@ -163,8 +161,7 @@ def create_workdir(filename, action="", nested=True):
     try:
         os.makedirs(outdir, exist_ok=True)
     except OSError as error:
-        print("ERROR: creating folder {} \n {} ".format(filename, error))
-        sys.exit()
+        raise OSError(f"ERROR: creating folder {filename} \n {error} ")
 
     return outdir
 
@@ -183,26 +180,26 @@ def open_eps(filename, width=None):
         PIL Image object :
     """
 
-    print("width=", width)
+    # print("width=", width)
     original = [float(d) for d in Image.open(filename).size]
-    print("original=", original)
+    # print("original=", original)
     scale = width / original[0]
-    print("scale=", scale)
+    # print("scale=", scale)
     img = Image.open(filename)
 
-    print("new im size = ", img.size)
+    # print("new im size = ", img.size)
 
     if width is not None:
-        print("scaling-loading")
+        # print("scaling-loading")
         img.load(scale=math.ceil(scale))
-        print("new im size after scaling = ", img.size)
+        # print("new im size after scaling = ", img.size)
     if scale != 1:
-        print("scaling-thumbnail")
+        # print("scaling-thumbnail")
         img.thumbnail([int(scale * d) for d in original], Image.ANTIALIAS)
-        print("new img_np size after thumbnail = ", img.size)
+        # print("new img_np size after thumbnail = ", img.size)
 
-    print("sleeping 60...")
-    time.sleep(60)
+    # print("sleeping 60...")
+    # time.sleep(60)
     return img
 
 
@@ -229,7 +226,7 @@ def get_eps_size(epsfile):
             height = int(m.groups()[3]) - int(m.groups()[1])
             break
 
-    # print('get_eps_size({}) returning: ({}x{})'.format(epsfile,width,height))
+    log.debug(f"get_eps_size({epsfile}) returning: ({width}x{height})")
     return (width, height)
 
 
@@ -288,8 +285,8 @@ def calculate_scale_factor(orig_tup, new_tup, allow_crop=False):
     x_ratio = round(new_tup[0] / orig_tup[0], 1)
     y_ratio = round(new_tup[1] / orig_tup[1], 1)
 
-    print("x_ratio=", x_ratio)
-    print("y_ratio=", x_ratio)
+    # print("x_ratio=", x_ratio)
+    # print("y_ratio=", x_ratio)
 
     if allow_crop:
         return min(x_ratio, y_ratio)
@@ -325,10 +322,10 @@ def replace_eps_bounding_box(newx, newy, filepath):
     with open(filepath) as f:
         s = f.read()
         if bounding_box not in s:
-            print('"{}" not found in {}.'.format(bounding_box, filepath))
+            log.debug('"{}" not found in {}.'.format(bounding_box, filepath))
             # return
         if hires_bounding_box not in s:
-            print('"{}" not found in {}.'.format(hires_bounding_box, filepath))
+            log.debug('"{}" not found in {}.'.format(hires_bounding_box, filepath))
             # return
 
     # Safely write the changed content, if found in the file
@@ -356,16 +353,7 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
 
     """
 
-    print(
-        "resize_eps(",
-        "infile=",
-        infile,
-        ", outfile=",
-        outfile,
-        ", newsize=",
-        newsize,
-        ")",
-    )
+    log.debug(f"resize_eps(infile={infile} outfile={outfile} newsize={newsize}")
 
     print("orig_sizze=", get_eps_size(infile))
     print("newsize=", newsize)
@@ -374,32 +362,40 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
 
     gs_bin = shutil.which("gs")
 
-    if not gs_bin:
-        print(f"ERROR: ABORTING:  Cannot find executable 'gs' {gs_bin=}")
+    if gs_bin is None:
+        raise FileNotFoundError(f"Cannot find binary for ghostscript 'gs' in your $PATH.\n")
 
-        sys.exit(1)
-
-    print(f" ------##---- {gs_bin=}")
-    call_list = [
+    # fmt: off
+    sys_call = [
         gs_bin,
-        "-q",  # quiet
-        "-dBATCH",  # exit after last file
-        "-o",
-        outfile,  # quotelib.quote(outfile),
+        "-q",           # quiet
+        "-dBATCH",      # exit after last file
+        "-o", outfile,  # quotelib.quote(outfile),
         "-sDEVICE=eps2write",
         "-dDEVICEWIDTHPOINTS={}".format(newsize[0]),
         "-dDEVICEHEIGHTPOINTS={}".format(newsize[1]),
-        "-c",
-        f'"<</Install {{ {scale:4.2f} {scale:4.2f} scale }}>> setpagedevice"',
+        "-c", f'"<</Install {{ {scale:4.2f} {scale:4.2f} scale }}>> setpagedevice"',
         "-f",
         infile,
     ]
+    # fmt: on
 
-    print("before")
-    print("calling : ", " ".join(quotelib.quote(call_list)))
-    print("after")
+    # print("before")
+    # print("calling : ", " ".join(quotelib.quote(call_list)))
+    # print("after")
 
-    result = run(call_list, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+    quoted_sys_call = []
+    for i in sys_call:
+        quoted_sys_call.append(shlex.quote(item))
+
+    # for item in infiles:
+    #     sys_call.append(item)
+    #     quoted_sys_call.append(shlex.quote(item))
+
+    calling_str = "Calling : ", " ".join(quoted_sys_call)
+    log.info(calling_str)
+
+    result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True)
     print(
         "gs returncode={}, stdout={}, stderr={}".format(
             result.returncode, result.stdout, result.stderr

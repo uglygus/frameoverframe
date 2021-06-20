@@ -28,10 +28,12 @@ import tempfile
 
 from colorama import Fore, Style, init
 from PIL import Image
-from quotelib import quote
 
 from frameoverframe.config import RAW_EXTENSIONS
 from frameoverframe.utils import sorted_listdir, test_one_extension
+
+# from quotelib import quote
+
 
 Image.MAX_IMAGE_PIXELS = 244022272
 
