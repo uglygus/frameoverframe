@@ -9,6 +9,11 @@
 import argparse
 import logging.config
 
+
+#   logging.config.dictConfig() and logging.getLogger()
+#   must come after importing LOGGING_CONFIG
+#   but before any other frameoverframe modules.
+
 from frameoverframe.config import LOGGING_CONFIG
 
 #   logging.config.dictConfig() and logging.getLogger()

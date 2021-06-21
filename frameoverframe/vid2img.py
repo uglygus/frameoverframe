@@ -6,6 +6,7 @@ Takes a video file and createws a folder of still images
 """
 
 import logging
+
 import os
 import shutil
 import subprocess
