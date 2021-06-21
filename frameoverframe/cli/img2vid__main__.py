@@ -12,9 +12,9 @@
 
 """
 
-
 import argparse
 import logging.config
+import sys
 
 from colorama import Fore, Style, init
 from PIL import Image
@@ -73,7 +73,23 @@ def collect_args():
         action="store_true",
         help="Burn in framenumbers.",
     )
-
+    verbosity = parser.add_mutually_exclusive_group()
+    verbosity.add_argument(
+        "--quiet",
+        "-q",
+        action="store_const",
+        const=logging.WARN,
+        dest="loglevel",
+        help="Only output when necessary.",
+    )
+    verbosity.add_argument(
+        "--verbose",
+        "-v",
+        action="store_const",
+        const=logging.DEBUG,
+        dest="loglevel",
+        help="Increase output verbosity.",
+    )
     parser.set_defaults(loglevel=logging.INFO)
     args = parser.parse_args()
 
@@ -88,7 +104,11 @@ def main():
 
     log.debug(f"{args=}")
 
-    img2vid(args.input_dirs, args.output_filename, args.profile, framenumber=args.framenumber)
+    try:
+        img2vid(args.input_dirs, args.output_filename, args.profile, framenumber=args.framenumber)
+    except NotADirectoryError as e:
+        log.warn(e)
+        sys.exit(1)
 
     log.info("DONE.")
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import inspect
 import logging
 import math
 import os
@@ -50,6 +51,11 @@ def file_not_exist(filepath):
 
     """
     return not os.path.isfile(filepath) or os.stat(filepath).st_size == 0
+
+
+def me():
+    """returns the name of the function that called me()"""
+    return inspect.stack()[1][3] + "()"
 
 
 def test_one_extension(src_dir, fatal=True):
@@ -380,33 +386,25 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
     ]
     # fmt: on
 
-    # print("before")
-    # print("calling : ", " ".join(quotelib.quote(call_list)))
-    # print("after")
-
     quoted_sys_call = []
     for i in sys_call:
         quoted_sys_call.append(shlex.quote(item))
-
-    # for item in infiles:
-    #     sys_call.append(item)
-    #     quoted_sys_call.append(shlex.quote(item))
 
     calling_str = "Calling : ", " ".join(quoted_sys_call)
     log.info(calling_str)
 
     result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-    print(
+    log.debug(
         "gs returncode={}, stdout={}, stderr={}".format(
             result.returncode, result.stdout, result.stderr
         )
     )
 
     if result.returncode:
-        print("FAILED: ", gs_bin)
-        print("returncode = ", result.returncode)
-        print("stdout = ", result.stderr)
-        print("stderr = ", result.stderr)
+        log.debug("FAILED: ", gs_bin)
+        log.debug("returncode = ", result.returncode)
+        log.debug("stdout = ", result.stderr)
+        log.debug("stderr = ", result.stderr)
         sys.exit(1)
 
     # If the eps does not fill the box the new box will be smaller then desired
