@@ -20,6 +20,7 @@ best:
 
 """
 
+import inspect
 import logging
 import os
 import shlex
@@ -32,7 +33,7 @@ from colorama import Fore, Style, init
 from PIL import Image
 
 from frameoverframe.config import RAW_EXTENSIONS
-from frameoverframe.utils import sorted_listdir, test_one_extension
+from frameoverframe.utils import me, sorted_listdir, test_one_extension
 
 log = logging.getLogger("frameoverframe")
 
@@ -54,13 +55,12 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
 
     # if any dir has more than one extension in it ERROR out
     for _dir in input_dirs:
+        log.debug(f"{me()} Processing directory: {_dir}")
         if not test_one_extension(_dir, fatal=False):
             log.info(
                 f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Directory contains more than one extension. "
             )
             return 1
-        log.debug("_dir[0][0] = ", _dir[0][0])
-        log.debug("RAW_EXTENSONS=", RAW_EXTENSIONS)
         if _dir[0][0] in RAW_EXTENSIONS:
             log.info(
                 f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Directory contains raw file with extension, {_dir[0][0]} "
@@ -157,7 +157,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         out_filepath = output_file
 
     try:
-        print("openning-->", sorted_listdir(input_dirs[0])[0])
+        log.debug(f"{me()} openning-->{sorted_listdir(input_dirs[0])[0]}")
         im = Image.open(sorted_listdir(input_dirs[0])[0])
     except Image.DecompressionBombError:
         log.warn(
@@ -215,8 +215,8 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         for item in sys_call:
             quoted_sys_call.append(shlex.quote(item))
 
-        calling_str = "Calling : ", " ".join(quoted_sys_call)
-        log.info(calling_str)
+        calling_str = "Calling : " + " ".join(quoted_sys_call)
+        log.info(f"\n{calling_str}\n")
 
         subprocess.call(sys_call)
 
