@@ -4,14 +4,15 @@ test_images - test each image in every input folder.
 relies on identify from imagemagick
 """
 
-
+import logging
 import os
 import shutil
 import subprocess
 
-from quotelib import quote
-
 from frameoverframe.utils import sorted_listdir
+
+log = logging.getLogger("frameoverframe")
+
 
 vid_exts = ["mov", "mp4", "avi"]
 
@@ -30,7 +31,7 @@ def test_image(image):
        a string containing an error message otherwise
     """
 
-    print(image)
+    log.info(image)
 
     ext = os.path.splitext(image)[1]
 
