@@ -3,10 +3,37 @@
     ffmpeg wrapper
     takes a folder of images creates a video
 
+    Takes one or more folders of images and creates a video. \
+    This video is just a preview not meant for editing it is highly compressed. \
+    Framerate 24fps. \
+    By default video dimensions are the same as the original images \
+    the --preview option will make the dimensions 1080p or smaller."
+)
+
 """
 
 
 import argparse
+import logging.config
+
+from colorama import Fore, Style, init
+from PIL import Image
+
+from frameoverframe.config import LOGGING_CONFIG
+
+#   logging.config.dictConfig() and logging.getLogger()
+#   must come after importing LOGGING_CONFIG
+#   but before any other frameoverframe modules.
+
+logging.config.dictConfig(LOGGING_CONFIG)
+
+from frameoverframe.config import RAW_EXTENSIONS
+from frameoverframe.utils import sorted_listdir, test_one_extension
+
+log = logging.getLogger("frameoverframe")
+
+Image.MAX_IMAGE_PIXELS = 244022272  # otherwise PIL bails on large images
+
 
 from frameoverframe.img2vid import img2vid
 
@@ -47,21 +74,24 @@ def collect_args():
         help="Burn in framenumbers.",
     )
 
-    return parser
+    parser.set_defaults(loglevel=logging.INFO)
+    args = parser.parse_args()
+
+    return args
 
 
 def main():
     """commandline setup img2vid"""
 
-    parser = collect_args()
-    args = parser.parse_args()
+    args = collect_args()
+    log.setLevel(args.loglevel)
 
-    print(f"{args=}")
+    log.debug(f"{args=}")
 
     img2vid(args.input_dirs, args.output_filename, args.profile, framenumber=args.framenumber)
 
-    print("DONE.")
+    log.info("DONE.")
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
