@@ -34,9 +34,7 @@ from PIL import Image
 from frameoverframe.config import RAW_EXTENSIONS
 from frameoverframe.utils import sorted_listdir, test_one_extension
 
-
 log = logging.getLogger("frameoverframe")
-
 
 Image.MAX_IMAGE_PIXELS = 244022272
 
