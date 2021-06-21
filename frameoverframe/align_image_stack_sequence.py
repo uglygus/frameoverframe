@@ -21,6 +21,7 @@ from PIL import Image
 
 log = logging.getLogger("frameoverframe")
 
+
 def convert_to_png(infile, outfile="", delete_original=True):
     """
     use PIL to convert an image to png and optionally delete original
@@ -106,7 +107,6 @@ def align_image_stack(infiles, out_dir="", prefix="aligned-"):
 
     calling_str = "Calling : ", " ".join(quoted_sys_call)
     log.info(calling_str)
-
 
     result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=False)
 

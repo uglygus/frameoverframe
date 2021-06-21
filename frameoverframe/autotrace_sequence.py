@@ -92,8 +92,8 @@ def process_file(filename, args):
                 waiting_to_place_job = False
 
             else:
-                dots += 1
-                print("all job slots are full sleeping...", str(dots), "seconds", end="\r", flush=True)
+                dots = dots + 1
+                log.warning(f"all job slots are full sleeping...{str(dots)} {seconds}")
                 time.sleep(1)
 
                 for job in jobs:
@@ -105,5 +105,6 @@ def process_file(filename, args):
                         dots = 2
 
     if SAVE_OUTPUT_MOV:
+        fullname = basename(filename) + ".mp4"
         outclip = ImageSequenceClip(images_list, fps=24)
-        outclip.write_videofile(basename(filename) + .mp4, fps=24)
+        outclip.write_videofile(fullname, fps=24)
