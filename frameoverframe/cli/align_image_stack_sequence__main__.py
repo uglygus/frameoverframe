@@ -5,8 +5,18 @@
 """
 
 import argparse
+import logging.config
 import os
 import sys
+
+#   logging.config.dictConfig() and logging.getLogger()
+#   must come after importing LOGGING_CONFIG
+#   but before any other frameoverframe modules.
+from frameoverframe.config import LOGGING_CONFIG
+
+logging.config.dictConfig(LOGGING_CONFIG)
+log = logging.getLogger("frameoverframe")
+
 
 from frameoverframe.align_image_stack_sequence import align_image_stack_sequence
 
@@ -22,7 +32,30 @@ def collect_args():
     )
 
     parser.add_argument("input", nargs="*", default=None, help="folder(s)")
-    return parser
+
+    verbosity = parser.add_mutually_exclusive_group()
+    verbosity.add_argument(
+        "--quiet",
+        "-q",
+        action="store_const",
+        const=logging.WARN,
+        dest="loglevel",
+        help="Only output when necessary.",
+    )
+
+    verbosity.add_argument(
+        "--verbose",
+        "-v",
+        action="store_const",
+        const=logging.DEBUG,
+        dest="loglevel",
+        help="Increase output verbosity.",
+    )
+
+    parser.set_defaults(loglevel=logging.INFO)
+    args = parser.parse_args()
+
+    return args
 
 
 def main():
@@ -48,12 +81,14 @@ def main():
 
     """
 
-    parser = collect_args()
-    args = parser.parse_args()
+    args = collect_args()
+    log.setLevel(args.loglevel)
 
     if not args.input:
         parser.print_help()
         return 0
+
+    log.debug(f"{args=}")
 
     for single_input in args.input:
 
@@ -67,9 +102,9 @@ def main():
             align_image_stack_sequence(image_list, args.brackets)
 
         else:
-            print("Cannot process files. input must be a direcotry of images")
+            log.warn("Cannot process files. Input must be a direcotry of images")
             return 1
-
+    log.info("DONE.")
     return 0
 
 
