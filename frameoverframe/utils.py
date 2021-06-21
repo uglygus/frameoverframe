@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
+import inspect
 import logging
 import math
 import os
 import re
+import shlex
 import shutil
 import sys
-import time
 from functools import reduce
 from itertools import takewhile
 from pathlib import Path
@@ -52,6 +53,11 @@ def file_not_exist(filepath):
     return not os.path.isfile(filepath) or os.stat(filepath).st_size == 0
 
 
+def me():
+    """returns the name of the function that called me()"""
+    return inspect.stack()[1][3] + "()"
+
+
 def test_one_extension(src_dir, fatal=True):
     """make sure the directory only has one extension type otherwise error out
 
@@ -62,13 +68,12 @@ def test_one_extension(src_dir, fatal=True):
 
     if len(ext_list(src_dir)) > 1:
         if fatal:
-            log.warn(
+            log.warning(
                 f"ERROR: Directory contains files with more than one extension.\n"
                 f" Consider running 'unmix' {src_dir}"
             )
             raise IOError
-        else:
-            return False
+        return False
     return True
 
 
@@ -110,7 +115,7 @@ def sorted_listdir(directory, ignore_hidden=True):
     # print(f"{log.level=}")
     # log.debug(f"debug")
     # log.info(f"info")
-    # log.warning(f"warn")
+    # log.warninging(f"warn")
 
     try:
         names = os.listdir(directory)
@@ -161,7 +166,7 @@ def create_workdir(filename, action="", nested=True):
     try:
         os.makedirs(outdir, exist_ok=True)
     except OSError as error:
-        raise OSError(f"ERROR: creating folder {filename} \n {error} ")
+        raise OSError(f"ERROR: creating folder {filename} \n {error} ") from error
 
     return outdir
 
@@ -218,7 +223,7 @@ def get_eps_size(epsfile):
 
     pattern = re.compile(r"%%BoundingBox: (\d*) (\d*) (\d+) (\d+)")
 
-    for i, line in enumerate(open(epsfile, "r")):
+    for _, line in enumerate(open(epsfile, "r")):
         m = re.search(pattern, line)
 
         if m:
@@ -290,8 +295,7 @@ def calculate_scale_factor(orig_tup, new_tup, allow_crop=False):
 
     if allow_crop:
         return min(x_ratio, y_ratio)
-    else:
-        return max(x_ratio, y_ratio)
+    return max(x_ratio, y_ratio)
 
 
 def replace_eps_bounding_box(newx, newy, filepath):
@@ -363,7 +367,7 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
     gs_bin = shutil.which("gs")
 
     if gs_bin is None:
-        raise FileNotFoundError(f"Cannot find binary for ghostscript 'gs' in your $PATH.\n")
+        raise FileNotFoundError("Cannot find binary for ghostscript 'gs' in your $PATH.\n")
 
     # fmt: off
     sys_call = [
@@ -380,33 +384,25 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
     ]
     # fmt: on
 
-    # print("before")
-    # print("calling : ", " ".join(quotelib.quote(call_list)))
-    # print("after")
-
     quoted_sys_call = []
-    for i in sys_call:
+    for item in sys_call:
         quoted_sys_call.append(shlex.quote(item))
-
-    # for item in infiles:
-    #     sys_call.append(item)
-    #     quoted_sys_call.append(shlex.quote(item))
 
     calling_str = "Calling : ", " ".join(quoted_sys_call)
     log.info(calling_str)
 
-    result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-    print(
+    result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=True)
+    log.debug(
         "gs returncode={}, stdout={}, stderr={}".format(
             result.returncode, result.stdout, result.stderr
         )
     )
 
     if result.returncode:
-        print("FAILED: ", gs_bin)
-        print("returncode = ", result.returncode)
-        print("stdout = ", result.stderr)
-        print("stderr = ", result.stderr)
+        log.debug("FAILED: {gs_bin}")
+        log.debug("returncode = {result.returncode}")
+        log.debug("stdout = {result.stderr}")
+        log.debug("stderr = {result.stderr}")
         sys.exit(1)
 
     # If the eps does not fill the box the new box will be smaller then desired
