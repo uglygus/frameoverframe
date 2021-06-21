@@ -9,11 +9,17 @@
 import argparse
 import logging.config
 
+from frameoverframe.config import LOGGING_CONFIG
+
 #   logging.config.dictConfig() and logging.getLogger()
 #   must come after importing LOGGING_CONFIG
 #   but before any other frameoverframe modules.
 
-from frameoverframe.config import LOGGING_CONFIG
+
+#   logging.config.dictConfig() and logging.getLogger()
+#   must come after importing LOGGING_CONFIG
+#   but before any other frameoverframe modules.
+
 
 logging.config.dictConfig(LOGGING_CONFIG)
 log = logging.getLogger("frameoverframe")
@@ -30,7 +36,7 @@ def collect_args():
     )
 
     parser.add_argument("input_mov", help="video file...")
-    group = parser.add_mutually_exclusive_group()
+    verbosity = parser.add_mutually_exclusive_group()
     parser.add_argument(
         "-o",
         "--output_folder",
@@ -38,7 +44,7 @@ def collect_args():
         default=None,
         help="output folder, default is the name of name_of_input_video",
     )
-    group.add_argument(
+    verbosity.add_argument(
         "--quiet",
         "-q",
         action="store_const",
@@ -46,7 +52,7 @@ def collect_args():
         dest="loglevel",
         help="Only output when necessary.",
     )
-    group.add_argument(
+    verbosity.add_argument(
         "--verbose",
         "-v",
         action="store_const",
@@ -55,7 +61,7 @@ def collect_args():
         help="Increase output verbosity.",
     )
 
-    parser.set_defaults(loglevel=logging.INFO)
+    verbosity.set_defaults(loglevel=logging.INFO)
     args = parser.parse_args()
     log.setLevel(args.loglevel)
 
