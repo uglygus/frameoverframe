@@ -21,7 +21,6 @@ from PIL import Image
 
 log = logging.getLogger("frameoverframe")
 
-
 def convert_to_png(infile, outfile="", delete_original=True):
     """
     use PIL to convert an image to png and optionally delete original
@@ -100,12 +99,14 @@ def align_image_stack(infiles, out_dir="", prefix="aligned-"):
     for i in sys_call:
         quoted_sys_call.append(i)
 
+    quoted_sys_call = []
     for item in infiles:
         sys_call.append(item)
         quoted_sys_call.append(shlex.quote(item))
 
     calling_str = "Calling : ", " ".join(quoted_sys_call)
     log.info(calling_str)
+
 
     result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=False)
 
@@ -119,6 +120,7 @@ def align_image_stack(infiles, out_dir="", prefix="aligned-"):
         aligned_images.append(os.path.join(out_dir, os.path.basename(infile)))
 
     log.debug("aligned_images = f{aligned_images}")
+
     os.chdir(original_cwd)
 
     return aligned_images
@@ -145,6 +147,7 @@ def align_image_stack_sequence(infiles, bracket, out_dir="", prefix="aligned-"):
 
     if out_dir == "":
         parent_dir = Path(infiles[0]).absolute().parent
+
         aligned_dir = str(parent_dir) + "_aligned"
 
         out_dir = os.path.join(parent_dir, aligned_dir)
