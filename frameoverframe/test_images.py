@@ -32,18 +32,18 @@ def test_image(image):
        a string containing an error message otherwise
     """
 
-    log.info(image)
+    log.debug("working on : {}".format(image))
 
     ext = os.path.splitext(image)[1]
 
     image_error = None
 
     if not os.path.isfile(image):
-        log.info("skipping (not a file): ", image)
+        log.info("skipping (not a file): {}".format(image))
         return None
 
     if ext in vid_exts:
-        log.info("skipping : ", image)
+        log.info("skipping : {}".format(image))
         return None
 
     identify_bin = shutil.which("identify")
@@ -53,7 +53,7 @@ def test_image(image):
     result = subprocess.run(sys_call, capture_output=True)
 
     concat_result = str(result.stdout + result.stderr)
-    #  log.info('concat_result=', concat_result)
+    log.debug("concat_result = {}".format(concat_result))
 
     error_strings = [
         "no decode delegate for this image format",
@@ -65,7 +65,7 @@ def test_image(image):
         "NoDecodeDelegateForThisImageFormat",
     ]
 
-    # log.info('image_error=', image_error)
+    log.debug("image_error= {}".format(image_error))
 
     for error_string in error_strings:
         if error_string in concat_result:
@@ -89,13 +89,14 @@ def test_images(input_dirs):
     try:
         for image_dir in input_dirs:
             for image in sorted_listdir(image_dir):
-                test_image = image
-                print(f"{test_image=}")
                 result = test_image(image)
                 if result is not None:
-                    log.debug(result)
+                    log.warn(result)
     except FileNotFoundError as e:
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        raise
 
     if 0 == len(sorted_listdir(image_dir)):
-        print("Input directory contains no images.")
+        log.info("Input directory contains no images.")
