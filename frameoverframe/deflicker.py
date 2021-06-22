@@ -65,7 +65,16 @@ def calc_brightness(images, sigma=2.5):
     brightness = []
     # prog = getProgressBar(logger)
     for filename in images:
-        image = io.imread(filename)
+        try:
+            image = io.imread(filename)
+        except ValueError as e:
+            #        print("cooper ValueError=", e)
+            if "truncated" in str(e):
+                raise ValueError(
+                    "---TRUNCATED---> " + filename + "\n" + str(e)
+                )  # filename + ":" + str(e)
+            else:
+                raise ValueError(filename + "\n" + str(e))
         mask = np.ones_like(image[:, :, 0], dtype=bool)
 
         if sigma is not None:

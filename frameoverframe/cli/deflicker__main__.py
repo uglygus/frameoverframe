@@ -88,13 +88,21 @@ def main():
 
         print("args==", args)
 
-        deflicker(
-            images,
-            args["--window"],
-            args["--outdir"],
-            fmt=args["--format"],
-            sigma=args["--sigma"],
-        )
+        try:
+            deflicker(
+                images,
+                args["--window"],
+                args["--outdir"],
+                fmt=args["--format"],
+                sigma=args["--sigma"],
+            )
+        except ValueError as e:
+            print(e)
+            return 1
+        except OSError as e:
+            print("OSError =", e)
+            return 1
+
     except DocoptExit as e:
         print(e)
     except SchemaError as e:
@@ -104,4 +112,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
