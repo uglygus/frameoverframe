@@ -33,6 +33,7 @@ def vid2img(input_mov, output_folder=None):
 
     ffmpeg_bin = shutil.which("ffmpeg")
 
+
     if ffmpeg_bin == None:
         raise FileNotFoundError("FFMPEG binary not found in your $PATH.")
 
@@ -42,6 +43,7 @@ def vid2img(input_mov, output_folder=None):
         ff_logflags = ["-loglevel", "error", "-stats"]
     elif log.level >= logging.WARN:
         ff_logflags = ["-loglevel", "error", "-nostats"]
+
 
     sys_call = [ffmpeg_bin]
     sys_call.extend(ff_logflags)
