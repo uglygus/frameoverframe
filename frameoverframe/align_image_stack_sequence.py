@@ -97,10 +97,7 @@ def align_image_stack(infiles, out_dir="", prefix="aligned-"):
     # fmt: on
 
     quoted_sys_call = []
-    for i in sys_call:
-        quoted_sys_call.append(i)
 
-    quoted_sys_call = []
     for item in infiles:
         sys_call.append(item)
         quoted_sys_call.append(shlex.quote(item))
