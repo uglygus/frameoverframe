@@ -7,13 +7,10 @@ Takes a video file and createws a folder of still images
 
 import logging
 import os
+import shlex
 import shutil
 import subprocess
 import sys
-
-from quotelib import quote
-
-# import frameoverframe.utils as utils
 
 log = logging.getLogger("frameoverframe")
 
@@ -33,7 +30,6 @@ def vid2img(input_mov, output_folder=None):
 
     ffmpeg_bin = shutil.which("ffmpeg")
 
-
     if ffmpeg_bin == None:
         raise FileNotFoundError("FFMPEG binary not found in your $PATH.")
 
@@ -43,7 +39,6 @@ def vid2img(input_mov, output_folder=None):
         ff_logflags = ["-loglevel", "error", "-stats"]
     elif log.level >= logging.WARN:
         ff_logflags = ["-loglevel", "error", "-nostats"]
-
 
     sys_call = [ffmpeg_bin]
     sys_call.extend(ff_logflags)
@@ -55,6 +50,12 @@ def vid2img(input_mov, output_folder=None):
         ]
     )
 
-    calling_log = "Calling : " + " ".join(quote(sys_call))
+    quoted_sys_call = []
+
+    for item in sys_call:
+        quoted_sys_call.append(shlex.quote(item))
+
+    calling_str = "Calling : ", " ".join(quoted_sys_call)
+    calling_log = "Calling : " + " ".join(sys_call)
     log.info(calling_log)
     subprocess.call(sys_call)
