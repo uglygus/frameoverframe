@@ -36,7 +36,7 @@ def collect_args():
     )
 
     parser.add_argument("input_mov", help="video file...")
-    verbosity = parser.add_mutually_exclusive_group()
+
     parser.add_argument(
         "-o",
         "--output_folder",
@@ -44,6 +44,7 @@ def collect_args():
         default=None,
         help="output folder, default is the name of name_of_input_video",
     )
+    verbosity = parser.add_mutually_exclusive_group()
     verbosity.add_argument(
         "--quiet",
         "-q",

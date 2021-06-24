@@ -14,8 +14,6 @@ from pathlib import Path
 from subprocess import PIPE, run
 
 import exifread
-
-# import quotelib
 from PIL import Image
 
 log = logging.getLogger("frameoverframe")
@@ -374,7 +372,7 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
         gs_bin,
         "-q",           # quiet
         "-dBATCH",      # exit after last file
-        "-o", outfile,  # quotelib.quote(outfile),
+        "-o", outfile,
         "-sDEVICE=eps2write",
         "-dDEVICEWIDTHPOINTS={}".format(newsize[0]),
         "-dDEVICEHEIGHTPOINTS={}".format(newsize[1]),

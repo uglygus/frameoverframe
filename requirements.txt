@@ -33,7 +33,6 @@ progressbar == 2.5
 # frameoverframe/cli/align_image_stack_sequence__main__.py: 21
 # frameoverframe/img2vid.py: 26
 # frameoverframe/utils.py: 11
-quotelib == 0.0.1
 
 # frameoverframe/cli/deflicker__main__.py: 23
 schema == 0.7.2
