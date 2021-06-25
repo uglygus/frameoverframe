@@ -7,6 +7,17 @@
 
 
 import argparse
+import logging.config
+import sys
+
+from frameoverframe.config import LOGGING_CONFIG
+
+#   logging.config.dictConfig() and logging.getLogger()
+#   must come after importing LOGGING_CONFIG
+#   but before any other frameoverframe modules.
+
+logging.config.dictConfig(LOGGING_CONFIG)
+log = logging.getLogger("frameoverframe")
 
 from frameoverframe.raw2dng import raw2dng
 
@@ -16,27 +27,54 @@ def collect_args():
 
     parser = argparse.ArgumentParser(
         description='Wrapper for "Adobe DNG Converter" \
-                     Accepts a directory instead of individual files.'
+                     Accepts a directories instead of individual files.'
     )
 
     parser.add_argument("input_dirs", nargs="+", help="directory of images...")
     parser.add_argument(
         "-o", "--output_dir", action="store", default=None, help="outputdirectory for the DNG files"
     )
+    verbosity = parser.add_mutually_exclusive_group()
+    verbosity.add_argument(
+        "--quiet",
+        "-q",
+        action="store_const",
+        const=logging.WARN,
+        dest="loglevel",
+        help="Only output when necessary.",
+    )
+    verbosity.add_argument(
+        "--verbose",
+        "-v",
+        action="store_const",
+        const=logging.DEBUG,
+        dest="loglevel",
+        help="Increase output verbosity.",
+    )
 
-    return parser
+    verbosity.set_defaults(loglevel=logging.INFO)
+    args = parser.parse_args()
+    log.debug("args.loglevel = {}".format(args.loglevel))
+    return args
 
 
 def main():
-    """commandline setup img2vid"""
+    """Use Adobe DNG Converter to convert RAW files to DNG
+    Requires Adobe DNG Converter to be installed.
+    """
 
-    parser = collect_args()
-    args = parser.parse_args()
+    args = collect_args()
+    log.setLevel(args.loglevel)
 
-    raw2dng(args.input_dirs, args.output_dir)
+    try:
+        raw2dng(args.input_dirs, args.output_dir)
+    except FileNotFoundError as e:
+        print("FileNotFoundError: ", e)
+        return 1
 
-    print("DONE.")
+    log.info("DONE.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
