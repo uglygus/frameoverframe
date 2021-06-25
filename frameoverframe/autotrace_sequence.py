@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import logging
 import multiprocessing
 import time
 
@@ -8,6 +9,8 @@ from moviepy.editor import ImageSequenceClip, VideoClip, VideoFileClip
 from PIL import Image
 
 from .autotrace import autotrace
+
+log = logging.getLogger("frameoverframe")
 
 SAVE_OUTPUT_MOV = False
 
@@ -93,7 +96,7 @@ def process_file(filename, args):
 
             else:
                 dots = dots + 1
-                log.warning(f"all job slots are full sleeping...{str(dots)} {seconds}")
+                log.warning(f"all job slots are full sleeping...{str(dots)}")
                 time.sleep(1)
 
                 for job in jobs:
