@@ -4,8 +4,12 @@ import argparse
 import os
 import sys
 
+importlogging
+
 import frameoverframe.autotrace
 import frameoverframe.autotrace_sequence
+
+log = logging.getLogger("frameoverframe")
 
 
 def collect_args():

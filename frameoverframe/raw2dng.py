@@ -31,7 +31,6 @@ def what_strange_land_is_this():
     )
     return None
 
-
 def Adobe_DNG_Converter_name():
 
     land = what_strange_land_is_this()
@@ -64,6 +63,7 @@ def WSL_path_converter(path):
 
     quoted_sys_call = [shlex.quote(i) for i in sys_call]
 
+
     log.info("Calling : " + " ".join(quoted_sys_call))
     winpath = subprocess.check_output(sys_call)
     winpath = winpath.strip()
@@ -74,6 +74,7 @@ def raw2dng(input_dirs, output_dir):
     """convert RAW to DNG"""
 
     log.debug("Top of raw2dng() input_dirs={} output_dir={}".format(input_dirs, output_dir))
+
 
     # add possible locations for Adobe DNG Converter to the PATH
     os.environ["PATH"] = (

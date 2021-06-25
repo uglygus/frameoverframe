@@ -12,14 +12,16 @@
 """
 
 import inspect
+import logging
+import shlex
 import shutil
 import sys
 from pathlib import Path
 from subprocess import PIPE, run
 
-import quotelib
-
 from .utils import create_workdir, file_not_exist, open_eps, resize_eps
+
+log = logging.getLogger("frameoverframe")
 
 
 def autotrace(img, filename, framenumber, centerline, save_png=False):
@@ -70,14 +72,15 @@ def autotrace(img, filename, framenumber, centerline, save_png=False):
         img.save(infile)
 
     if file_not_exist(epsfile):
-        call_list = [autotrace_bin, infile, "--output-file", epsfile, "--despeckle-level", "20"]
+        sys_call = [autotrace_bin, infile, "--output-file", epsfile, "--despeckle-level", "20"]
 
         if centerline:
-            call_list.append("--centerline")
+            sys_call.append("--centerline")
 
-        print("calling : ", " ".join(quotelib.quote(call_list)))
-        #   input('xxx abcd ...')
-        result = run(call_list, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+        quoted_sys_call = [shlex.quote(i) for i in sys_call]
+        log.info("Calling : " + " ".join(quoted_sys_call))
+
+        result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True)
         print(
             "autotrace returncode={}, stdout={}, stderr={}".format(
                 result.returncode, result.stdout, result.stderr
