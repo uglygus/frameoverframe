@@ -50,12 +50,8 @@ def vid2img(input_mov, output_folder=None):
         ]
     )
 
-    # quoted_sys_call = []
-    #
-    # for item in sys_call:
-    #     quoted_sys_call.append(shlex.quote(item))
-    print("dddd")
     quoted_sys_call = [shlex.quote(i) for i in sys_call]
     log.info("Calling : " + " ".join(quoted_sys_call))
     #    log.info("Calling : " + " ".join(sys_call))
+
     subprocess.call(sys_call)
