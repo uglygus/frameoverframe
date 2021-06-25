@@ -17,13 +17,19 @@ import frameoverframe.utils as utils
 def collect_args():
     """collect commandline arguments"""
 
-
-    parser = argparse.ArgumentParser( \
+    parser = argparse.ArgumentParser(
         description="Provides information such as length, exif tags, frames per second."
     )
 
     parser.add_argument("arguments", nargs="*", default=None, help="folder(s)")
-    parser.add_argument("-f", "--fps",action="store_const", const="fps", dest="command", help="Report the speed of shooting with a graph.")
+    parser.add_argument(
+        "-f",
+        "--fps",
+        action="store_const",
+        const="fps",
+        dest="command",
+        help="Report the speed of shooting with a graph.",
+    )
     # parser.add_argument(
     #     "-a",
     #     "--alltags",
@@ -41,17 +47,16 @@ def main():
 
     args = collect_args()
 
-    print('args=', args)
+    print("args=", args)
 
+    print("TYPE INPUT=", type(args.arguments))
 
-    print('TYPE INPUT=', type(args.arguments))
-
-    print('args.argumebnts=', args.arguments)
+    print("args.argumebnts=", args.arguments)
 
     if args.command == "fps":
         for dirfile in args.arguments:
             print(f"{dirfile=}")
-            dirfile=os.path.abspath(dirfile)
+            dirfile = os.path.abspath(dirfile)
             print(f"{dirfile=}")
             if os.path.isdir(dirfile):
                 info.fps_dir(dirfile)
@@ -65,9 +70,7 @@ def main():
                 print("No path provided. eg: $ fofinfo --fps ./somedir/")
                 return 1
 
-
             # ["fps", "a", "alltags", "input"]:
-
 
             ### hese need to be implemented. do not delete
     # frames = len(os.listdir(item))
