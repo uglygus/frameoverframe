@@ -29,6 +29,9 @@ def thin_shape():
     pass
 
 
+# def keep_every_n()
+
+
 def thin(src_dir, every, dst_dir=None, inplace=False):
     """
     thins files from a folder. Does not recurse into sum folders.
