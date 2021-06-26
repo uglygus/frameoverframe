@@ -57,7 +57,7 @@ setuptools.setup(
             "rename_uniq = frameoverframe.cli.rename_uniq__main__:main",
             "renumber = frameoverframe.cli.renumber__main__:main",
             "thin = frameoverframe.cli.thin__main__:main",
-            "test_images = frameoverframe.cli.test_images__main__:main",
+            "check_images = frameoverframe.cli.check_images__main__:main",
             "autotrace_sequence = frameoverframe.cli.autotrace_sequence__main__:main",
             "unmix = frameoverframe.cli.unmix__main__:main",
             "vid2img = frameoverframe.cli.vid2img__main__:main",
