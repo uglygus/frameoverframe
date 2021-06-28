@@ -5,17 +5,28 @@
         accepts a list of directories to be combined and renumbered. Combines files into
         directories with max_files in each directory.
 
+    When sorting by filename it uses the enclosing folder and filename as the key.
+    ie: /pth/to/another/file0000.jpg
+        /another/pth/to/another/file0000.jpg
+        should produce an error because they have the same key:
+            another/file0000.jpg
 
+    ie: /pth/to/another/file0000.jpg
+        /pth/to/another-1/file0000.jpg
+        should sort using the keys:
+            /another/file0000.jpg  (pos1)
+            /another-1/file0000.jpg (pos2)
 """
 
 
 import argparse
 import math
 import os
+import pathlib
 import re
 import shutil
 import sys
-from pathlib import Path
+from pathlib import PurePath
 from time import sleep, strftime
 
 from .renumber import renumber
@@ -34,23 +45,101 @@ def strip_bad_ending(string):
     return string.rstrip(" _-")
 
 
-def sort_without_suffix(items):
-    """Sort a list after removing the common suffix.
-    We need this because:
-    ["A-2_ARW", "A_ARW", "A-1_ARW"].sort() produces ["A-1_ARW", "A-2_ARW", "A_ARW"]
-    we want: ["A_ARW", "A-1_ARW", "A-2_ARW"]
+def parent_and_basename(filepath):
+    """returns the parent and basename of a filepath
+    ie: /the/path/to/folder/00001.JPG
+    returns "folder/00001.JPG"
     """
 
-    csuffix = common_suffix(items)
+    path = pathlib.PurePath(filepath)
+
+    # print("filepath=", filepath)
+    # print("filepath.parents 1=", str(Path(filepath).resolve().parents[1]))
+    # print("filepath.parents 0=", str(Path(filepath).resolve().parents[0]))
+    # print("parent0=", str(path.parent.name))
+    # print("parent2=", str(Path(filepath).resolve().parent))
+    # print("parent3=")
+    # print("name=", str(path.name))
+    # print("returning=", str(path.parent.name) + "/" + str(path.name))
+    # input(".... perent and base ....")
+    return str(path.parent.name) + "/" + str(path.name)
+
+
+def sort_without_suffix_or_fulldir(items):
+    """Sort a list after removing the common suffix and parent dirs.
+
+    We need this because:
+    ["A-2_ARW", "A_ARW", "A_1_ARW"].sort() produces ["A-1_ARW", "A-2_ARW", "A_ARW"]
+    we want: ["A_ARW", "A-1_ARW", "A-2_ARW"]
+    """
+    # print("sort_without_suffix: items=", items)
+
+    working = []
+    for i in items:
+        # my_dict = {"orig": i, "sortable": os.path.abspath(i)}
+        working.append({"orig": i, "sortable": os.path.abspath(i)})
+    # print("working===", working)
+    # input("borken...")
+    # print("working['sortable']")
+    #    for row in working:
+    #        print("row ", row, "sortable=", row["sortable"])
+    # print('sortable_list === ', [for i in working[i].['sortable'] ])
+    # input("...herre...")
+
+    #    csuffix = common_suffix(items)
+    csuffix = common_suffix([i["sortable"] for i in working])
     suffixlen = -1 * len(csuffix)
 
-    trimmed_items = [d[:suffixlen] for d in items]
-    print(f"{trimmed_items=}")
-    trimmed_items.sort()
-    trimmed_items = [d + csuffix for d in trimmed_items]  # add the suffix back
-    print(f"{trimmed_items=}")
+    # print(f"{csuffix=}")
+    # print(f"{suffixlen=}")
 
-    return trimmed_items
+    if csuffix:
+        # print(f"{csuffix=}")
+        # print(f"{suffixlen=}")
+        #
+        # print(f"{items[0]=}")
+        # print(f"d:1  {items[0][:1]=}")
+        # print(f"d:0  {items[0][:0]=}")
+
+        # sorted_items = [d[:suffixlen] for d in items]
+
+        # strip everything before the enclosing folder
+        for row in working:
+            row["sortable"] = parent_and_basename(row["sortable"])
+        # print("working after trimming front path==", working)
+        # input("...")
+
+        # strip the common suffix
+        for row in working:
+            row["sortable"] = row["sortable"][:suffixlen]
+        # print("working after trimming suffix==", working)
+        # input("...")
+
+        # normalize '-_' to hyphens
+        for row in working:
+            row["sortable"] = row["sortable"].replace("_", "-")
+        # print("working after normalizing '-_' ==", working)
+        # input("...")
+
+        working = sorted(working, key=lambda i: i["sortable"])
+        # print("working was sorted using lambda.")
+        # print("working=", working)
+        # input("working...")
+        sorted_items = [i["orig"] for i in working]
+        # print(f"{sorted_items=}")
+
+        # input("done..")
+    else:
+        #    print("NOTHING TO TRIM NO COMMON SUFFIX")
+        sorted_items = items
+
+    # print("orig_items", items)
+    # print("sorted_items=", sorted_items)
+    # #
+    # print("returning working:", working)
+    # #
+    # input("returning ...")
+    return sorted_items
 
 
 def recombine(
@@ -71,14 +160,15 @@ def recombine(
         out_dir (list): List of directories that things were combined into. or None
     """
     print("len(src_dirs)= ", len(src_dirs))
+    print("src_dirs=", src_dirs)
     if len(src_dirs) < 2:
         print("recombine returning. len(src_dirs)= ", len(src_dirs))
         print(f"{src_dirs=}")
         return src_dirs
 
     print("recombine: src_dirs=", src_dirs)
-    src_dirs = sort_without_suffix(src_dirs)
-    print("recombine: src_dirs=", src_dirs)
+    src_dirs = sort_without_suffix_or_fulldir(src_dirs)
+    print("recombine: sorted src_dirs=", src_dirs)
 
     if dst_dir is None:
         new_basename = split_name_number(os.path.basename(src_dirs[0]))[0]
@@ -118,18 +208,21 @@ def recombine(
     # test all folders to make sure they contain only one extension
     print("checking to make sure there's only one extension")
     for directory in src_dirs:
-        print(directory, "... ", end="")
+        print(directory, "...")  # end="")
         test_one_extension(directory, fatal=True)
         print("OK")
 
     for directory in src_dirs:
+        print(" for item in :sorted_listdir(directory)==", sorted_listdir(directory))
         for item in sorted_listdir(directory):
-            if not os.path.isfile(os.path.join(directory, item)):
+            print("directory=", directory, "item=", item)
+            if not os.path.isfile(item):
+                print(" not a file: ", os.path.join(directory, item))
                 continue
-            all_files.append(os.path.join(directory, item))
-
+            all_files.append(item)
+    #    input("144..>")
     tmp_dst_dirs = []
-    print(f"{dst_dir=}")
+    #    print(f"145...> {dst_dirs=}")
     for dst_dir in dst_dirs:
         if os.path.exists(dst_dir):
             print("WARNING: Output directory already exists.", dst_dir)
@@ -138,7 +231,8 @@ def recombine(
         tmp_dst_dirs.append(dst_dir)
     dst_dirs = tmp_dst_dirs
 
-    # print('dst_dirs=',dst_dirs)
+    #    print("all_files[]==", all_files)
+    #    print("154..> dst_dirs=", dst_dirs)
     current_dir = 0
     count = 0
     for item in all_files:
@@ -152,16 +246,20 @@ def recombine(
             print("os.makedirs( ", dst)
             os.makedirs(dst)
 
-        item_dest = dst + "/" + os.path.basename(Path(item).parent) + "-" + os.path.basename(item)
+        item_dest = (
+            dst + "/" + os.path.basename(PurePath(item).parent) + "-" + os.path.basename(item)
+        )
 
         if copy_files:
-            # print("recombine copying : ", item, " -->", item_dest)
+            print("recombine copying : ", item, " -->", item_dest)
             shutil.copyfile(item, item_dest)
         else:
-            # print("recombine moving : ", item, " -->", item_dest)
+            print("recombine moving : ", item, " -->", item_dest)
             shutil.move(item, item_dest)
         count += 1
 
+    # print("before remove dirs")
+    # input("...179 ...")
     # remove empty directories
     if not copy_files:
         for directory in src_dirs:
@@ -169,6 +267,8 @@ def recombine(
 
     # input('about to remove timestamps')
     print("about to remove timestamps:  dst_dirs = ", dst_dirs)
+    print(f"{dst_dirs=}")
+    #    input("..186...dirs were gone by here\.")
     new_dst_dirs = []
     # remove empty directories
     # remove = 20200810_132823
@@ -179,10 +279,10 @@ def recombine(
         m = p.search(directory)
         if m is None:
             new_dst_dirs.append(directory)
-            #        print('m was None')
+            print("m was None")
             continue
-        #    print('m.group()=',m.group())
-        #    print('m.group=1', m.group(1))
+            print("m.group()=", m.group())
+            print("m.group=1", m.group(1))
         new_dir = m.group(1)
 
         if os.path.exists(new_dir):
@@ -194,6 +294,8 @@ def recombine(
         # if it fails wait a sec and retry...
         # print ('sleep...')
         # sleep(2)
+
+        input(".stop here..")
 
         i = 0
         again = True
@@ -213,6 +315,9 @@ def recombine(
             print("bottom of WHILE UP UP UP")
 
         new_dst_dirs.append(new_dir)
+    print("done for loop. ")
+    print(f"recombine - line 232 - OGOPOGO    {new_dst_dirs=}")
+    # input("ok ogopogo...")
     dst_dirs = new_dst_dirs
 
     # input('about to renumber')
@@ -220,6 +325,8 @@ def recombine(
     for one_dst_dir in dst_dirs:
         if prefix == ":folder":
             prefix = os.path.basename(os.path.normpath(one_dst_dir))
+        print(" About to renumber --> one_dst_dir=", one_dst_dir)
+        # input("...")
         renumber(one_dst_dir, inplace=True, prefix=prefix, sort_method="name", padding=padding)
 
     print(f"recombine returning 2 == {dst_dirs=}")

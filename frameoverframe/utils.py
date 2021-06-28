@@ -13,7 +13,9 @@ from itertools import takewhile
 from pathlib import Path
 from subprocess import PIPE, run
 
-import exifread
+import exifread  # legacy, used this to read tags
+from exif import Image as exifImage  # need this to write tags
+from exif import LightSource
 from PIL import Image
 
 log = logging.getLogger("frameoverframe")
@@ -36,6 +38,60 @@ def exif_creation_date(filename):
         exifdate = None
 
     return exifdate
+
+
+def add_exif_filename(filename):
+    """given an image file add an exif tag that contains the current filename"""
+
+    with open(filename, "rb") as image_file:
+        my_image = exifImage(image_file)
+
+        # print("exif_add_filename_tag() : filename=", filename)
+        # print("my_image.has_exif=", my_image.has_exif)
+        # print("my_image has tags:", my_image.list_all())
+
+        # my_image.original_filename = filename
+        my_image.image_description = filename
+        # my_image.light_source = LightSource.DAYLIGHT
+
+        # print("my_image.has_exif=", my_image.has_exif)
+        # print("now my_image has tags:", my_image.list_all())
+        # print("my_image.image_description = ", my_image.image_description)
+        # print("--")
+
+    with open(filename, "wb") as image_file:
+        image_file.write(my_image.get_file())
+
+        # print("reading with read_exif_filename(filename), == ", read_exif_filename(filename))
+        #
+        # input("added exif data to :: ......")
+
+    return
+
+
+def read_exif_filename(filename):
+    """given an image file read the exif tag that contains the original filename"""
+
+    with open(filename, "rb") as image_file:
+        my_image = exifImage(image_file)
+
+        if my_image.has_exif == False:
+            raise TypeError("image has no EXIF tags.", my_image)
+
+        print("exif_add_filename_tag() : filename=", filename)
+        print("my_image.has_exif=", my_image.has_exif)
+        print("my_image has tags:", my_image.list_all())
+
+        # my_image.original_filename = filename
+        my_image.image_description = filename
+        # my_image.light_source = LightSource.DAYLIGHT
+
+        print("my_image.has_exif=", my_image.has_exif)
+        print("now my_image has tags:", my_image.list_all())
+        print("my_image.image_description = ", my_image.image_description)
+
+        return my_image.image_description
+    return
 
 
 def file_not_exist(filepath):

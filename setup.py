@@ -46,6 +46,7 @@ setuptools.setup(
         "console_scripts": [
             "align_image_stack_sequence= frameoverframe.cli.align_image_stack_sequence__main__:main",
             "bracket = frameoverframe.cli.bracket__main__:main",
+            "check_images = frameoverframe.cli.check_images__main__:main",
             "deflicker = frameoverframe.cli.deflicker__main__:main",
             "enfuse_batch = frameoverframe.cli.enfuse_batch__main__:main",
             "img2vid = frameoverframe.cli.img2vid__main__:main",
@@ -57,7 +58,6 @@ setuptools.setup(
             "rename_uniq = frameoverframe.cli.rename_uniq__main__:main",
             "renumber = frameoverframe.cli.renumber__main__:main",
             "thin = frameoverframe.cli.thin__main__:main",
-            "check_images = frameoverframe.cli.check_images__main__:main",
             "autotrace_sequence = frameoverframe.cli.autotrace_sequence__main__:main",
             "unmix = frameoverframe.cli.unmix__main__:main",
             "vid2img = frameoverframe.cli.vid2img__main__:main",
