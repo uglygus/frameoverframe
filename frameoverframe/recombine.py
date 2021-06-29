@@ -20,6 +20,7 @@
 
 
 import argparse
+import logging
 import math
 import os
 import pathlib
@@ -31,6 +32,8 @@ from time import sleep, strftime
 
 from .renumber import renumber
 from .utils import common_suffix, sorted_listdir, split_name_number, test_one_extension
+
+log = logging.getLogger("frameoverframe")
 
 
 def strip_bad_ending(string):
@@ -71,6 +74,14 @@ def sort_without_suffix_or_fulldir(items):
     We need this because:
     ["A-2_ARW", "A_ARW", "A_1_ARW"].sort() produces ["A-1_ARW", "A-2_ARW", "A_ARW"]
     we want: ["A_ARW", "A-1_ARW", "A-2_ARW"]
+
+    ALSO - importantly for my purposes because users make mistakes:
+                treat '-'  and '_' interchangeably.
+            incase people make:
+                infolder
+                infolder_1
+                infolder-2
+                etc
     """
     # print("sort_without_suffix: items=", items)
 
@@ -168,7 +179,11 @@ def recombine(
 
     print("recombine: src_dirs=", src_dirs)
     src_dirs = sort_without_suffix_or_fulldir(src_dirs)
-    print("recombine: sorted src_dirs=", src_dirs)
+
+    log.info("recombine: Input directories will be processed in this order:")
+    for d in src_dirs:
+        log.info(d)
+    # nput("...")
 
     if dst_dir is None:
         new_basename = split_name_number(os.path.basename(src_dirs[0]))[0]
@@ -176,8 +191,6 @@ def recombine(
         new_basename = strip_bad_ending(new_basename)
         print("new_basename = ", new_basename)
         dst_dir = os.path.join(os.path.dirname(src_dirs[0]), new_basename)
-
-    print(f"{dst_dir=}")
 
     if prefix == ":folder":
         prefix = os.path.basename(os.path.normpath(src_dirs[0]))
@@ -188,11 +201,7 @@ def recombine(
 
     dirs_needed = math.ceil(item_count / max_files)
 
-    print("Creating", dirs_needed, "new directories. For", item_count, "items...")
-
     dst_dirs = []
-
-    print(f"{dirs_needed=}")
 
     # only append a number to destination dirs if there is more than one
     for i in range(0, dirs_needed):
@@ -202,27 +211,38 @@ def recombine(
             dst_dirs.append(dst_dir)
 
     print(f"{dst_dirs=}")
+    log.info("Creating {} new directories. For {} items.".format(dirs_needed, item_count))
+    log.info("New directories:")
+    for d in dst_dirs:
+        log.info(d)
 
     all_files = []
 
+    # input("dirs made...")
+
     # test all folders to make sure they contain only one extension
-    print("checking to make sure there's only one extension")
+    log.info("Checking to make sure there's only one extension")
     for directory in src_dirs:
-        print(directory, "...")  # end="")
         test_one_extension(directory, fatal=True)
-        print("OK")
+        log.info("{} ... OK".format(directory))
 
     for directory in src_dirs:
-        print(" for item in :sorted_listdir(directory)==", sorted_listdir(directory))
+        log.debug(" Collecting files from: {}".format(directory))
+        # print(" for item in :sorted_listdir(directory)==", sorted_listdir(directory))
         for item in sorted_listdir(directory):
             print("directory=", directory, "item=", item)
             if not os.path.isfile(item):
                 print(" not a file: ", os.path.join(directory, item))
                 continue
             all_files.append(item)
-    #    input("144..>")
+        # input("... done writing one dir to all_files[]...")
+
+    log.debug("recombine: Done writing all_files[] list:}")
+    for f in all_files:
+        log.debug(f)
+    # input(".. did debug an all files print?")
     tmp_dst_dirs = []
-    #    print(f"145...> {dst_dirs=}")
+
     for dst_dir in dst_dirs:
         if os.path.exists(dst_dir):
             print("WARNING: Output directory already exists.", dst_dir)
@@ -231,8 +251,11 @@ def recombine(
         tmp_dst_dirs.append(dst_dir)
     dst_dirs = tmp_dst_dirs
 
-    #    print("all_files[]==", all_files)
-    #    print("154..> dst_dirs=", dst_dirs)
+    log.debug("list of destination direcries made:")
+    for d in dst_dirs:
+        log.debug(d)
+
+    # input("...desst dir list createed...")
     current_dir = 0
     count = 0
     for item in all_files:
@@ -246,21 +269,28 @@ def recombine(
             print("os.makedirs( ", dst)
             os.makedirs(dst)
 
-        item_dest = (
-            dst + "/" + os.path.basename(PurePath(item).parent) + "-" + os.path.basename(item)
-        )
+        _, ext = os.path.splitext(item)
+        # item_dest = (
+        #     dst + "/" + os.path.basename(PurePath(item).parent) + "-" + os.path.basename(item)
+        # )
 
+        item_dest = "{}/{:05d}{}".format(dst, count, ext)
+        # print("ext=", ext)
+        # print("dst=", dst)
+        # print("item=", item)
+        # print("item_dest= {}".format(item_dest))
+        # print("about to moving one...")
         if copy_files:
-            print("recombine copying : ", item, " -->", item_dest)
+            log.info("recombine: copying : {} --> {}".format(item, item_dest))
             shutil.copyfile(item, item_dest)
         else:
-            print("recombine moving : ", item, " -->", item_dest)
+            log.info("recombine: moving : {} --> {}".format(item, item_dest))
             shutil.move(item, item_dest)
         count += 1
 
-    # print("before remove dirs")
-    # input("...179 ...")
-    # remove empty directories
+    log.debug("All files moved. Input dirs should be empty if not --safe")
+    # input("...")
+
     if not copy_files:
         for directory in src_dirs:
             shutil.rmtree(directory)
@@ -268,7 +298,7 @@ def recombine(
     # input('about to remove timestamps')
     print("about to remove timestamps:  dst_dirs = ", dst_dirs)
     print(f"{dst_dirs=}")
-    #    input("..186...dirs were gone by here\.")
+
     new_dst_dirs = []
     # remove empty directories
     # remove = 20200810_132823
@@ -295,8 +325,6 @@ def recombine(
         # print ('sleep...')
         # sleep(2)
 
-        input(".stop here..")
-
         i = 0
         again = True
         while again:
@@ -315,21 +343,30 @@ def recombine(
             print("bottom of WHILE UP UP UP")
 
         new_dst_dirs.append(new_dir)
-    print("done for loop. ")
-    print(f"recombine - line 232 - OGOPOGO    {new_dst_dirs=}")
-    # input("ok ogopogo...")
+
     dst_dirs = new_dst_dirs
 
-    # input('about to renumber')
+    print("recombine: about to renumber")
     # renumber new files
     for one_dst_dir in dst_dirs:
         if prefix == ":folder":
             prefix = os.path.basename(os.path.normpath(one_dst_dir))
+
+        # print("middle prefix=", prefix)
+        # m = re.match("(.+)(_\d\d)", prefix)
+        # if m:
+        #     print("prefix=", prefix)
+        #     prefix = m[1]
+        # else:
+        #     print("no match!")
+        print("final prefix=", prefix)
         print(" About to renumber --> one_dst_dir=", one_dst_dir)
         # input("...")
         renumber(one_dst_dir, inplace=True, prefix=prefix, sort_method="name", padding=padding)
-
+        # print("done renumber.")
+        # input("...")
     print(f"recombine returning 2 == {dst_dirs=}")
+
     return dst_dirs
 
 

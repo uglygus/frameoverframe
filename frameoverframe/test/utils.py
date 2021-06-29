@@ -16,7 +16,7 @@ import subprocess
 # import unittest
 from pathlib import Path
 
-from frameoverframe.utils import add_exif_filename
+from frameoverframe.utils import exif_write_filename
 
 #
 # import frameoverframe as fof
@@ -28,7 +28,6 @@ from frameoverframe.utils import add_exif_filename
 IM_COLORS = [
     "lightblue",
     "LightPink1",
-    "CadetBlue1",
     "MediumSpringGreen",
     "MediumForestGreen",
     "DarkSeaGreen2",
@@ -103,4 +102,4 @@ def lots_o_images(dirname, count=1000, color="lightblue", prefix="", ext="JPG"):
     for i in range(0, count):
         filepath = f"{dirname}/{prefix}{i:05}.{ext}"
         new_image(filepath, color=color)
-        add_exif_filename(filepath)
+        exif_write_filename(filepath)

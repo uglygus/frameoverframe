@@ -40,7 +40,33 @@ def exif_creation_date(filename):
     return exifdate
 
 
-def add_exif_filename(filename):
+def exif_read_filename(filename):
+    """given an image file read the exif tag that contains the original filename"""
+
+    with open(filename, "rb") as image_file:
+        my_image = exifImage(image_file)
+
+        if my_image.has_exif == False:
+            raise TypeError("image has no EXIF tags.", my_image)
+
+        # print("exif_add_filename_tag() : filename=", filename)
+        # print("my_image.has_exif=", my_image.has_exif)
+        # print("my_image has tags:", my_image.list_all())
+
+        # my_image.original_filename = filename
+        # my_image.image_description = filename
+        # my_image.light_source = LightSource.DAYLIGHT
+
+        # print("my_image.has_exif=", my_image.has_exif)
+        # print("now my_image has tags:", my_image.list_all())
+        # print("my_image.image_description = ", my_image.image_description)
+
+        # print("exif_read_filename returning=", my_image.image_description)
+        return my_image.image_description
+    return
+
+
+def exif_write_filename(filename):
     """given an image file add an exif tag that contains the current filename"""
 
     with open(filename, "rb") as image_file:
@@ -62,35 +88,10 @@ def add_exif_filename(filename):
     with open(filename, "wb") as image_file:
         image_file.write(my_image.get_file())
 
-        # print("reading with read_exif_filename(filename), == ", read_exif_filename(filename))
+        # print("reading with exif_read_filename(filename), == ", exif_read_filename(filename))
         #
         # input("added exif data to :: ......")
 
-    return
-
-
-def read_exif_filename(filename):
-    """given an image file read the exif tag that contains the original filename"""
-
-    with open(filename, "rb") as image_file:
-        my_image = exifImage(image_file)
-
-        if my_image.has_exif == False:
-            raise TypeError("image has no EXIF tags.", my_image)
-
-        print("exif_add_filename_tag() : filename=", filename)
-        print("my_image.has_exif=", my_image.has_exif)
-        print("my_image has tags:", my_image.list_all())
-
-        # my_image.original_filename = filename
-        my_image.image_description = filename
-        # my_image.light_source = LightSource.DAYLIGHT
-
-        print("my_image.has_exif=", my_image.has_exif)
-        print("now my_image has tags:", my_image.list_all())
-        print("my_image.image_description = ", my_image.image_description)
-
-        return my_image.image_description
     return
 
 
@@ -154,13 +155,17 @@ def ext_list(directorypath):
     return extlist
 
 
-def sorted_listdir(directory, ignore_hidden=True):
+really_fullpaths = []
+
+
+def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=True):
     """returns a list : the full path to every file in a directory sorted alphanumerically.
 
     Args:
       directory (path-like object): path to a directory
       ignore_hidden (bool): when true do not return hidden files. (default=True)
 
+      first_pass(bool): if True reset the global really_full_paths[]
     Returns:
         list (str): List of filenames in the directory sorted alphanumerically.
 
@@ -171,6 +176,9 @@ def sorted_listdir(directory, ignore_hidden=True):
     # log.info(f"info")
     # log.warninging(f"warn")
 
+    # import frameoverframe
+    # frameoverframe.utils.sorted_listdir('.', recursive=True)
+
     try:
         names = os.listdir(directory)
     except FileNotFoundError as e:
@@ -178,13 +186,30 @@ def sorted_listdir(directory, ignore_hidden=True):
             log.exception(f"sorted_listdir() : {e}")
         raise
 
+    if first_pass:
+        really_full_paths = []
     names.sort()
+    print("names=", names)
     fullpaths = []
 
     for filename in names:
+        fullpath = os.path.join(directory, filename)
+        if os.path.isdir(fullpath) == True:
+            print(filename, " is  a DIR")
+            if recursive:
+                really_full_paths.append(os.path.join(directory, filename))
+                fullpaths.append(os.path.join(directory, filename))
+                sorted_listdir(os.path.join(directory, filename), recursive=True, first_pass=False)
+        else:
+            print(filename, " is not a DIR")
         if ignore_hidden and filename.startswith("."):
             continue
+        really_full_paths.append(os.path.join(directory, filename))
         fullpaths.append(os.path.join(directory, filename))
+    print("fullpaths=", fullpaths)
+    # input(".. done soerted_listdir...")
+
+    print("really_full_paths=", really_full_paths)
     return fullpaths
 
 

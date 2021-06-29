@@ -22,12 +22,28 @@ log = logging.getLogger("frameoverframe")
 
 from frameoverframe.recombine import parent_and_basename, recombine, sort_without_suffix_or_fulldir
 from frameoverframe.test.utils import IM_COLORS, dummy_sdcard, file_count, lots_o_images
-from frameoverframe.utils import read_exif_filename, sorted_listdir
+from frameoverframe.utils import exif_read_filename, sorted_listdir
 
 log.setLevel(logging.DEBUG)
 log.debug("debug loggging is working in test_recombine")
 log.info("info loggging is working in test_recombine")
 log.warn("warn loggging is working in test_recombine")
+
+
+#
+# def recursive_listdir(start_dir):
+#     full_list = []
+#     for root, dirs, files in os.walk(start_dir):
+#         path = root.split(os.sep)
+#         full_list.append((len(path) - 1) * "---" + os.path.basename(root))
+#         # print((len(path) - 1) * "---", os.path.basename(root))
+#         for file in files:
+#             full_list.append(len(path) * "---" + file)
+#         #    print(len(path) * "---", file)
+#
+#     input("... recursive--")
+#     print("full_list=", full_list)
+#     return full_list
 
 
 class TestRecombine(unittest.TestCase):
@@ -44,7 +60,6 @@ class TestRecombine(unittest.TestCase):
 
         ALSO - importantly for my purposes because users make mistakes:
             treat '-'  and '_' interchangeably.
-
         """
 
         orig_list = [
@@ -63,96 +78,68 @@ class TestRecombine(unittest.TestCase):
 
         sorted_list = sort_without_suffix_or_fulldir(orig_list)
 
-        # print(f"{orig_list=}")
-        # print(f"{sorted_list=}")
-        # print(f"{expected_list=}")
-        # input("...a sorting...")
-
         self.assertEqual(sorted_list == expected_list, True)
 
-    def test_recombine_two_dirs(self):
+    def test_recombine_three_dirs(self):
         """test to make sure two dirs are recombined correctly."""
 
         print("self.tmpdir=", self.tmpdir)
+        dir1 = os.path.join(self.tmpdir, "2020-06-21 Raccoon_00")
 
-        print("new dir called=-", os.path.join(self.tmpdir, "DIR_1"))
+        dir2 = os.path.join(self.tmpdir, "2020-06-21 Raccoon-2")
+        dir3 = os.path.join(self.tmpdir, "2020-06-21 Raccoon 3")
 
-        dir1 = os.path.join(self.tmpdir, "2020-06-21 DIR_1")
-
-        # os.makedirs(o, exist_ok=True)
-        dir2 = os.path.join(self.tmpdir, "2020-06-21 DIR_2")
-        final_dir = os.path.join(self.tmpdir, "2020-06-21 DIR_2")
+        # final_dir = os.path.join(self.tmpdir, "2020-06-21 DIR_2")
 
         print("dir1=", dir1)
-        os.makedirs(dir1, exist_ok=True)
-        os.makedirs(dir2, exist_ok=True)
+        os.makedirs(dir1)
+        os.makedirs(dir2)
+        os.makedirs(dir3)
 
         print("string dir1=", dir1)
         # input("...check tmp dir for match")
-        lots_o_images(dir1, color=IM_COLORS[0], count=5, prefix="2021-09-09 raccoon ")
+        lots_o_images(dir1, color=IM_COLORS[0], count=2, prefix="2021-09-09 raccoon ")
 
-        lots_o_images(dir2, color=IM_COLORS[1], count=5, prefix="2021-09-09 raccoon ")
+        lots_o_images(dir2, color=IM_COLORS[1], count=3, prefix="2021-09-09 raccoon ")
 
-        # print("dir fof=", dir(fof))
+        lots_o_images(dir3, color=IM_COLORS[2], count=3, prefix="2021-09-09 raccoon ")
 
-        new_dirs = recombine([dir1, dir2])
+        new_dirs = recombine([dir1, dir2, dir3], max_files=3)
 
+        print("new_dirs=", new_dirs)
+        # input("new dirs...")
         for d in new_dirs:
             for f in sorted_listdir(d):
                 print("checking file f=", f)
                 # input("reading exif...")
-                dirx, filx = os.path.split(read_exif_filename(f))
+                dirx, filx = os.path.split(exif_read_filename(f))
                 orig_id = os.path.basename(dirx) + filx
                 new_id = os.path.basename(d) + f
 
                 print("original_filename (orig_id)", orig_id)
                 print("new=", f, "original=", orig_id)
                 # input("done one file comparison....")
-        input("..done recombine..check file colors..")
+
+        expected_filelist = []
+        final_filelist = []
+        print("\n--- actual files just created list -----")
+        for d in new_dirs:
+            for f in sorted_listdir(d):
+                print(exif_read_filename(f), " ==> ", f)
+                final_filelist.append(exif_read_filename(f))
+
+        # input(" wh not stop...")
+        # print(f"{expected_filelist=}")
+        # print("--- final list - red from files exifname-----")
+        # for item in final_filelist:
+        #     print(exif_read_filename(item))
+
+        # input("..done recombine..check file colors..")
+
+        final_layout = sorted_listdir(self.tmpdir, recursive=True)
+        print("\nfinal_layout=", final_layout)
 
         self.assertEqual(True, True)
-
-    # def test_recombine_one_existing_and_two_new_dirs(self):
-    #     """Adding two new directories to a pre-existing dir."""
-    #
-    #     print("Adding two new directories to a pre-existing dir.")
-    #     print("self.tmpdir=", self.tmpdir)
-    #
-    #     prefix = "2021-06-23 butterflies"
-    #
-    #     pre_existing_dir = os.path.join(self.tmpdir, prefix + "_1")
-    #
-    #     print("pre-existing dir", pre_existing_dir)
-    #
-    #     dir1 = os.path.join(self.tmpdir, "2021-06-23 butterflies-1")
-    #
-    #     #### only got to here...
-    #
-    #     # os.makedirs(o, exist_ok=True)
-    #     dir2 = os.path.join(self.tmpdir, "2021-06-23 butterflies-2")
-    #     # final_dir = os.path.join(self.tmpdir, "2020-06-21 DIR_2")
-    #
-    #     print("dir1=", dir1)
-    #     os.makedirs(dir1, exist_ok=True)
-    #     os.makedirs(dir2, exist_ok=True)
-    #
-    #     print("string dir1=", dir1)
-    #     lots_o_images(
-    #         pre_existing_dir, color=IM_COLORS[0], count=23, prefix="2021-06-23 butterflies"
-    #     )
-    #
-    #     # input("...check tmp dir for match")
-    #     lots_o_images(dir1, color=IM_COLORS[0], count=5, prefix="2021-09-09 raccoon ")
-    #
-    #     lots_o_images(dir2, color=IM_COLORS[1], count=11, prefix="2021-09-09 raccoon ")
-    #
-    #     # print("dir fof=", dir(fof))
-    #
-    #     recombine([dir1, dir2])
-    #
-    #     input("..done recombine....")
-    #
-    #     self.assertEqual(True, True)
 
 
 if __name__ == "__main__":
