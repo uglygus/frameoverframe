@@ -28,7 +28,6 @@ log = logging.getLogger("frameoverframe")
 def thin_shape():
     pass
 
-
 def thin(src_dir, every, dst_dir=None, inplace=False):
     """
     thins files from a folder. Does not recurse into sum folders.

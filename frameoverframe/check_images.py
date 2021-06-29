@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-test_images - test each image in every input folder.
+check_images - test each image in every input folder.
 relies on identify from imagemagick
 """
 import errno
@@ -18,7 +18,7 @@ log = logging.getLogger("frameoverframe")
 vid_exts = ["mov", "mp4", "avi"]
 
 
-def test_image(image):
+def check_image(image):
     """test a single image.
 
         Returns: None on success or non image file
@@ -74,7 +74,7 @@ def test_image(image):
     return image_error
 
 
-def test_images(input_dirs):
+def check_images(input_dirs):
     """test every image in each directory
 
     Args:
