@@ -155,6 +155,7 @@ def ext_list(directorypath):
     return extlist
 
 
+recursing = None
 really_fullpaths = []
 
 
@@ -165,7 +166,7 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
       directory (path-like object): path to a directory
       ignore_hidden (bool): when true do not return hidden files. (default=True)
 
-      first_pass(bool): if True reset the global really_full_paths[]
+      first_pass(bool): if True reset the global really_fullpaths[]
     Returns:
         list (str): List of filenames in the directory sorted alphanumerically.
 
@@ -176,8 +177,14 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
     # log.info(f"info")
     # log.warninging(f"warn")
 
-    # import frameoverframe
+    # import frameoverframe; import importlib
+
     # frameoverframe.utils.sorted_listdir('.', recursive=True)
+
+    # importlib.reload(frameoverframe)
+
+    global really_fullpaths
+    global recursing
 
     try:
         names = os.listdir(directory)
@@ -187,30 +194,36 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
         raise
 
     if first_pass:
-        really_full_paths = []
+        print("resetting really_fullpaths")
+        really_fullpaths = []
+
     names.sort()
     print("names=", names)
     fullpaths = []
 
     for filename in names:
         fullpath = os.path.join(directory, filename)
+        if ignore_hidden and filename.startswith("."):
+            continue
         if os.path.isdir(fullpath) == True:
             print(filename, " is  a DIR")
             if recursive:
-                really_full_paths.append(os.path.join(directory, filename))
+                print("recursive=True")
+                really_fullpaths.append(os.path.join(directory, filename))
                 fullpaths.append(os.path.join(directory, filename))
                 sorted_listdir(os.path.join(directory, filename), recursive=True, first_pass=False)
+            else:
+                print("recursive=false")
         else:
             print(filename, " is not a DIR")
-        if ignore_hidden and filename.startswith("."):
-            continue
-        really_full_paths.append(os.path.join(directory, filename))
-        fullpaths.append(os.path.join(directory, filename))
-    print("fullpaths=", fullpaths)
-    # input(".. done soerted_listdir...")
 
-    print("really_full_paths=", really_full_paths)
-    return fullpaths
+            really_fullpaths.append(os.path.join(directory, filename))
+            fullpaths.append(os.path.join(directory, filename))
+
+    print("fullpaths=", fullpaths)
+
+    print("really_fullpaths=", really_fullpaths)
+    return really_fullpaths
 
 
 def create_workdir(filename, action="", nested=True):

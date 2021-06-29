@@ -6,6 +6,7 @@
 import logging.config
 import os
 import os.path
+import re
 import sys
 import tempfile
 import unittest
@@ -22,7 +23,7 @@ log = logging.getLogger("frameoverframe")
 
 from frameoverframe.recombine import parent_and_basename, recombine, sort_without_suffix_or_fulldir
 from frameoverframe.test.utils import IM_COLORS, dummy_sdcard, file_count, lots_o_images
-from frameoverframe.utils import exif_read_filename, sorted_listdir
+from frameoverframe.utils import exif_read_filename, recursing, sorted_listdir
 
 log.setLevel(logging.DEBUG)
 log.debug("debug loggging is working in test_recombine")
@@ -81,7 +82,7 @@ class TestRecombine(unittest.TestCase):
         self.assertEqual(sorted_list == expected_list, True)
 
     def test_recombine_three_dirs(self):
-        """test to make sure two dirs are recombined correctly."""
+        """test to make sure three dirs are recombined correctly."""
 
         print("self.tmpdir=", self.tmpdir)
         dir1 = os.path.join(self.tmpdir, "2020-06-21 Raccoon_00")
@@ -136,10 +137,53 @@ class TestRecombine(unittest.TestCase):
 
         # input("..done recombine..check file colors..")
 
-        final_layout = sorted_listdir(self.tmpdir, recursive=True)
-        print("\nfinal_layout=", final_layout)
+        print("-------------------last_sorted_listdir------")
+        recursing = True
+        # really_fullpaths = []
+        interim_layout = sorted_listdir(self.tmpdir, recursive=True)
+        recursing = False
 
-        self.assertEqual(True, True)
+        print("\ninterim_layout=", interim_layout)
+        for i in interim_layout:
+            print(i)
+
+        print("trim off the temp dirs")
+
+        ## trim the temp dir off of final layout
+        final_layout = []
+        for i in interim_layout:
+            m = re.match("(\./tmp\w+)(.*)", i)
+            if m:
+                print("m[1]=", m[2])
+                final_layout.append(m[2])
+                m = None
+            else:
+                print("no match!!! ++++")
+
+        expected_layout = [
+            "/2020-06-21 Raccoon_00",
+            "/2020-06-21 Raccoon_00/2020-06-21 Raccoon_00_00000.JPG",
+            "/2020-06-21 Raccoon_00/2020-06-21 Raccoon_00_00001.JPG",
+            "/2020-06-21 Raccoon_00/2020-06-21 Raccoon_00_00002.JPG",
+            "/2020-06-21 Raccoon_01",
+            "/2020-06-21 Raccoon_01/2020-06-21 Raccoon_00_00000.JPG",
+            "/2020-06-21 Raccoon_01/2020-06-21 Raccoon_00_00001.JPG",
+            "/2020-06-21 Raccoon_01/2020-06-21 Raccoon_00_00002.JPG",
+            "/2020-06-21 Raccoon_02",
+            "/2020-06-21 Raccoon_02/2020-06-21 Raccoon_00_00000.JPG",
+            "/2020-06-21 Raccoon_02/2020-06-21 Raccoon_00_00001.JPG",
+        ]
+
+        for i in interim_layout:
+            print("interim   ", i)
+        for i in final_layout:
+            print("final     ", i)
+        for i in expected_layout:
+            print("expected  ", i)
+        # print("final_layout==", final_layout)
+        # print("expected_layout==", expected_layout)
+
+        self.assertEqual(final_layout == expected_layout, True)
 
 
 if __name__ == "__main__":
