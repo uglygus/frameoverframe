@@ -32,7 +32,6 @@ def what_strange_land_is_this():
     return None
 
 
-
 def WSL_path_converter(path):
     """Converts a path from linux to Windows format
     Uses Microsoft's 'wslpath' command.
@@ -43,7 +42,7 @@ def WSL_path_converter(path):
     sys_call = [wslpath_bin, "-w", path]
 
     quoted_sys_call = [shlex.quote(i) for i in sys_call]
-
+    
     log.info("Calling : " + " ".join(quoted_sys_call))
     winpath = subprocess.check_output(sys_call)
     winpath = winpath.strip()
