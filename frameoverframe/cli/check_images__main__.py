@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
-    test_image
-
+    check_images
     Tests files one by one from many directories. Reports bad images to stdout.
-
+    Uses imagemagick's `identify` to do the actual testing
 """
 
 import argparse
@@ -18,7 +17,7 @@ from frameoverframe.config import LOGGING_CONFIG
 logging.config.dictConfig(LOGGING_CONFIG)
 log = logging.getLogger("frameoverframe")
 
-from frameoverframe.test_images import test_images
+from frameoverframe.check_images import check_images
 
 
 def collect_args():
@@ -72,7 +71,7 @@ def main():
 
     log.debug(f"args= {args}\n{log.level=}")
 
-    test_images(args.input_dirs)  # , args.recursive)
+    check_images(args.input_dirs)  # , args.recursive)
 
 
 if __name__ == "__main__":

@@ -20,7 +20,7 @@ A collection of scripts for organizing, converting and manipulating image sequen
 
 ***unmix*** - Given a folder sort images by extension and place each extension into its own folder.
 
-***test_images*** - Test images in every input folder using ffmpeg's 'identify'.
+***check_images*** - Test images in every input folder using ffmpeg's 'identify'.
 
 
 ### File format conversion scripts
@@ -43,3 +43,7 @@ A collection of scripts for organizing, converting and manipulating image sequen
 ***recombine*** - Recombine a list of directories to be combined and renumbered.
 
 ***tracer*** Vector based tracing of frames.
+
+### Tests
+The tests are scant and do not provide anywhere near coverage.
+`python -m unittest discover -s .`
