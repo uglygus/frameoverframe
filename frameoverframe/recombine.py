@@ -232,7 +232,7 @@ def recombine(
         for item in sorted_listdir(directory):
             print("directory=", directory, "item=", item)
             if not os.path.isfile(item):
-                print(" not a file: ", os.path.join(directory, item))
+                #print(" not a file: ", os.path.join(directory, item))
                 continue
             all_files.append(item)
         # input("... done writing one dir to all_files[]...")
