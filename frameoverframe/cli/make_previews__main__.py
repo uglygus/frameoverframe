@@ -14,8 +14,6 @@ import sys
 
 from colorama import Fore, Style, init
 
-import logging.config
-
 from frameoverframe.config import LOGGING_CONFIG
 
 logging.config.dictConfig(LOGGING_CONFIG)
@@ -29,7 +27,9 @@ from frameoverframe.utils import ext_list, sorted_listdir
 def collect_args():
     """collect commandline arguments"""
 
-    parser = argparse.ArgumentParser(description="Look for directories of pegs and make a previes for each one.")
+    parser = argparse.ArgumentParser(
+        description="Look for directories of pegs and make a previes for each one."
+    )
 
     parser.add_argument(
         "src_dir",
@@ -60,7 +60,6 @@ def collect_args():
     return args
 
 
-
 def main():
     """
     Can be called from the commmandline:
@@ -77,8 +76,6 @@ def main():
 
     from itertools import product
 
-
-
     for _dir in sorted_listdir(args.src_dir):
         # inpu("...waiting..top of for....")
         skip_this_dir = False
@@ -86,9 +83,7 @@ def main():
         log.info(f"{_dir}")
 
         if os.path.isfile(_dir):
-            log.debug(
-                f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL}not a directory."
-            )
+            log.debug(f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL}not a directory.")
             continue
 
         if os.path.isfile(f"{_dir}.mp4") or os.path.isfile(f"{_dir}_preview.mp4"):
@@ -135,5 +130,5 @@ if __name__ == "__main__":
     log.debug(f"args= {args}")
     log.debug(f"{log.level=}")
 
-    input('... maiin...')
-    #sys.exit(main())
+    input("... maiin...")
+    # sys.exit(main())
