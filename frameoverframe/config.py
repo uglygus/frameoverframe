@@ -5,6 +5,8 @@
 # These should be case insensitive. Hopefully.
 RAW_EXTENSIONS = [".CR2", ".ARW", ".NEF", ".DNG"]
 
+FILES_TO_IGNORE = [".DS_Store", "Thumbs.db"]
+
 LOGFILE = "frameoverframe.log"
 
 LOGGING_CONFIG = {

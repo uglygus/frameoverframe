@@ -194,11 +194,11 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
         raise
 
     if first_pass:
-        print("resetting really_fullpaths")
+        log.debug("utils.py : resetting really_fullpaths")
         really_fullpaths = []
 
     names.sort()
-    print("names=", names)
+
     fullpaths = []
 
     for filename in names:
@@ -206,23 +206,23 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
         if ignore_hidden and filename.startswith("."):
             continue
         if os.path.isdir(fullpath) == True:
-            print(filename, " is  a DIR")
+            # print(filename, " is  a DIR")
             if recursive:
-                print("recursive=True")
+                #    print("recursive=True")
                 really_fullpaths.append(os.path.join(directory, filename))
                 fullpaths.append(os.path.join(directory, filename))
                 sorted_listdir(os.path.join(directory, filename), recursive=True, first_pass=False)
-            else:
-                print("recursive=false")
+            # else:
+            #    print("recursive=false")
         else:
-            print(filename, " is not a DIR")
+            # print(filename, " is not a DIR")
 
             really_fullpaths.append(os.path.join(directory, filename))
             fullpaths.append(os.path.join(directory, filename))
 
-    print("fullpaths=", fullpaths)
+    # print("fullpaths=", fullpaths)
 
-    print("really_fullpaths=", really_fullpaths)
+    # print("really_fullpaths=", really_fullpaths)
     return really_fullpaths
 
 
