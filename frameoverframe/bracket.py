@@ -97,7 +97,7 @@ def merge(input_dirs):
         thisdirlist = []
 
         for f in os.listdir(input_dir):
-            if f == ".DS_Store":
+            if f in FIlES_TO_IGNORE:
                 continue
 
             thisdirlist.append(f)
