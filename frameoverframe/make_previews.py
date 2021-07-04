@@ -32,55 +32,48 @@ log = logging.getLogger("frameoverframe")
 
 def _make_previews(src_dir):
     init()  # colorama
-    dirs_changed_need_to_recurse = False
+    was_the_list_of_dirs_modified = False
 
     log.debug("make_previews : in_dir = %s" % (src_dir))
 
-    for _dir in sorted_listdir(src_dir):
+    for item in sorted_listdir(src_dir):
         skip_this_dir = False
-        if os.path.isfile(_dir):
-            log.debug(f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL}not a directory.")
+
+        if os.path.isfile(item):
+            log.debug(f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL}not a directory.")
             continue
 
-        if os.path.isfile(f"{_dir}.mp4") or os.path.isfile(f"{_dir}_preview.mp4"):
-            log.debug(f"Restarting - Video file for {src_dir}/{_dir} already exists.")
+        if os.path.isfile(f"{item}.mp4") or os.path.isfile(f"{item}_preview.mp4"):
+            log.info(f"Video file for '{item}' already exists.")
             continue
-        else:
-            log.debug(" Continuing - There is no video for: {_dir}")
-        extensions = ext_list(_dir)
-        log.debug(f"{extensions=}")
-        log.debug(f"'{_dir}' -- Needs video.")
+
+        log.info(f"There is no video for: '{item}'")
+        extensions = ext_list(item)
 
         if extensions == [""]:
             log.info(
-                f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Folder contains only directories."
+                f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} directory contains only directories."
             )
             continue
 
         log.debug("Checking folder for RAW extensions.")
-        log.debug("extensions = %s" % (extensions))
         for ext, raw_ext in product(extensions, RAW_EXTENSIONS):
             if re.search(rf"{ext}$", raw_ext, re.IGNORECASE):
-                log.debug("RAW Extension found, %s needs unmix." % (raw_ext))
-
-                result = unmix(_dir)
-                if result:
-                    dirs_changed_need_to_recurse = True
-
+                log.debug("RAW Extension found, %s needs to unmix." % (raw_ext))
+                if unmix(item):
+                    log.info(f"{item} was unmixed I will need double check all this.")
+                    was_the_list_of_dirs_modified = True
                 skip_this_dir = True
                 break
-            else:
-                log.debug("NO-MATCH")
 
         if skip_this_dir:
-            log.debug("continuing because skip_this_dir = True")
+            log.debug(f"'{item}' got unmixed so do not make a video.")
             continue
 
-            # , {_dir}.mp4)
-        log.info(f"calling image2vid({_dir}")
-        img2vid(_dir)  # , _dir + ".mp4"
+        log.info(f"Making video for '{item}'")
+        img2vid(item)
 
-    return dirs_changed_need_to_recurse
+    return was_the_list_of_dirs_modified
 
 
 def make_previews(src_dir):
