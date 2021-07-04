@@ -20,7 +20,6 @@ from frameoverframe.config import LOGGING_CONFIG
 #   must come after importing LOGGING_CONFIG
 #   but before any other frameoverframe modules.
 
-
 logging.config.dictConfig(LOGGING_CONFIG)
 log = logging.getLogger("frameoverframe")
 

@@ -71,11 +71,13 @@ def unmix(src_dir):
 
     """
 
+    new_dirs = []
+
     ext_list = utils.ext_list(src_dir)
 
     if ext_list == [""]:
         log.warn("Directory has no files with extensions. Stopping.")
-        return None
+        return new_dirs
 
     ext_list.sort()
 
@@ -83,26 +85,28 @@ def unmix(src_dir):
         log.info(f"unmix: Looks good folder is already unmixed. {src_dir}")
         log.debug(f"{ext_list[0]=}")
         ext = ext_list[0].lstrip(".")
-        src_dir_EXT = src_dir + "_" + ext
-        log.debug("Renaming {src_dir} to {src_dir_EXT}")
-        os.rename(src_dir, src_dir_EXT)
-        return [""]
+
+        if not src_dir.endswith("_" + ext):
+            src_dir_EXT = src_dir + "_" + ext
+            log.debug("Renaming {src_dir} to {src_dir_EXT}")
+            os.rename(src_dir, src_dir_EXT)
+        else:
+            log.debug("src_dir alread ends with %s" % ext)
+        return new_dirs
 
     if len(ext_list) == 0:
         log.warn(f"unmix: Not sure if we can even get here? Extension list is empty. {src_dir}")
-        return [""]
+        return new_dirs
 
     if len(ext_list) > 2:
         log.warn(f"unmix: This folder has more than two extensions. Stopping. {src_dir}")
         log.warn(f"{ext_list=}")
-        return [""]
+        return new_dirs
 
     for d in ext_list:
         if d == "":
             log.warn(f"unmix: This folder has other folders in it. Stopping. {src_dir}")
-            return [""]
-
-    new_dirs = []
+            return new_dirs
 
     for ext in ext_list:
         ext = ext.lstrip(".")
@@ -137,4 +141,5 @@ def unmix(src_dir):
     # Canon and Sony cameras the JPG folder is second.
     # Sony ['indir_ARW', 'indir_JPG']
     # Canon ['indir_CR2, 'indir_JPG']
+
     return new_dirs
