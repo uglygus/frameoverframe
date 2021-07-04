@@ -166,22 +166,10 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
       directory (path-like object): path to a directory
       ignore_hidden (bool): when true do not return hidden files. (default=True)
 
-      first_pass(bool): if True reset the global really_fullpaths[]
+      first_pass(bool): if True reset the global really_fullpaths[] (default=True)
     Returns:
         list (str): List of filenames in the directory sorted alphanumerically.
-
     """
-    # print("top of sorted_listdir()")
-    # print(f"{log.level=}")
-    # log.debug(f"debug")
-    # log.info(f"info")
-    # log.warninging(f"warn")
-
-    # import frameoverframe; import importlib
-
-    # frameoverframe.utils.sorted_listdir('.', recursive=True)
-
-    # importlib.reload(frameoverframe)
 
     global really_fullpaths
     global recursing
@@ -194,7 +182,7 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
         raise
 
     if first_pass:
-        #    print("resetting really_fullpaths")
+        # print("resetting really_fullpaths")
         really_fullpaths = []
 
     names.sort()
@@ -202,23 +190,28 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
     fullpaths = []
 
     for filename in names:
+        log.debug("sorted_listdir(): top of outer for: filename= %s", filename)
         fullpath = os.path.join(directory, filename)
         if ignore_hidden and filename.startswith("."):
             continue
         if os.path.isdir(fullpath) == True:
-            print(filename, " is  a DIR")
+            # print(filename, " is a DIRectory")
             if recursive:
-                #    print("recursive=True")
+                log.debug("sorted_listdir(): recursive=True")
                 really_fullpaths.append(os.path.join(directory, filename))
                 fullpaths.append(os.path.join(directory, filename))
                 sorted_listdir(os.path.join(directory, filename), recursive=True, first_pass=False)
-        else:
+            log.debug("sorted_listdir(): not recursive")
             really_fullpaths.append(os.path.join(directory, filename))
             fullpaths.append(os.path.join(directory, filename))
 
-    # print("fullpaths=", fullpaths)
+        else:
+            log.debug("sorted_listdir(): it is NOT a directory")
+            really_fullpaths.append(os.path.join(directory, filename))
+            fullpaths.append(os.path.join(directory, filename))
 
-    # print("really_fullpaths=", really_fullpaths)
+    #    print("fullpaths=", fullpaths)
+    #    print("really_fullpaths=", really_fullpaths)
     return really_fullpaths
 
 
