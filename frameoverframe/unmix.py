@@ -83,9 +83,13 @@ def unmix(src_dir):
         log.info(f"unmix: Looks good folder is already unmixed. {src_dir}")
         log.debug(f"{ext_list[0]=}")
         ext = ext_list[0].lstrip(".")
-        src_dir_EXT = src_dir + "_" + ext
-        log.debug("Renaming {src_dir} to {src_dir_EXT}")
-        os.rename(src_dir, src_dir_EXT)
+
+        if not src_dir.endswith("_" + ext):
+            src_dir_EXT = src_dir + "_" + ext
+            log.debug("Renaming {src_dir} to {src_dir_EXT}")
+            os.rename(src_dir, src_dir_EXT)
+        else:
+            log.debug("src_dir alread ends with %s" % ext)
         return [""]
 
     if len(ext_list) == 0:
