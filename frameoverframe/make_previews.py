@@ -25,62 +25,71 @@ from colorama import Fore, Style, init
 from frameoverframe.config import RAW_EXTENSIONS
 from frameoverframe.img2vid import img2vid
 from frameoverframe.unmix import unmix
-from frameoverframe.utils import ext_list, sorted_listdir
+from frameoverframe.utils import ext_list, folder_contains_ext, sorted_listdir
 
 log = logging.getLogger("frameoverframe")
 
 
 def _make_previews(src_dir):
     init()  # colorama
-    dirs_changed_need_to_recurse = False
 
     log.debug("make_previews : in_dir = %s" % (src_dir))
 
-    for _dir in sorted_listdir(src_dir):
-        skip_this_dir = False
-        if os.path.isfile(_dir):
-            log.debug(f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL}not a directory.")
+    was_the_list_of_dirs_modified = False
+    for item in sorted_listdir(src_dir):
+        contains_raw_ext = False
+
+        if os.path.isfile(item):
+            log.info(f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Not a directory.")
             continue
 
-        if os.path.isfile(f"{_dir}.mp4") or os.path.isfile(f"{_dir}_preview.mp4"):
-            log.debug(f"Restarting - Video file for {src_dir}/{_dir} already exists.")
+        if os.path.isfile(f"{item}.mp4") or os.path.isfile(f"{item}_preview.mp4"):
+            log.info(f"{item}' -- {Fore.GREEN}SKIPPING{Style.RESET_ALL} Video file alread exists.")
             continue
-        else:
-            log.debug(" Continuing - There is no video for: {_dir}")
-        extensions = ext_list(_dir)
-        log.debug(f"{extensions=}")
-        log.debug(f"'{_dir}' -- Needs video.")
 
+        extensions = ext_list(item)
         if extensions == [""]:
             log.info(
-                f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Folder contains only directories."
+                f"'{item}' -- {Fore.YELLOW}SKIPPING{Style.RESET_ALL} directory contains only directories."
             )
             continue
 
-        log.debug("Checking folder for RAW extensions.")
-        log.debug("extensions = %s" % (extensions))
-        for ext, raw_ext in product(extensions, RAW_EXTENSIONS):
-            if re.search(rf"{ext}$", raw_ext, re.IGNORECASE):
-                log.debug("RAW Extension found, %s needs unmix." % (raw_ext))
-
-                result = unmix(_dir)
-                if result:
-                    dirs_changed_need_to_recurse = True
-
-                skip_this_dir = True
-                break
-            else:
-                log.debug("NO-MATCH")
-
-        if skip_this_dir:
-            log.debug("continuing because skip_this_dir = True")
+        if len(extensions) > 2:
+            log.info(
+                f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Contains more than two filetypes. {extensions}"
+            )
             continue
 
-            # , {_dir}.mp4)
-        log.info(f"calling image2vid({_dir}")
-        img2vid(_dir)  # , _dir + ".mp4"
+        if folder_contains_ext(item, RAW_EXTENSIONS) and folder_contains_ext(item, "JPG"):
+            log.debug(f"unmixing {item}")
+            if unmix(item):
+                log.debug(f"{item} just got unmixed I will need double check all this.")
+                was_the_list_of_dirs_modified = True
+                continue
+            log.debug("unmix failed item=%s'" % (item))
+            contains_raw_ext = True
 
-    return dirs_changed_need_to_recurse
+        if not folder_contains_ext(item, "JPG"):
+            log.info(
+                f"'{item}' -- {Fore.YELLOW}SKIPPING{Style.RESET_ALL} Folder doesn't have any JPGs extensions={extensions}"
+            )
+            continue
+        #
+        # if folder_contains_ext(item, RAW_EXTENSIONS):
+        #     if unmix(item):
+        #         log.info(f"{item} just got unmixed I will need double check all this.")
+        #         was_the_list_of_dirs_modified = True
+        #         continue
+        #     log.debug("unmix failed itemr=%s'" % (item))
+        #     contains_raw_ext = True
+
+        if not was_the_list_of_dirs_modified:
+            # log.info(f"Making video for '{item}'")
+            img2vid(item)
+            log.info(
+                f"'{item}' -- {Fore.GREEN}SUCCESS{Style.RESET_ALL} Video for {item} succesfully made."
+            )
+    return was_the_list_of_dirs_modified
 
 
 def make_previews(src_dir):
