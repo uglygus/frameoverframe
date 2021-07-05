@@ -107,7 +107,7 @@ def main():
     try:
         img2vid(args.input_dirs, args.output_filename, args.profile, framenumber=args.framenumber)
     except NotADirectoryError as e:
-        log.warn(e)
+        log.warning(e)
         sys.exit(1)
 
     log.info("DONE.")
