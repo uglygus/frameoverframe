@@ -29,6 +29,7 @@ def collect_args():
 
     parser.add_argument(
         "src_dir",
+        nargs="+",
         help="Source directory. ",
     )
 
@@ -70,7 +71,17 @@ def main():
     log.setLevel(args.loglevel)
     #    log.critical("logging level : %s", logging.getLevelName(log.getEffectiveLevel()))
 
-    make_previews(args.src_dir)
+    for single_input in args.src_dir:
+        if not os.path.isdir(single_input):
+            print("ERROR: input is not a directory: " + single_input)
+            return 1
+
+        try:
+            make_previews(single_input)
+        except FileNotFoundError as e:
+            log.warn("File not Found: %s", e)
+
+    return 0
 
 
 if __name__ == "__main__":

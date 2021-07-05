@@ -13,8 +13,8 @@ import unittest
 from pathlib import Path
 
 import frameoverframe as fof
-
-# from frameoverframe.test.utils import dir_count, dummy_sdcard, file_count, lots_o_files
+from frameoverframe.test.utils import dummy_sdcard
+from frameoverframe.utils import folder_contains_ext
 
 log = logging.getLogger("frameoverframe")
 
@@ -29,26 +29,16 @@ class TestUtils(unittest.TestCase):
         self.tmpdir_obj.cleanup()
 
     def test_folder_contains_SINGLE(self):
-        """test to make sure folder_contains()
-        works with a single input.
-        """
-        self.assertEqual(utils.folder_contains(self.sdcard, "jpg"), True)
+        self.assertEqual(folder_contains_ext(self.sdcard, "jpg"), True)
 
-    def test_unmix_dircount_is_two(self):
-        """test to make sure the number of files is the same
-        before and after unmixing.
-        """
+    def test_folder_contains_SINGLE_nomatch(self):
+        self.assertEqual(folder_contains_ext(self.sdcard, "XXX"), False)
 
-        # original_count = file_count(self.tmpdir)
+    def test_folder_contains_LIST(self):
+        self.assertEqual(folder_contains_ext(self.sdcard, ["xxx", "arw"]), True)
 
-        fof.unmix.unmix(self.sdcard)
-
-        # final_count = count(self.tmpdir)
-        #
-        # print(f"{original_count=}")
-        # print(f"{final_count=}")
-
-        self.assertEqual(dir_count(self.tmpdir), 2)
+    def test_folder_contains_LIST_nomatch(self):
+        self.assertEqual(folder_contains_ext(self.sdcard, ["xxx", "yyy"]), False)
 
 
 if __name__ == "__main__":

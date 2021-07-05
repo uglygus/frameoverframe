@@ -9,7 +9,7 @@ import shlex
 import shutil
 import sys
 from functools import reduce
-from itertools import takewhile
+from itertools import product, takewhile
 from pathlib import Path
 from subprocess import PIPE, run
 
@@ -158,20 +158,28 @@ def ext_list(directorypath):
 def folder_contains_ext(src_dir, search_exts):
     """
     search_exts: is a string or list of strings.
+                 ignores case
     Returns: True if any of the files in the folder have one of the search_exts.
     """
-    if not type(exts, list):
-        ext_list = [exts]
+    if not isinstance(search_exts, list):
+        search_exts = [search_exts]
 
     actual_exts = ext_list(src_dir)
     log.debug(f"Checking folder_contains ({src_dir}, {search_exts})")
     for ext, raw_ext in product(actual_exts, search_exts):
         if ext == "":
             continue
-        print(f"ext={ext}, raw_ext={raw_ext}")
+        log.debug(f"ext={ext}, raw_ext={raw_ext}")
+        ext = ext.lstrip(".")
         if re.search(rf"{ext}$", raw_ext, re.IGNORECASE):
+            log.debug("folder_contains_ext returning: True")
             return True
+    log.debug("folder_contains_ext returning:False")
     return False
+
+
+recursing = None
+really_fullpaths = []
 
 
 def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=True):
@@ -221,7 +229,7 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
             fullpaths.append(os.path.join(directory, filename))
 
         else:
-            log.debug("sorted_listdir(): it is NOT a directory")
+            # log.debug("sorted_listdir(): it is NOT a directory")
             really_fullpaths.append(os.path.join(directory, filename))
             fullpaths.append(os.path.join(directory, filename))
 

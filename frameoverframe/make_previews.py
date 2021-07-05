@@ -25,40 +25,9 @@ from colorama import Fore, Style, init
 from frameoverframe.config import RAW_EXTENSIONS
 from frameoverframe.img2vid import img2vid
 from frameoverframe.unmix import unmix
-from frameoverframe.utils import ext_list, sorted_listdir
+from frameoverframe.utils import ext_list, folder_contains_ext, sorted_listdir
 
 log = logging.getLogger("frameoverframe")
-
-
-def folder_contains_RAW_EXT(src_dir):
-    extensions = ext_list(src_dir)
-    log.debug(f"Checking folder_contains_RAW_EXT({src_dir})")
-    for ext, raw_ext in product(extensions, RAW_EXTENSIONS):
-        if ext == "":
-            continue
-        print(f"ext={ext}, raw_ext={raw_ext}")
-        if re.search(rf"{ext}$", raw_ext, re.IGNORECASE):
-            print("yes it does contain ", ext)
-
-
-def check_folder_for_RAW_extensions(src_dir):
-
-    contains_raw_ext = False
-    was_the_list_of_dirs_modified = False
-
-    extensions = ext_list(src_dir)
-    log.debug("Checking folder for RAW extensions.")
-    for ext, raw_ext in product(extensions, RAW_EXTENSIONS):
-        if re.search(rf"{ext}$", raw_ext, re.IGNORECASE):
-            if unmix(src_dir):
-                log.info(f"{src_dir} was unmixed I will need double check all this.")
-                was_the_list_of_dirs_modified = True
-            log.debug("RAW Extension found, skipping '%s'" % (raw_ext))
-            contains_raw_ext = True
-    print("check_for... returning (%s, %s)" % (contains_raw_ext, was_the_list_of_dirs_modified))
-
-    input(";;;")
-    return (contains_raw_ext, was_the_list_of_dirs_modified)
 
 
 def _make_previews(src_dir):
@@ -70,46 +39,56 @@ def _make_previews(src_dir):
     for item in sorted_listdir(src_dir):
         contains_raw_ext = False
 
-        folder_contains_RAW_EXT(src_dir)
-
         if os.path.isfile(item):
-            log.debug(f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL}not a directory.")
+            log.info(f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Not a directory.")
             continue
 
         if os.path.isfile(f"{item}.mp4") or os.path.isfile(f"{item}_preview.mp4"):
-            log.info(f"Video file for '{item}' already exists.")
+            log.info(f"{item}' -- {Fore.GREEN}SKIPPING{Style.RESET_ALL} Video file alread exists.")
             continue
 
         extensions = ext_list(item)
         if extensions == [""]:
             log.info(
-                f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} directory contains only directories."
+                f"'{item}' -- {Fore.YELLOW}SKIPPING{Style.RESET_ALL} directory contains only directories."
             )
             continue
 
         if len(extensions) > 2:
             log.info(
-                f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Contains more than two tiletypes. extensions={extensions}"
+                f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Contains more than two filetypes. {extensions}"
             )
             continue
 
-        # if extensions contains ".JPG" or extensions contains ".jpg":
-        #     if extensions
+        if folder_contains_ext(item, RAW_EXTENSIONS) and folder_contains_ext(item, "JPG"):
+            log.debug(f"unmixing {item}")
+            if unmix(item):
+                log.debug(f"{item} just got unmixed I will need double check all this.")
+                was_the_list_of_dirs_modified = True
+                continue
+            log.debug("unmix failed item=%s'" % (item))
+            contains_raw_ext = True
 
-        (contains_raw_ext, was_this_list_of_dirs_modified) = check_folder_for_RAW_extensions(item)
-        if was_this_list_of_dirs_modified:
-            was_the_list_of_dirs_modified = True
-
-        if contains_raw_ext:
-            log.debug("Why and how did we get here?")
-            log.debug(
-                f"'{item}' contains RAW images but was not correctly unmixed. Do not make a video."
+        if not folder_contains_ext(item, "JPG"):
+            log.info(
+                f"'{item}' -- {Fore.YELLOW}SKIPPING{Style.RESET_ALL} Folder doesn't have any JPGs extensions={extensions}"
             )
             continue
+        #
+        # if folder_contains_ext(item, RAW_EXTENSIONS):
+        #     if unmix(item):
+        #         log.info(f"{item} just got unmixed I will need double check all this.")
+        #         was_the_list_of_dirs_modified = True
+        #         continue
+        #     log.debug("unmix failed itemr=%s'" % (item))
+        #     contains_raw_ext = True
 
-        log.info(f"Making video for '{item}'")
-        img2vid(item)
-
+        if not was_the_list_of_dirs_modified:
+            # log.info(f"Making video for '{item}'")
+            img2vid(item)
+            log.info(
+                f"'{item}' -- {Fore.GREEN}SUCCESS{Style.RESET_ALL} Video for {item} succesfully made."
+            )
     return was_the_list_of_dirs_modified
 
 
