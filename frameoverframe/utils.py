@@ -9,7 +9,7 @@ import shlex
 import shutil
 import sys
 from functools import reduce
-from itertools import takewhile
+from itertools import product, takewhile
 from pathlib import Path
 from subprocess import PIPE, run
 
@@ -155,6 +155,29 @@ def ext_list(directorypath):
     return extlist
 
 
+def folder_contains_ext(src_dir, search_exts):
+    """
+    search_exts: is a string or list of strings.
+                 ignores case
+    Returns: True if any of the files in the folder have one of the search_exts.
+    """
+    if not isinstance(search_exts, list):
+        search_exts = [search_exts]
+
+    actual_exts = ext_list(src_dir)
+    log.debug(f"Checking folder_contains ({src_dir}, {search_exts})")
+    for ext, raw_ext in product(actual_exts, search_exts):
+        if ext == "":
+            continue
+        log.debug(f"ext={ext}, raw_ext={raw_ext}")
+        ext = ext.lstrip(".")
+        if re.search(rf"{ext}$", raw_ext, re.IGNORECASE):
+            log.debug("folder_contains_ext returning: True")
+            return True
+    log.debug("folder_contains_ext returning:False")
+    return False
+
+
 recursing = None
 really_fullpaths = []
 
@@ -166,22 +189,10 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
       directory (path-like object): path to a directory
       ignore_hidden (bool): when true do not return hidden files. (default=True)
 
-      first_pass(bool): if True reset the global really_fullpaths[]
+      first_pass(bool): if True reset the global really_fullpaths[] (default=True)
     Returns:
         list (str): List of filenames in the directory sorted alphanumerically.
-
     """
-    # print("top of sorted_listdir()")
-    # print(f"{log.level=}")
-    # log.debug(f"debug")
-    # log.info(f"info")
-    # log.warninging(f"warn")
-
-    # import frameoverframe; import importlib
-
-    # frameoverframe.utils.sorted_listdir('.', recursive=True)
-
-    # importlib.reload(frameoverframe)
 
     global really_fullpaths
     global recursing
@@ -194,7 +205,7 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
         raise
 
     if first_pass:
-        log.debug("utils.py : resetting really_fullpaths")
+
         really_fullpaths = []
 
     names.sort()
@@ -202,27 +213,28 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
     fullpaths = []
 
     for filename in names:
+        log.debug("sorted_listdir(): top of outer for: filename= %s", filename)
         fullpath = os.path.join(directory, filename)
         if ignore_hidden and filename.startswith("."):
             continue
         if os.path.isdir(fullpath) == True:
-            # print(filename, " is  a DIR")
+
+            # print(filename, " is a DIRectory")
             if recursive:
-                #    print("recursive=True")
+                log.debug("sorted_listdir(): recursive=True")
                 really_fullpaths.append(os.path.join(directory, filename))
                 fullpaths.append(os.path.join(directory, filename))
                 sorted_listdir(os.path.join(directory, filename), recursive=True, first_pass=False)
-            # else:
-            #    print("recursive=false")
-        else:
-            # print(filename, " is not a DIR")
-
+            log.debug("sorted_listdir(): not recursive")
             really_fullpaths.append(os.path.join(directory, filename))
             fullpaths.append(os.path.join(directory, filename))
 
-    # print("fullpaths=", fullpaths)
+        else:
+            # log.debug("sorted_listdir(): it is NOT a directory")
+            really_fullpaths.append(os.path.join(directory, filename))
+            fullpaths.append(os.path.join(directory, filename))
 
-    # print("really_fullpaths=", really_fullpaths)
+
     return really_fullpaths
 
 
