@@ -30,6 +30,17 @@ from frameoverframe.utils import ext_list, sorted_listdir
 log = logging.getLogger("frameoverframe")
 
 
+def folder_contains_RAW_EXT(src_dir):
+    extensions = ext_list(src_dir)
+    log.debug(f"Checking folder_contains_RAW_EXT({src_dir})")
+    for ext, raw_ext in product(extensions, RAW_EXTENSIONS):
+        if ext == "":
+            continue
+        print(f"ext={ext}, raw_ext={raw_ext}")
+        if re.search(rf"{ext}$", raw_ext, re.IGNORECASE):
+            print("yes it does contain ", ext)
+
+
 def check_folder_for_RAW_extensions(src_dir):
 
     contains_raw_ext = False
@@ -44,7 +55,7 @@ def check_folder_for_RAW_extensions(src_dir):
                 was_the_list_of_dirs_modified = True
             log.debug("RAW Extension found, skipping '%s'" % (raw_ext))
             contains_raw_ext = True
-    print("check_for... returning (%s, %s)", (contains_raw_ext, was_the_list_of_dirs_modified))
+    print("check_for... returning (%s, %s)" % (contains_raw_ext, was_the_list_of_dirs_modified))
 
     input(";;;")
     return (contains_raw_ext, was_the_list_of_dirs_modified)
@@ -55,8 +66,11 @@ def _make_previews(src_dir):
 
     log.debug("make_previews : in_dir = %s" % (src_dir))
 
+    was_the_list_of_dirs_modified = False
     for item in sorted_listdir(src_dir):
         contains_raw_ext = False
+
+        folder_contains_RAW_EXT(src_dir)
 
         if os.path.isfile(item):
             log.debug(f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL}not a directory.")
@@ -66,14 +80,21 @@ def _make_previews(src_dir):
             log.info(f"Video file for '{item}' already exists.")
             continue
 
-        #        log.info(f"There is no video for: '{item}'")
-
         extensions = ext_list(item)
         if extensions == [""]:
             log.info(
                 f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} directory contains only directories."
             )
             continue
+
+        if len(extensions) > 2:
+            log.info(
+                f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Contains more than two tiletypes. extensions={extensions}"
+            )
+            continue
+
+        # if extensions contains ".JPG" or extensions contains ".jpg":
+        #     if extensions
 
         (contains_raw_ext, was_this_list_of_dirs_modified) = check_folder_for_RAW_extensions(item)
         if was_this_list_of_dirs_modified:

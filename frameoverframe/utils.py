@@ -155,8 +155,23 @@ def ext_list(directorypath):
     return extlist
 
 
-recursing = None
-really_fullpaths = []
+def folder_contains_ext(src_dir, search_exts):
+    """
+    search_exts: is a string or list of strings.
+    Returns: True if any of the files in the folder have one of the search_exts.
+    """
+    if not type(exts, list):
+        ext_list = [exts]
+
+    actual_exts = ext_list(src_dir)
+    log.debug(f"Checking folder_contains ({src_dir}, {search_exts})")
+    for ext, raw_ext in product(actual_exts, search_exts):
+        if ext == "":
+            continue
+        print(f"ext={ext}, raw_ext={raw_ext}")
+        if re.search(rf"{ext}$", raw_ext, re.IGNORECASE):
+            return True
+    return False
 
 
 def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=True):
@@ -210,8 +225,6 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
             really_fullpaths.append(os.path.join(directory, filename))
             fullpaths.append(os.path.join(directory, filename))
 
-    #    print("fullpaths=", fullpaths)
-    #    print("really_fullpaths=", really_fullpaths)
     return really_fullpaths
 
 
