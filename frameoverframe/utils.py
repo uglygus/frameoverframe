@@ -9,11 +9,15 @@ import shlex
 import shutil
 import sys
 from functools import reduce
-from itertools import takewhile
+from itertools import product, takewhile
 from pathlib import Path
 from subprocess import PIPE, run
 
-import exifread
+
+import exifread  # legacy, used this to read tags
+from exif import Image as exifImage  # need this to write tags
+from exif import LightSource
+
 from PIL import Image
 
 log = logging.getLogger("frameoverframe")
@@ -36,6 +40,61 @@ def exif_creation_date(filename):
         exifdate = None
 
     return exifdate
+
+
+def exif_read_filename(filename):
+    """given an image file read the exif tag that contains the original filename"""
+
+    with open(filename, "rb") as image_file:
+        my_image = exifImage(image_file)
+
+        if my_image.has_exif == False:
+            raise TypeError("image has no EXIF tags.", my_image)
+
+        # print("exif_add_filename_tag() : filename=", filename)
+        # print("my_image.has_exif=", my_image.has_exif)
+        # print("my_image has tags:", my_image.list_all())
+
+        # my_image.original_filename = filename
+        # my_image.image_description = filename
+        # my_image.light_source = LightSource.DAYLIGHT
+
+        # print("my_image.has_exif=", my_image.has_exif)
+        # print("now my_image has tags:", my_image.list_all())
+        # print("my_image.image_description = ", my_image.image_description)
+
+        # print("exif_read_filename returning=", my_image.image_description)
+        return my_image.image_description
+    return
+
+
+def exif_write_filename(filename):
+    """given an image file add an exif tag that contains the current filename"""
+
+    with open(filename, "rb") as image_file:
+        my_image = exifImage(image_file)
+
+        # print("exif_add_filename_tag() : filename=", filename)
+        # print("my_image.has_exif=", my_image.has_exif)
+        # print("my_image has tags:", my_image.list_all())
+
+        # my_image.original_filename = filename
+        my_image.image_description = filename
+        # my_image.light_source = LightSource.DAYLIGHT
+
+        # print("my_image.has_exif=", my_image.has_exif)
+        # print("now my_image has tags:", my_image.list_all())
+        # print("my_image.image_description = ", my_image.image_description)
+        # print("--")
+
+    with open(filename, "wb") as image_file:
+        image_file.write(my_image.get_file())
+
+        # print("reading with exif_read_filename(filename), == ", exif_read_filename(filename))
+        #
+        # input("added exif data to :: ......")
+
+    return
 
 
 def file_not_exist(filepath):
@@ -98,22 +157,47 @@ def ext_list(directorypath):
     return extlist
 
 
-def sorted_listdir(directory, ignore_hidden=True):
+def folder_contains_ext(src_dir, search_exts):
+    """
+    search_exts: is a string or list of strings.
+                 ignores case
+    Returns: True if any of the files in the folder have one of the search_exts.
+    """
+    if not isinstance(search_exts, list):
+        search_exts = [search_exts]
+
+    actual_exts = ext_list(src_dir)
+    log.debug(f"Checking folder_contains ({src_dir}, {search_exts})")
+    for ext, raw_ext in product(actual_exts, search_exts):
+        if ext == "":
+            continue
+        log.debug(f"ext={ext}, raw_ext={raw_ext}")
+        ext = ext.lstrip(".")
+        if re.search(rf"{ext}$", raw_ext, re.IGNORECASE):
+            log.debug("folder_contains_ext returning: True")
+            return True
+    log.debug("folder_contains_ext returning:False")
+    return False
+
+
+recursing = None
+really_fullpaths = []
+
+
+def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=True):
     """returns a list : the full path to every file in a directory sorted alphanumerically.
 
     Args:
       directory (path-like object): path to a directory
       ignore_hidden (bool): when true do not return hidden files. (default=True)
 
+      first_pass(bool): if True reset the global really_fullpaths[] (default=True)
     Returns:
         list (str): List of filenames in the directory sorted alphanumerically.
-
     """
-    # print("top of sorted_listdir()")
-    # print(f"{log.level=}")
-    # log.debug(f"debug")
-    # log.info(f"info")
-    # log.warninging(f"warn")
+
+    global really_fullpaths
+    global recursing
 
     try:
         names = os.listdir(directory)
@@ -122,14 +206,36 @@ def sorted_listdir(directory, ignore_hidden=True):
             log.exception(f"sorted_listdir() : {e}")
         raise
 
+    if first_pass:
+        # print("resetting really_fullpaths")
+        really_fullpaths = []
+
     names.sort()
+
     fullpaths = []
 
     for filename in names:
+        log.debug("sorted_listdir(): top of outer for: filename= %s", filename)
+        fullpath = os.path.join(directory, filename)
         if ignore_hidden and filename.startswith("."):
             continue
-        fullpaths.append(os.path.join(directory, filename))
-    return fullpaths
+        if os.path.isdir(fullpath) == True:
+            # print(filename, " is a DIRectory")
+            if recursive:
+                log.debug("sorted_listdir(): recursive=True")
+                really_fullpaths.append(os.path.join(directory, filename))
+                fullpaths.append(os.path.join(directory, filename))
+                sorted_listdir(os.path.join(directory, filename), recursive=True, first_pass=False)
+            log.debug("sorted_listdir(): not recursive")
+            really_fullpaths.append(os.path.join(directory, filename))
+            fullpaths.append(os.path.join(directory, filename))
+
+        else:
+            # log.debug("sorted_listdir(): it is NOT a directory")
+            really_fullpaths.append(os.path.join(directory, filename))
+            fullpaths.append(os.path.join(directory, filename))
+
+    return really_fullpaths
 
 
 def create_workdir(filename, action="", nested=True):
