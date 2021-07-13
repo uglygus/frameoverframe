@@ -18,10 +18,12 @@ log = logging.getLogger("frameoverframe")
 
 
 def what_strange_land_is_this():
+    print("platform.sys()=", platform.system())
+    print("platform.uname().release=", platform.uname().release)
     if platform.system() == "Darwin":
         return "Darwin"
-    if platform.system() == "linux":
-        if "Microsoft" in platform.uname().release:
+    if platform.system() == "linux" or platform.system() == "Linux":
+        if "Microsoft" in platform.uname().release or "microsoft" in platform.uname().release:
             log.debug("under WSL")
             return "WSL"
         else:
@@ -37,16 +39,21 @@ def WSL_path_converter(path):
     Uses Microsoft's 'wslpath' command.
     """
 
+    print("WSL_path_converter IN path == ", path)
+
     wslpath_bin = shutil.which("wslpath")
 
     sys_call = [wslpath_bin, "-w", path]
 
     quoted_sys_call = [shlex.quote(i) for i in sys_call]
-    
+
     log.info("Calling : " + " ".join(quoted_sys_call))
     winpath = subprocess.check_output(sys_call)
     winpath = winpath.strip()
-    return winpath
+
+    print("WSL_path_converter OUT path == ", winpath)
+    input("....")
+    return winpath.decode("utf-8")
 
 
 def raw2dng(input_dirs, output_dir):
@@ -80,12 +87,15 @@ def raw2dng(input_dirs, output_dir):
                 file = WSL_path_converter(file)
             sys_call = [AdobeDNG_bin, "-c", file]
 
+            for sc in sys_call:
+                print("syscall=", sc, type(sc))
+
             quoted_sys_call = [shlex.quote(i) for i in sys_call]
             log.info("Calling : " + " ".join(quoted_sys_call))
 
             result = subprocess.run(sys_call)
             if result.returncode != 0:
-                log.debug("Adobe DNG Vonverter failed check your images.")
+                log.debug("Adobe DNG Converter failed check your images.")
                 return 1
         unmix(_dir)
         return 0
