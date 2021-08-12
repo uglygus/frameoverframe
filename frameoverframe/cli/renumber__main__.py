@@ -20,9 +20,17 @@ docstring for more.
 import argparse
 import os
 import sys
+import logging.config
+
+#   logging.config.dictConfig() and logging.getLogger()
+#   must come after importing LOGGING_CONFIG
+#   but before any other frameoverframe modules.
+from frameoverframe.config import LOGGING_CONFIG
+
+logging.config.dictConfig(LOGGING_CONFIG)
+log = logging.getLogger("frameoverframe")
 
 from frameoverframe.renumber import renumber
-
 
 def collect_args():
     """collect commandline arguments"""
@@ -30,7 +38,8 @@ def collect_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "src_dir",
+        "src_dirs",
+        nargs="+",
         help="Source directory. ",
     )
 
@@ -84,8 +93,29 @@ def collect_args():
         help="How many digits for number. (default 5) eg. 00001.jpg",
     )
 
-    return parser
+    verbosity = parser.add_mutually_exclusive_group()
+    verbosity.add_argument(
+        "--quiet",
+        "-q",
+        action="store_const",
+        const=logging.WARN,
+        dest="loglevel",
+        help="Only output when necessary.",
+    )
 
+    verbosity.add_argument(
+        "--verbose",
+        "-v",
+        action="store_const",
+        const=logging.DEBUG,
+        dest="loglevel",
+        help="Increase output verbosity.",
+    )
+
+    parser.set_defaults(loglevel=logging.INFO)
+    args = parser.parse_args()
+
+    return args
 
 def main():
     """
@@ -94,22 +124,56 @@ def main():
 
     """
 
-    parser = collect_args()
-    args = parser.parse_args()
 
-    if args.prefix == ":folder":
-        prefix = os.path.basename(os.path.normpath(args.src_dir))
-        args.prefix = prefix
+    args = collect_args()
+    log.setLevel(args.loglevel)
 
-    renumber(
-        args.src_dir,
-        dst_dir=args.dst_dir,
-        inplace=not args.safe,
-        sort_method=args.sort_method,
-        start_at=args.start_at,
-        prefix=args.prefix,
-        padding=args.padding,
-    )
+    log.debug(f"args= {args} -- {log.level=}")
+
+    for directory in args.src_dirs:
+        log.info(f"renumbering {directory} ...")
+
+
+        print('args.prefix=', args.prefix)
+        input('...')
+        if args.prefix == ":folder":
+            prefix = os.path.basename(os.path.normpath(directory))
+        else:
+            prefix=args.prefix
+#            args.prefix = prefix
+
+
+        try:
+            renumber(
+                directory,
+                dst_dir=args.dst_dir,
+                inplace=not args.safe,
+                sort_method=args.sort_method,
+                start_at=args.start_at,
+                prefix=prefix,
+                padding=args.padding,
+            )
+        except FileNotFoundError as e:
+            log.warn(e)
+            return 1
+    return 0
+
+
+
+    #
+    # if args.prefix == ":folder":
+    #     prefix = os.path.basename(os.path.normpath(args.src_dir))
+    #     args.prefix = prefix
+    #
+    # renumber(
+    #     args.src_dir,
+    #     dst_dir=args.dst_dir,
+    #     inplace=not args.safe,
+    #     sort_method=args.sort_method,
+    #     start_at=args.start_at,
+    #     prefix=args.prefix,
+    #     padding=args.padding,
+    # )
 
 
 if __name__ == "__main__":
