@@ -85,17 +85,26 @@ def raw2dng(input_dirs, output_dir):
         for file in utils.sorted_listdir(_dir):
             if what_strange_land_is_this() == "WSL":
                 file = WSL_path_converter(file)
-            sys_call = [AdobeDNG_bin, "-c", "-p2", file]
 
-            for sc in sys_call:
-                print("syscall=", sc, type(sc))
 
-            quoted_sys_call = [shlex.quote(i) for i in sys_call]
-            log.info("Calling : " + " ".join(quoted_sys_call))
+            output_file = file.replace(".ARW", ".dng")
 
-            result = subprocess.run(sys_call)
-            if result.returncode != 0:
-                log.debug("Adobe DNG Converter failed check your images.")
-                return 1
+            if os.path.isfile(output_file):
+
+                sys_call = [AdobeDNG_bin, "-c", "-p2", file]
+
+                for sc in sys_call:
+                    print("syscall=", sc, type(sc))
+
+                quoted_sys_call = [shlex.quote(i) for i in sys_call]
+                log.info("Calling : " + " ".join(quoted_sys_call))
+
+                result = subprocess.run(sys_call)
+                if result.returncode != 0:
+                    log.debug("Adobe DNG Converter failed check your images.")
+                    return 1
+            else:
+                log.info("{} already exists".format(output_file))
+
         unmix(_dir)
         return 0
