@@ -51,8 +51,8 @@ def WSL_path_converter(path):
     winpath = subprocess.check_output(sys_call)
     winpath = winpath.strip()
 
-    print("WSL_path_converter OUT path == ", winpath)
-    input("....")
+    #print("WSL_path_converter OUT path == ", winpath)
+    #nputinput("....")
     return winpath.decode("utf-8")
 
 
@@ -85,7 +85,7 @@ def raw2dng(input_dirs, output_dir):
         for file in utils.sorted_listdir(_dir):
             if what_strange_land_is_this() == "WSL":
                 file = WSL_path_converter(file)
-            sys_call = [AdobeDNG_bin, "-c", file]
+            sys_call = [AdobeDNG_bin, "-c", "-p2", file]
 
             for sc in sys_call:
                 print("syscall=", sc, type(sc))
