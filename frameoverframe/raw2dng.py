@@ -10,9 +10,11 @@ import platform
 import shlex
 import shutil
 import subprocess
+from pathlib import Path
 
 import frameoverframe.utils as utils
 from frameoverframe.unmix import unmix
+import frameoverframe.config as config
 
 log = logging.getLogger("frameoverframe")
 
@@ -46,14 +48,26 @@ def WSL_path_converter(path):
     sys_call = [wslpath_bin, "-w", path]
 
     quoted_sys_call = [shlex.quote(i) for i in sys_call]
+    i_had_to_touch_path_because_wsl_sucks = False
+
+    if not os.path.exists(path):
+        #https://github.com/microsoft/WSL/issues/4908
+        log.debug('WSL_path_converter() path does not exist. touching file to get it. because wslpath sucks.')
+        i_had_to_touch_path_because_wsl_sucks = True
+        Path(path).touch()
 
     log.info("Calling : " + " ".join(quoted_sys_call))
     winpath = subprocess.check_output(sys_call)
-    winpath = winpath.strip()
 
+    if i_had_to_touch_path_because_wsl_sucks:
+        os.unlink(path)
+
+    winpath = winpath.strip()
+    winpath = winpath.decode("utf-8")
+    #input(f'WSLpath got bpath...{winpath}...')
     #print("WSL_path_converter OUT path == ", winpath)
     #nputinput("....")
-    return winpath.decode("utf-8")
+    return winpath
 
 
 def raw2dng(input_dirs, output_dir):
@@ -83,14 +97,34 @@ def raw2dng(input_dirs, output_dir):
 
     for _dir in input_dirs:
         for file in utils.sorted_listdir(_dir):
-            if what_strange_land_is_this() == "WSL":
-                file = WSL_path_converter(file)
+
+            _, ext = os.path.splitext(file)
+
+            # print('ext==', ext)
+            # print('ext.upoper()==', ext.upper())
+            # print('RAW_EXT=', config.RAW_EXTENSIONS)
+            # input('...')
+            if not ext.upper() in config.RAW_EXTENSIONS:
+                log.debug("skipping. File doesn't have a RAW extension.")
+                continue
+            if ext.casefold() == '.dng'.casefold():
+                log.debug("skipping. File is already a DNG.")
+                continue
 
             output_file = file.replace(".ARW", ".dng")
-            print('output_file=', output_file)
+            # print('look for output_file=', output_file)
+            # input('..')
+
+
             if os.path.isfile(output_file):
                 log.info("{} already exists".format(output_file))
-                break
+                continue
+            # print('did not find it.')
+            # input('asdfds...')
+
+
+            if what_strange_land_is_this() == "WSL":
+                file = WSL_path_converter(file)
 
             sys_call = [AdobeDNG_bin, "-c", "-p2", file]
 
