@@ -18,8 +18,8 @@ log = logging.getLogger("frameoverframe")
 
 
 def what_strange_land_is_this():
-    print("platform.sys()=", platform.system())
-    print("platform.uname().release=", platform.uname().release)
+    #print("platform.sys()=", platform.system())
+    #print("platform.uname().release=", platform.uname().release)
     if platform.system() == "Darwin":
         return "Darwin"
     if platform.system() == "linux" or platform.system() == "Linux":
@@ -39,7 +39,7 @@ def WSL_path_converter(path):
     Uses Microsoft's 'wslpath' command.
     """
 
-    print("WSL_path_converter IN path == ", path)
+    #print("WSL_path_converter IN path == ", path)
 
     wslpath_bin = shutil.which("wslpath")
 
@@ -87,23 +87,24 @@ def raw2dng(input_dirs, output_dir):
                 file = WSL_path_converter(file)
 
             output_file = file.replace(".ARW", ".dng")
-
+            print('output_file=', output_file)
             if os.path.isfile(output_file):
-
-                sys_call = [AdobeDNG_bin, "-c", "-p2", file]
-
-                for sc in sys_call:
-                    print("syscall=", sc, type(sc))
-
-                quoted_sys_call = [shlex.quote(i) for i in sys_call]
-                log.info("Calling : " + " ".join(quoted_sys_call))
-
-                result = subprocess.run(sys_call)
-                if result.returncode != 0:
-                    log.debug("Adobe DNG Converter failed check your images.")
-                    return 1
-            else:
                 log.info("{} already exists".format(output_file))
+                break
+
+            sys_call = [AdobeDNG_bin, "-c", "-p2", file]
+
+            #for sc in sys_call:
+                #print("syscall=", sc, type(sc))
+
+            quoted_sys_call = [shlex.quote(i) for i in sys_call]
+            log.info("\nCalling : " + " ".join(quoted_sys_call))
+
+            result = subprocess.run(sys_call)
+            if result.returncode != 0:
+                log.debug("Adobe DNG Converter failed check your images.")
+                return 1
+
 
         unmix(_dir)
         return 0
