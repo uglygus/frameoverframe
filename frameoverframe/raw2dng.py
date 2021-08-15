@@ -85,8 +85,6 @@ def raw2dng(input_dirs, output_dir):
         for file in utils.sorted_listdir(_dir):
             if what_strange_land_is_this() == "WSL":
                 file = WSL_path_converter(file)
-                
-            sys_call = [AdobeDNG_bin, "-c", "-p2", file]
 
             output_file = file.replace(".ARW", ".dng")
 
