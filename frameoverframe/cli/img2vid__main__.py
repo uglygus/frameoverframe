@@ -69,7 +69,7 @@ def collect_args():
         "-f",
         "--framenumber",
         dest="framenumber",
-        default=True,
+        default=False,
         action="store_true",
         help="Burn in framenumbers.",
     )
