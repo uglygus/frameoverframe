@@ -28,14 +28,14 @@ LOGGING_CONFIG = {
             "formatter": "simple",
             "stream": "ext://sys.stdout",
         },
-        "file": {
-            "level": "DEBUG",
-            "class": "logging.handlers.RotatingFileHandler",
-            "formatter": "detailed",
-            "filename": LOGFILE,
-            "maxBytes": 10485760,  # 10MB
-            "backupCount": 3,
-        },
+        # "file": {
+        #     "level": "DEBUG",
+        #     "class": "logging.handlers.RotatingFileHandler",
+        #     "formatter": "detailed",
+        #     "filename": LOGFILE,
+        #     "maxBytes": 10485760,  # 10MB
+        #     "backupCount": 3,
+        # },
     },
     # include "file" in the list of handlers to log to the file too.
     "loggers": {
