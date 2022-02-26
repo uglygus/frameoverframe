@@ -66,9 +66,6 @@ def WSL_path_converter(path):
 
     winpath = winpath.strip()
     winpath = winpath.decode("utf-8")
-    # input(f'WSLpath got bpath...{winpath}...')
-    # print("WSL_path_converter OUT path == ", winpath)
-    # nputinput("....")
     return winpath
 
 
@@ -98,12 +95,16 @@ def raw2dng(input_dirs, output_dir):
     input_dirs.sort()
 
     for _dir in input_dirs:
+        print('_dir==', _dir)
+        outpur_dir = _dir.replace('_ARW', '_DNG')
+        print('output_dir=', output_dir)
+        input('...ok ok...')
         for file in utils.sorted_listdir(_dir):
 
             _, ext = os.path.splitext(file)
 
             # print('ext==', ext)
-            # print('ext.upoper()==', ext.upper())
+            # print('ext.upper()==', ext.upper())
             # print('RAW_EXT=', config.RAW_EXTENSIONS)
             # input('...')
             if not ext.upper() in config.RAW_EXTENSIONS:

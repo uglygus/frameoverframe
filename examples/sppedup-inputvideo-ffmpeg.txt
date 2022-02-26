@@ -1,1 +1,0 @@
-ffmpeg -i  /Volumes/Untitled/PRIVATE/M4ROOT/CLIP/C0368.MP4 -filter:v 'setpts=0.1*PTS'  -an ~'/BIG STUFF/fancylily-sped up 10x.mp4'
