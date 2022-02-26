@@ -71,7 +71,7 @@ def collect_args():
         dest="framenumber",
         default=False,
         action="store_true",
-        help="Burn in framenumbers.",
+        help="Burn in framenumbers. default:False",
     )
     verbosity = parser.add_mutually_exclusive_group()
     verbosity.add_argument(

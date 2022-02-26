@@ -9,7 +9,7 @@ presets:
 
 preview: (default)
     encoding = h264, fast encode, medium bitrate
-    fps = 23.976
+    fps = 30
     dimensions = max 1080p if image is over 1080 in one dimension shrink it to fit in a
     1080x1080 box. Does not change images under 1080x1080.
 
@@ -94,7 +94,8 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         # fmt: off
         ffmpeg_settings = [
             "-loglevel", "error", '-stats',
-            "-r", "24000/1001",
+        #    "-r", "24000/1001",
+            "-r", 30,
             "-vcodec", "libx264",
             "-pix_fmt", "yuv420p",
             "-preset", "veryfast",
@@ -113,7 +114,8 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
 
         # fmt: off
         ffmpeg_settings = [
-            "-r", "24000/1001",
+            #"-r", "24000/1001",
+            "-r", 30,
             "-vcodec", "libx264",
             "-crf", "17",
             "-pix_fmt", "yuv422p",
@@ -133,7 +135,8 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         )
         # fmt: off
         ffmpeg_settings = [
-            "-r", "24000/1001",
+            #"-r", "24000/1001",
+            "-r", 30,
             "-vcodec", "dnxhd",
             "-profile:v", "dnxhr_sq",
             "-pix_fmt", "yuv422p",
