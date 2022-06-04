@@ -20,8 +20,6 @@ log = logging.getLogger("frameoverframe")
 
 
 def what_strange_land_is_this():
-    # print("platform.sys()=", platform.system())
-    # print("platform.uname().release=", platform.uname().release)
     if platform.system() == "Darwin":
         return "Darwin"
     if platform.system() == "linux" or platform.system() == "Linux":
@@ -41,13 +39,12 @@ def WSL_path_converter(path):
     Uses Microsoft's 'wslpath' command.
     """
 
-    # print("WSL_path_converter IN path == ", path)
-
     wslpath_bin = shutil.which("wslpath")
 
     sys_call = [wslpath_bin, "-w", path]
 
     quoted_sys_call = [shlex.quote(i) for i in sys_call]
+
     i_had_to_touch_path_because_wsl_sucks = False
 
     if not os.path.exists(path):
@@ -58,6 +55,7 @@ def WSL_path_converter(path):
         i_had_to_touch_path_because_wsl_sucks = True
         Path(path).touch()
 
+
     log.info("Calling : " + " ".join(quoted_sys_call))
     winpath = subprocess.check_output(sys_call)
 
@@ -65,8 +63,9 @@ def WSL_path_converter(path):
         os.unlink(path)
 
     winpath = winpath.strip()
-    winpath = winpath.decode("utf-8")
-    return winpath
+
+    return winpath.decode("utf-8")
+
 
 
 def raw2dng(input_dirs, output_dir):
@@ -131,6 +130,9 @@ def raw2dng(input_dirs, output_dir):
 
             # for sc in sys_call:
             # print("syscall=", sc, type(sc))
+
+            for sc in sys_call:
+                print("syscall=", sc, type(sc))
 
             quoted_sys_call = [shlex.quote(i) for i in sys_call]
             log.info("\nCalling : " + " ".join(quoted_sys_call))
