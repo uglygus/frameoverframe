@@ -39,7 +39,7 @@ def convert_to_png(infile, outfile="", delete_original=True):
     try:
         Image.open(infile).save(outfile)
     except IOError:
-        # log.warn("Cannot convert to PNG:", infile)
+        # log.warning("Cannot convert to PNG:", infile)
         raise IOError("Cannot convert to PNG:", infile)
 
     if delete_original:
@@ -108,9 +108,9 @@ def align_image_stack(infiles, out_dir="", prefix="aligned-"):
     result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=False)
 
     if result.returncode != 0:
-        log.warn("align_image_stack FAILED returncode = ", result.returncode)
-        log.warn("stdout = ", result.stdout)
-        log.warn("stderr = ", result.stderr)
+        log.warning("align_image_stack FAILED returncode = ", result.returncode)
+        log.warning("stdout = ", result.stdout)
+        log.warning("stderr = ", result.stderr)
         raise ChildProcessError("Call to 'align_image_stack' failed.")
 
     for infile in infiles:

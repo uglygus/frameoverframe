@@ -78,7 +78,7 @@ def unmix(src_dir):
     ext_list = utils.ext_list(src_dir)
 
     if ext_list == [""]:
-        log.warn("Directory has no files with extensions. Stopping.")
+        log.warning("Directory has no files with extensions. Stopping.")
         return new_dirs
 
     ext_list.sort()
@@ -97,17 +97,17 @@ def unmix(src_dir):
         return new_dirs
 
     if len(ext_list) == 0:
-        log.warn(f"unmix: Not sure if we can even get here? Extension list is empty. {src_dir}")
+        log.warning(f"unmix: Not sure if we can even get here? Extension list is empty. {src_dir}")
         return new_dirs
 
     if len(ext_list) > 2:
-        log.warn(f"unmix: This folder has more than two extensions. Stopping. {src_dir}")
-        log.warn(f"{ext_list=}")
+        log.warning(f"unmix: This folder has more than two extensions. Stopping. {src_dir}")
+        log.warning(f"{ext_list=}")
         return new_dirs
 
     for d in ext_list:
         if d == "":
-            log.warn(f"unmix: This folder has other folders in it. Stopping. {src_dir}")
+            log.warning(f"unmix: This folder has other folders in it. Stopping. {src_dir}")
             return new_dirs
 
     for ext in ext_list:
@@ -117,7 +117,7 @@ def unmix(src_dir):
         try:
             os.mkdir(new_dir)
         except FileExistsError:
-            log.warn(f"ERROR: Directory already exists. {new_dir}")
+            log.warning(f"ERROR: Directory already exists. {new_dir}")
             raise
 
         new_dirs.append(new_dir)
@@ -134,7 +134,7 @@ def unmix(src_dir):
             log.debug(f"renaming {orig_item} -> {new_item}")
             shutil.move(orig_item, new_item)
         except FileNotFoundError as e:
-            log.warn(f"renaming {orig_item} -> {new_item}")
+            log.warning(f"renaming {orig_item} -> {new_item}")
             raise
 
     shutil.rmtree(src_dir)

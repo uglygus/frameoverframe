@@ -145,7 +145,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         # fmt: on
 
     else:
-        log.warn(
+        log.warning(
             'ERROR: img2vid profile not supported: allowed values are "preview", "best" supplied: ',
             profile,
         )
@@ -163,7 +163,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         log.debug(f"{me()} openning-->{sorted_listdir(input_dirs[0])[0]}")
         im = Image.open(sorted_listdir(input_dirs[0])[0])
     except Image.DecompressionBombError:
-        log.warn(
+        log.warning(
             "Image is too large for PIL to open. "
             ' Change this line: PIL.Image.MAX_IMAGE_PIXELS = 244022272" in img2vid.py'
         )
@@ -178,7 +178,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         # print(new_width, "x", new_height, sorted_listdir(input_dir)[0])
 
         if new_width != width or new_height != height:
-            log.warn("ERROR: All images must be the same dimensions.")
+            log.warning("ERROR: All images must be the same dimensions.")
             return False
 
     tmp_link_dir = tempfile.mkdtemp(prefix="img2vid_")
@@ -226,7 +226,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
 
         shutil.rmtree(tmp_link_dir)
     else:
-        log.warn("ERROR: ffmpeg is required and is not intstalled. (this is a log)")
+        log.warning("ERROR: ffmpeg is required and is not intstalled. (this is a log)")
         raise FileNotFoundError(
             "ERROR: ffmpeg is required and is not intstalled. (this is an exception)"
         )

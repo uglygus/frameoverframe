@@ -28,7 +28,7 @@ from frameoverframe.utils import exif_read_filename, recursing, sorted_listdir
 log.setLevel(logging.DEBUG)
 log.debug("debug loggging is working in test_recombine")
 log.info("info loggging is working in test_recombine")
-log.warn("warn loggging is working in test_recombine")
+log.warning("warn loggging is working in test_recombine")
 
 
 #
