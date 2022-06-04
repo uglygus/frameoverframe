@@ -13,9 +13,11 @@ from itertools import product, takewhile
 from pathlib import Path
 from subprocess import PIPE, run
 
+
 import exifread  # legacy, used this to read tags
 from exif import Image as exifImage  # need this to write tags
 from exif import LightSource
+
 from PIL import Image
 
 log = logging.getLogger("frameoverframe")
