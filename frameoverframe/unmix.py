@@ -46,6 +46,8 @@ def new_dirname(src_dir, ext):
         /path/to/final_JPG_01
     """
 
+    ext = ext.upper()
+
     # does it end in numbers _01 ? If so keep the numbers at the end.
 
     m = re.search("_[0-9]+$", os.path.basename(src_dir))
