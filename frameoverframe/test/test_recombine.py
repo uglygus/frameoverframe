@@ -6,6 +6,7 @@
 import logging.config
 import os
 import os.path
+import pprint
 import re
 import sys
 import tempfile
@@ -25,11 +26,12 @@ from frameoverframe.recombine import parent_and_basename, recombine, sort_withou
 from frameoverframe.test.utils import IM_COLORS, dummy_sdcard, file_count, lots_o_images
 from frameoverframe.utils import exif_read_filename, recursing, sorted_listdir
 
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 log.debug("debug loggging is working in test_recombine")
 log.info("info loggging is working in test_recombine")
 log.warning("warn loggging is working in test_recombine")
 
+pp = pprint.PrettyPrinter(indent=4)
 
 #
 # def recursive_listdir(start_dir):
@@ -49,7 +51,7 @@ log.warning("warn loggging is working in test_recombine")
 
 class TestRecombine(unittest.TestCase):
     def setUp(self):
-        self.tmpdir_obj = tempfile.TemporaryDirectory(dir=".")
+        self.tmpdir_obj = tempfile.TemporaryDirectory(dir="/tmp")
         self.tmpdir = self.tmpdir_obj.name
         # self.sdcard = dummy_sdcard(self.tmpdir)
 
@@ -92,7 +94,8 @@ class TestRecombine(unittest.TestCase):
 
         # final_dir = os.path.join(self.tmpdir, "2020-06-21 DIR_2")
 
-        print("dir1=", dir1)
+        print("abs dir1=", os.path.abspath(dir1))
+
         os.makedirs(dir1)
         os.makedirs(dir2)
         os.makedirs(dir3)
@@ -105,21 +108,14 @@ class TestRecombine(unittest.TestCase):
 
         lots_o_images(dir3, color=IM_COLORS[2], count=3, prefix="2021-09-09 raccoon ")
 
+        def numfiles(path):
+            return len([f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))])
+
+        print("len dir1 = ", numfiles(dir1))
+        print("len dir2 = ", numfiles(dir2))
+        print("len dir3 = ", numfiles(dir3))
+        input("...")
         new_dirs = recombine([dir1, dir2, dir3], max_files=3)
-
-        print("new_dirs=", new_dirs)
-        # input("new dirs...")
-        for d in new_dirs:
-            for f in sorted_listdir(d):
-                print("checking file f=", f)
-                # input("reading exif...")
-                dirx, filx = os.path.split(exif_read_filename(f))
-                orig_id = os.path.basename(dirx) + filx
-                new_id = os.path.basename(d) + f
-
-                print("original_filename (orig_id)", orig_id)
-                print("new=", f, "original=", orig_id)
-                # input("done one file comparison....")
 
         expected_filelist = []
         final_filelist = []
@@ -129,32 +125,37 @@ class TestRecombine(unittest.TestCase):
                 print(exif_read_filename(f), " ==> ", f)
                 final_filelist.append(exif_read_filename(f))
 
-        # input(" wh not stop...")
-        # print(f"{expected_filelist=}")
-        # print("--- final list - red from files exifname-----")
-        # for item in final_filelist:
-        #     print(exif_read_filename(item))
+        input("\n..done recombine..check file colors..")
 
-        # input("..done recombine..check file colors..")
+        print(f"final_filelist -> {final_filelist}")
 
         print("-------------------last_sorted_listdir------")
+        input(".........now go into sorted_listdir")
+
+        log.setLevel(logging.DEBUG)
+
         recursing = True
-        # really_fullpaths = []
         interim_layout = sorted_listdir(self.tmpdir, recursive=True)
         recursing = False
 
-        print("\ninterim_layout=", interim_layout)
+        print("\ninterim_layout (just list_dir)==")
+        for f in os.listdir(self.tmpdir):
+            print(f)
+
+        print("\ninterim_layout==")
         for i in interim_layout:
             print(i)
+
+        input(" check above vs disk...")
 
         print("trim off the temp dirs")
 
         ## trim the temp dir off of final layout
         final_layout = []
         for i in interim_layout:
-            m = re.match("(\./tmp\w+)(.*)", i)
+            m = re.match("(/tmp/\w+)(.*)", i)
             if m:
-                print("m[1]=", m[2])
+                # print("m[1]=", m[2])
                 final_layout.append(m[2])
                 m = None
             else:
@@ -180,8 +181,12 @@ class TestRecombine(unittest.TestCase):
             print("final     ", i)
         for i in expected_layout:
             print("expected  ", i)
-        # print("final_layout==", final_layout)
-        # print("expected_layout==", expected_layout)
+
+        print("\nfinal_layout==", final_layout)
+
+        print("\nexpected_layout==", expected_layout)
+
+        input("about to assert final_layout == expected_layout")
 
         self.assertEqual(final_layout == expected_layout, True)
 
