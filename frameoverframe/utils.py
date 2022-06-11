@@ -13,11 +13,9 @@ from itertools import product, takewhile
 from pathlib import Path
 from subprocess import PIPE, run
 
-
 import exifread  # legacy, used this to read tags
 from exif import Image as exifImage  # need this to write tags
 from exif import LightSource
-
 from PIL import Image
 
 log = logging.getLogger("frameoverframe")
@@ -212,7 +210,13 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
 
     names.sort()
 
+    print("sorted_listdir()  names==", names)
+
+    # input("sorted_listdir()  names...")
+
     fullpaths = []
+
+    #
 
     for filename in names:
         log.debug("sorted_listdir(): top of outer for: filename= %s", filename)
@@ -220,7 +224,7 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
         if ignore_hidden and filename.startswith("."):
             continue
         if os.path.isdir(fullpath) == True:
-            # print(filename, " is a DIRectory")
+            print(filename, "sorted_listdir()  is a DIRectory")
             if recursive:
                 log.debug("sorted_listdir(): recursive=True")
                 really_fullpaths.append(os.path.join(directory, filename))
@@ -231,10 +235,12 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
             fullpaths.append(os.path.join(directory, filename))
 
         else:
-            # log.debug("sorted_listdir(): it is NOT a directory")
+            log.debug("sorted_listdir(): it is NOT a directory")
             really_fullpaths.append(os.path.join(directory, filename))
             fullpaths.append(os.path.join(directory, filename))
 
+    log.debug(f"sorted_listdir(): returning: {really_fullpaths}")
+    # input("done")
     return really_fullpaths
 
 
