@@ -210,10 +210,6 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
 
     names.sort()
 
-    print("sorted_listdir()  names==", names)
-
-    # input("sorted_listdir()  names...")
-
     fullpaths = []
 
     #
@@ -224,7 +220,7 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
         if ignore_hidden and filename.startswith("."):
             continue
         if os.path.isdir(fullpath) == True:
-            print(filename, "sorted_listdir()  is a DIRectory")
+            # print(filename, "sorted_listdir()  is a DIRectory")
             if recursive:
                 log.debug("sorted_listdir(): recursive=True")
                 really_fullpaths.append(os.path.join(directory, filename))

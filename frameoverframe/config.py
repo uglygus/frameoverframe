@@ -5,7 +5,8 @@
 # These should be case insensitive. Hopefully.
 RAW_EXTENSIONS = [".CR2", ".ARW", ".NEF", ".DNG"]
 
-UNLINKABLE_FILES = [".DS_Store", "Thumbs.db"]
+# files to be deleted when encontered.
+TRASH_FILES = [".DS_Store", "Thumbs.db"]
 
 LOGFILE = "frameoverframe.log"
 

@@ -15,6 +15,8 @@ import os
 import shutil
 import sys
 
+from frameoverframe.config import TRASH_FILES
+
 from . import renumber
 
 
@@ -27,6 +29,8 @@ def split(brackets, input_dir):
     input_dir : dir with files to split
     """
 
+    input("about to split...")
+
     if brackets < 2:
         print("There needs to be at least 2 brackets. I got ", brackets, " brackets.")
         print("Exiting.")
@@ -38,6 +42,11 @@ def split(brackets, input_dir):
     allfiles = []
     for root, _dirs, files in os.walk(input_dir, topdown=True):
         for name in files:
+            if name in TRASH_FILES:
+                print(f"about to delete {name}")
+                input("...")
+                os.unlink(os.path.join(root, name))
+                continue
             allfiles.append((root, name))
 
     allfiles.sort()
@@ -46,15 +55,17 @@ def split(brackets, input_dir):
 
     for root, name in allfiles:
 
-        # print(
-        #     "counter=",
-        #     counter,
-        #     " MV ",
-        #     root + "/" + name,
-        #     input_dir + "_" + str(counter) + "/" + name,
-        # )
-
-        shutil.move(root + "/" + name, input_dir + "_" + str(counter) + "/" + name)
+        print(
+            "counter=",
+            counter,
+            " MV ",
+            root + "/" + name,
+            input_dir + "_" + str(counter) + "/" + name,
+        )
+        input(",....")
+        shutil.move(
+            os.path.join(root, name), os.path.join(input_dir + "_bracket_" + str(counter), name)
+        )
         counter += 1
         if counter == brackets + 1:
             counter = 1

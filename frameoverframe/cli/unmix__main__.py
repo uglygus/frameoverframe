@@ -71,6 +71,7 @@ def collect_args():
     )
 
     parser.set_defaults(loglevel=logging.INFO)
+    log.debug(parser)
     args = parser.parse_args()
 
     return args
@@ -93,6 +94,7 @@ def main():
         try:
             unmix(directory)
         except FileNotFoundError as e:
+            print("ERRROR")
             log.warning(e)
             return 1
     return 0

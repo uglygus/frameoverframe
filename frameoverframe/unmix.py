@@ -28,7 +28,10 @@ import re
 import shutil
 import sys
 
+from matplotlib.cbook import ls_mapper
+
 import frameoverframe.utils as utils
+from frameoverframe.config import TRASH_FILES
 
 log = logging.getLogger("frameoverframe")
 
@@ -80,37 +83,41 @@ def unmix(src_dir):
     if ext_list == [""]:
         log.warning("Directory has no files with extensions. Stopping.")
         return new_dirs
-
     ext_list.sort()
 
     if len(ext_list) == 1:
         log.info(f"unmix: Looks good folder is already unmixed. {src_dir}")
         log.debug(f"{ext_list[0]=}")
-        ext = ext_list[0].lstrip(".")
-
-        if not src_dir.endswith("_" + ext):
-            src_dir_EXT = src_dir + "_" + ext
-            log.debug("Renaming {src_dir} to {src_dir_EXT}")
-            os.rename(src_dir, src_dir_EXT)
-        else:
-            log.debug("src_dir alread ends with %s" % ext)
+        # ext = ""
         return new_dirs
+
+    # for ext in ext_list:
+    #     print("checking ext , src_dir=", src_dir)
+    #     print(f"{ext=}")
+    #     if not src_dir.endswith("_" + ext):
+    #         src_dir_EXT = src_dir + "_" + ext
+    #         log.debug(f"Renaming {src_dir} to {src_dir_EXT}")
+    #         os.rename(src_dir, src_dir_EXT)
+    #     else:
+    #         log.debug("src_dir alread ends with %s" % ext)
+    #     return new_dirs
 
     if len(ext_list) == 0:
         log.warning(f"unmix: Not sure if we can even get here? Extension list is empty. {src_dir}")
         return new_dirs
 
-    if len(ext_list) > 2:
-        log.warning(f"unmix: This folder has more than two extensions. Stopping. {src_dir}")
-        log.warning(f"{ext_list=}")
-        return new_dirs
+    # if len(ext_list) > 2:
+    #     log.warning(f"unmix: This folder has more than two extensions. Stopping. {src_dir}")
+    #     log.warning(f"{ext_list=}")
+    #     return new_dirs
 
     for d in ext_list:
         if d == "":
-            log.warning(f"unmix: This folder has other folders in it. Stopping. {src_dir}")
+            log.warning(f"unmix: This folder has a subfolder in it. Stopping. {src_dir}")
             return new_dirs
 
     for ext in ext_list:
+        log.debug("unmix: making new dirs.")
         ext = ext.lstrip(".")
 
         new_dir = new_dirname(src_dir, ext)
@@ -123,7 +130,8 @@ def unmix(src_dir):
         new_dirs.append(new_dir)
 
     for item in os.listdir(src_dir):
-        if item == ".DS_Store":
+        if item in TRASH_FILES:
+            os.unlink(os.path.join(src_dir, item))
             continue
 
         ext = os.path.splitext(os.path.split(item)[1])[1]
@@ -131,10 +139,10 @@ def unmix(src_dir):
         orig_item = os.path.join(src_dir, item)
         new_item = new_dirname(src_dir, ext)
         try:
-            log.debug(f"renaming {orig_item} -> {new_item}")
+            log.debug("renaming %s -> %s", orig_item, new_item)
             shutil.move(orig_item, new_item)
         except FileNotFoundError as e:
-            log.warning(f"renaming {orig_item} -> {new_item}")
+            log.warning("renaming %s -> %s", orig_item, new_item)
             raise
 
     shutil.rmtree(src_dir)
