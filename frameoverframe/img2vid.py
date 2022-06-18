@@ -9,7 +9,7 @@ presets:
 
 preview: (default)
     encoding = h264, fast encode, medium bitrate
-    fps = 23.976
+    fps = 30
     dimensions = max 1080p if image is over 1080 in one dimension shrink it to fit in a
     1080x1080 box. Does not change images under 1080x1080.
 
@@ -32,7 +32,7 @@ import tempfile
 from colorama import Fore, Style, init
 from PIL import Image
 
-from frameoverframe.config import RAW_EXTENSIONS
+from frameoverframe.config import RAW_EXTENSIONS, TRASH_FILES
 from frameoverframe.utils import me, sorted_listdir, test_one_extension
 
 log = logging.getLogger("frameoverframe")
@@ -94,7 +94,8 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         # fmt: off
         ffmpeg_settings = [
             "-loglevel", "error", '-stats',
-            "-r", "24000/1001",
+        #    "-r", "24000/1001",
+            "-r", "30",
             "-vcodec", "libx264",
             "-pix_fmt", "yuv420p",
             "-preset", "veryfast",
@@ -108,12 +109,14 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         outfile_ext = ".mp4"
 
         video_filter = (
-            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" + fnumber_filter
+            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
+            + fnumber_filter
         )
 
         # fmt: off
         ffmpeg_settings = [
-            "-r", "24000/1001",
+            #"-r", "24000/1001",
+            "-r", "30",
             "-vcodec", "libx264",
             "-crf", "17",
             "-pix_fmt", "yuv422p",
@@ -129,11 +132,13 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
 
         # fit in UHD4k and pad
         video_filter = (
-            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" + fnumber_filter
+            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
+            + fnumber_filter
         )
         # fmt: off
         ffmpeg_settings = [
-            "-r", "24000/1001",
+            #"-r", "24000/1001",
+            "-r", "30",
             "-vcodec", "dnxhd",
             "-profile:v", "dnxhr_sq",
             "-pix_fmt", "yuv422p",
@@ -142,7 +147,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         # fmt: on
 
     else:
-        log.warn(
+        log.warning(
             'ERROR: img2vid profile not supported: allowed values are "preview", "best" supplied: ',
             profile,
         )
@@ -160,7 +165,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         log.debug(f"{me()} openning-->{sorted_listdir(input_dirs[0])[0]}")
         im = Image.open(sorted_listdir(input_dirs[0])[0])
     except Image.DecompressionBombError:
-        log.warn(
+        log.warning(
             "Image is too large for PIL to open. "
             ' Change this line: PIL.Image.MAX_IMAGE_PIXELS = 244022272" in img2vid.py'
         )
@@ -175,7 +180,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         # print(new_width, "x", new_height, sorted_listdir(input_dir)[0])
 
         if new_width != width or new_height != height:
-            log.warn("ERROR: All images must be the same dimensions.")
+            log.warning("ERROR: All images must be the same dimensions.")
             return False
 
     tmp_link_dir = tempfile.mkdtemp(prefix="img2vid_")
@@ -189,7 +194,8 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         this_dir_images = sorted_listdir(input_dir)
 
         for image in this_dir_images:
-            if image.endswith(".DS_Store"):
+            if image in TRASH_FILES:
+                #    if image.endswith(".DS_Store"):
                 continue
             if image.endswith(".CR2"):
                 print("ERROR: CR2 is not a recognized image format for ffmpeg.", image)
@@ -222,7 +228,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
 
         shutil.rmtree(tmp_link_dir)
     else:
-        log.warn("ERROR: ffmpeg is required and is not intstalled. (this is a log)")
+        log.warning("ERROR: ffmpeg is required and is not intstalled. (this is a log)")
         raise FileNotFoundError(
             "ERROR: ffmpeg is required and is not intstalled. (this is an exception)"
         )

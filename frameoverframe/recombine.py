@@ -20,7 +20,7 @@
 
 
 import argparse
-import logging
+import logging.config
 import math
 import os
 import pathlib
@@ -30,8 +30,16 @@ import sys
 from pathlib import PurePath
 from time import sleep, strftime
 
+from frameoverframe.config import LOGGING_CONFIG
+
 from .renumber import renumber
-from .utils import common_suffix, sorted_listdir, split_name_number, test_one_extension
+from .utils import (
+    common_suffix,
+    rm_trash_files,
+    sorted_listdir,
+    split_name_number,
+    test_one_extension,
+)
 
 log = logging.getLogger("frameoverframe")
 
@@ -87,7 +95,6 @@ def sort_without_suffix_or_fulldir(items):
 
     working = []
     for i in items:
-        # my_dict = {"orig": i, "sortable": os.path.abspath(i)}
         working.append({"orig": i, "sortable": os.path.abspath(i)})
     # print("working===", working)
     # input("borken...")
@@ -97,7 +104,6 @@ def sort_without_suffix_or_fulldir(items):
     # print('sortable_list === ', [for i in working[i].['sortable'] ])
     # input("...herre...")
 
-    #    csuffix = common_suffix(items)
     csuffix = common_suffix([i["sortable"] for i in working])
     suffixlen = -1 * len(csuffix)
 
@@ -107,12 +113,12 @@ def sort_without_suffix_or_fulldir(items):
     if csuffix:
         # print(f"{csuffix=}")
         # print(f"{suffixlen=}")
-        #
+
         # print(f"{items[0]=}")
         # print(f"d:1  {items[0][:1]=}")
         # print(f"d:0  {items[0][:0]=}")
 
-        # sorted_items = [d[:suffixlen] for d in items]
+        sorted_items = [d[:suffixlen] for d in items]
 
         # strip everything before the enclosing folder
         for row in working:
@@ -141,8 +147,10 @@ def sort_without_suffix_or_fulldir(items):
 
         # input("done..")
     else:
-        #    print("NOTHING TO TRIM NO COMMON SUFFIX")
+        # print("NOTHING TO TRIM NO COMMON SUFFIX")
+        # print("type(items=", type(items))
         sorted_items = items
+        sorted_items.sort()
 
     # print("orig_items", items)
     # print("sorted_items=", sorted_items)
@@ -154,7 +162,12 @@ def sort_without_suffix_or_fulldir(items):
 
 
 def recombine(
-    src_dirs, dst_dir=None, copy_files=False, max_files=10000, prefix=":folder", padding=5
+    src_dirs,
+    dst_dir=None,
+    copy_files=False,
+    max_files=10000,
+    prefix=":folder",
+    padding=5,
 ):
     """Accepts a list of directories to be combined and renumbered. Combines files into
         directories with max_files in each directory.
@@ -170,26 +183,31 @@ def recombine(
     Returns:
         out_dir (list): List of directories that things were combined into. or None
     """
-    print("len(src_dirs)= ", len(src_dirs))
-    print("src_dirs=", src_dirs)
+
     if len(src_dirs) < 2:
-        print("recombine returning. len(src_dirs)= ", len(src_dirs))
-        print(f"{src_dirs=}")
         return src_dirs
 
-    print("recombine: src_dirs=", src_dirs)
+    # removing TRASH files
+    log.debug("removing TRASH files")
+    for directory in src_dirs:
+        rm_trash_files(directory)
+    #   input(f"\ndone removing TRASHs. -- {directory}")
+
+    print(f"{src_dirs=}")
     src_dirs = sort_without_suffix_or_fulldir(src_dirs)
+
+    print(f"{src_dirs=}")
 
     log.info("recombine: Input directories will be processed in this order:")
     for d in src_dirs:
         log.info(d)
-    # nput("...")
+    # input("...")
 
     if dst_dir is None:
         new_basename = split_name_number(os.path.basename(src_dirs[0]))[0]
-        print("new_basename = ", new_basename)
+        # print("new_basename = ", new_basename)
         new_basename = strip_bad_ending(new_basename)
-        print("new_basename = ", new_basename)
+        log.info("new_basename = %s", new_basename)
         dst_dir = os.path.join(os.path.dirname(src_dirs[0]), new_basename)
 
     if prefix == ":folder":
@@ -210,8 +228,10 @@ def recombine(
         else:
             dst_dirs.append(dst_dir)
 
-    print(f"{dst_dirs=}")
-    log.info("Creating {} new directories. For {} items.".format(dirs_needed, item_count))
+    # print(f"{dst_dirs=}")
+    log.info(
+        "Creating {} new directories. For {} items.".format(dirs_needed, item_count)
+    )
     log.info("New directories:")
     for d in dst_dirs:
         log.info(d)
@@ -362,7 +382,13 @@ def recombine(
         print("final prefix=", prefix)
         print(" About to renumber --> one_dst_dir=", one_dst_dir)
         # input("...")
-        renumber(one_dst_dir, inplace=True, prefix=prefix, sort_method="name", padding=padding)
+        renumber(
+            one_dst_dir,
+            inplace=True,
+            prefix=prefix,
+            sort_method="name",
+            padding=padding,
+        )
         # print("done renumber.")
         # input("...")
     print(f"recombine returning 2 == {dst_dirs=}")

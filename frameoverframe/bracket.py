@@ -97,7 +97,7 @@ def merge(input_dirs):
         thisdirlist = []
 
         for f in os.listdir(input_dir):
-            if f == ".DS_Store":
+            if f == ".DS_Store" or f == "Thumbs.db":
                 continue
 
             thisdirlist.append(f)

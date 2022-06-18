@@ -18,9 +18,9 @@ docstring for more.
 """
 
 import argparse
+import logging.config
 import os
 import sys
-import logging.config
 
 #   logging.config.dictConfig() and logging.getLogger()
 #   must come after importing LOGGING_CONFIG
@@ -31,6 +31,7 @@ logging.config.dictConfig(LOGGING_CONFIG)
 log = logging.getLogger("frameoverframe")
 
 from frameoverframe.renumber import renumber
+
 
 def collect_args():
     """collect commandline arguments"""
@@ -117,13 +118,13 @@ def collect_args():
 
     return args
 
+
 def main():
     """
     Can be called from the commmandline:
     usage: renumber.py [-h] [-o DST_DIR] [-i] [-s START_AT] [-x PREFIX] [-p PADDING] src_dir
 
     """
-
 
     args = collect_args()
     log.setLevel(args.loglevel)
@@ -133,15 +134,13 @@ def main():
     for directory in args.src_dirs:
         log.info(f"renumbering {directory} ...")
 
-
-        print('args.prefix=', args.prefix)
-        input('...')
+        print("args.prefix=", args.prefix)
+        input("...")
         if args.prefix == ":folder":
             prefix = os.path.basename(os.path.normpath(directory))
         else:
-            prefix=args.prefix
-#            args.prefix = prefix
-
+            prefix = args.prefix
+        #            args.prefix = prefix
 
         try:
             renumber(
@@ -157,8 +156,6 @@ def main():
             log.warn(e)
             return 1
     return 0
-
-
 
     #
     # if args.prefix == ":folder":
