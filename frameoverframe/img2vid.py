@@ -32,7 +32,7 @@ import tempfile
 from colorama import Fore, Style, init
 from PIL import Image
 
-from frameoverframe.config import RAW_EXTENSIONS, TRASHABLE_FILES
+from frameoverframe.config import RAW_EXTENSIONS, TRASH_FILES
 from frameoverframe.utils import me, sorted_listdir, test_one_extension
 
 log = logging.getLogger("frameoverframe")
@@ -194,7 +194,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         this_dir_images = sorted_listdir(input_dir)
 
         for image in this_dir_images:
-            if image in TRASHABLE_FILES:
+            if image in TRASH_FILES:
                 #    if image.endswith(".DS_Store"):
                 continue
             if image.endswith(".CR2"):

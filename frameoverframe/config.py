@@ -3,9 +3,9 @@
 # extensions = ["JPG", "ARW", "CR2"]  # not sure if this ever gets used??
 
 # These should be case insensitive. Hopefully.
-RAW_EXTENSIONS = [".CR2", ".ARW", ".NEF", ".DNG"]
+RAW_EXTENSIONS = [".CR2", ".ARW", ".NEF", ".DNG", "GPR"]
 
-TRASHABLE_FILES = [".DS_Store", "Thumbs.db"]
+TRASH_FILES = [".DS_Store", "Thumbs.db"]
 
 LOGFILE = "frameoverframe.log"
 

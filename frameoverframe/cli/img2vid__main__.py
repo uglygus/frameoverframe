@@ -28,12 +28,11 @@ from frameoverframe.config import LOGGING_CONFIG
 logging.config.dictConfig(LOGGING_CONFIG)
 
 from frameoverframe.config import RAW_EXTENSIONS
-from frameoverframe.utils import sorted_listdir, test_one_extension
+from frameoverframe.utils import sorted_listdir
 
 log = logging.getLogger("frameoverframe")
 
-Image.MAX_IMAGE_PIXELS = 244022272  # otherwise PIL bails on large images
-
+# Image.MAX_IMAGE_PIXELS = 244022272  # otherwise PIL bails on large images
 
 from frameoverframe.img2vid import img2vid
 
@@ -105,7 +104,12 @@ def main():
     log.debug(f"{args=}")
 
     try:
-        img2vid(args.input_dirs, args.output_filename, args.profile, framenumber=args.framenumber)
+        img2vid(
+            args.input_dirs,
+            args.output_filename,
+            args.profile,
+            framenumber=args.framenumber,
+        )
     except NotADirectoryError as e:
         log.warning(e)
         sys.exit(1)

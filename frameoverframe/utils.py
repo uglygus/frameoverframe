@@ -22,6 +22,8 @@ import frameoverframe.config as config
 
 log = logging.getLogger("frameoverframe")
 
+import frameoverframe.utils as utils
+
 
 def exif_creation_date(filename):
     """given an image file return the creation time: EXIF DateTimeOriginal."""
@@ -117,13 +119,16 @@ def me():
 
 def rm_trash_files(src_dir):
 
-    for filename in src_dir:
+    #  print("config.TRASH_FILES==", config.TRASH_FILES)
+    #  print(f"rm_trash_files({src_dir}) -->")
+    for filename in os.listdir(src_dir):
 
-        for regex in config.TRASHABLE_FILES:
-            if re.search(regex, filename, re.IGNORECASE):
-                print(filename, "--contains somethign--", regex)
-
-        if filename in config.TRASHABLE_FILES:
+        # for regex in config.TRASH_FILES:
+        #     if re.search(regex, filename, re.IGNORECASE):
+        #         print(filename, "--contains somethign--", regex)
+        # print("filename=", filename)
+        if filename in config.TRASH_FILES:
+            print(f"unlinking-> {os.path.join(src_dir, filename)}")
             os.unlink(os.path.join(src_dir, filename))
 
 
@@ -139,9 +144,9 @@ def test_one_extension(src_dir, fatal=True):
         if fatal:
             log.warning(
                 f"ERROR: Directory contains files with more than one extension.\n"
-                f" Consider running 'unmix' {src_dir}"
+                f" Consider running 'unmix {src_dir}'"
             )
-            raise IOError
+            sys.exit(1)
         return False
     return True
 
@@ -156,6 +161,8 @@ def ext_list(directorypath):
         nothing
     """
 
+    rm_trash_files(directorypath)
+
     dirlist = sorted_listdir(directorypath)
 
     extlist = []
@@ -165,7 +172,7 @@ def ext_list(directorypath):
         if ext not in extlist:
             extlist.append(ext)
 
-    #    log.debug(f"{utils.__name__} returning {ext_list=}")
+    log.debug(f"{utils.__name__} returning {ext_list=}")
     return extlist
 
 
@@ -226,15 +233,13 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
 
     fullpaths = []
 
-    #
-
     for filename in names:
         log.debug("sorted_listdir(): top of outer for: filename= %s", filename)
         fullpath = os.path.join(directory, filename)
         if ignore_hidden and filename.startswith("."):
             continue
         if os.path.isdir(fullpath) == True:
-            print(filename, "sorted_listdir()  is a DIRectory")
+            # print(filename, "sorted_listdir()  is a DIRectory")
             if recursive:
                 log.debug("sorted_listdir(): recursive=True")
                 really_fullpaths.append(os.path.join(directory, filename))
@@ -247,11 +252,11 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
             fullpaths.append(os.path.join(directory, filename))
 
         else:
-            log.debug("sorted_listdir(): it is NOT a directory")
+            # log.debug("sorted_listdir(): it is NOT a directory")
             really_fullpaths.append(os.path.join(directory, filename))
             fullpaths.append(os.path.join(directory, filename))
 
-    log.debug(f"sorted_listdir(): returning: {really_fullpaths}")
+    # log.debug(f"sorted_listdir(): returning: {really_fullpaths}")
     # input("done")
     return really_fullpaths
 
