@@ -28,6 +28,7 @@ import re
 import shutil
 import sys
 
+import frameoverframe.config as config
 import frameoverframe.utils as utils
 
 log = logging.getLogger("frameoverframe")
@@ -75,6 +76,8 @@ def unmix(src_dir):
 
     new_dirs = []
 
+    utils.rm_trash_files(src_dir)
+
     ext_list = utils.ext_list(src_dir)
 
     if ext_list == [""]:
@@ -97,17 +100,21 @@ def unmix(src_dir):
         return new_dirs
 
     if len(ext_list) == 0:
-        log.warning(f"unmix: Not sure if we can even get here? Extension list is empty. {src_dir}")
+        log.warning(
+            f"unmix: Not sure if we can even get here? Extension list is empty. {src_dir}"
+        )
         return new_dirs
 
-    if len(ext_list) > 2:
-        log.warning(f"unmix: This folder has more than two extensions. Stopping. {src_dir}")
-        log.warning(f"{ext_list=}")
-        return new_dirs
+    # if len(ext_list) > 2:
+    #     log.warning(f"unmix: This folder has more than two extensions. Stopping. {src_dir}")
+    #     log.warning(f"{ext_list=}")
+    #     return new_dirs
 
     for d in ext_list:
         if d == "":
-            log.warning(f"unmix: This folder has other folders in it. Stopping. {src_dir}")
+            log.warning(
+                f"unmix: This folder has other folders in it. Stopping. {src_dir}"
+            )
             return new_dirs
 
     for ext in ext_list:

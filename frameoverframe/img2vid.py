@@ -32,7 +32,7 @@ import tempfile
 from colorama import Fore, Style, init
 from PIL import Image
 
-from frameoverframe.config import RAW_EXTENSIONS, UNLINKABLE_FILES
+from frameoverframe.config import RAW_EXTENSIONS, TRASHABLE_FILES
 from frameoverframe.utils import me, sorted_listdir, test_one_extension
 
 log = logging.getLogger("frameoverframe")
@@ -109,7 +109,8 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         outfile_ext = ".mp4"
 
         video_filter = (
-            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" + fnumber_filter
+            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
+            + fnumber_filter
         )
 
         # fmt: off
@@ -131,7 +132,8 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
 
         # fit in UHD4k and pad
         video_filter = (
-            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" + fnumber_filter
+            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
+            + fnumber_filter
         )
         # fmt: off
         ffmpeg_settings = [
@@ -192,7 +194,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         this_dir_images = sorted_listdir(input_dir)
 
         for image in this_dir_images:
-            if image in UNLINKABLE_FILES:
+            if image in TRASHABLE_FILES:
                 #    if image.endswith(".DS_Store"):
                 continue
             if image.endswith(".CR2"):

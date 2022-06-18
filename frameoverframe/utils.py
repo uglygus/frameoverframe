@@ -18,6 +18,8 @@ from exif import Image as exifImage  # need this to write tags
 from exif import LightSource
 from PIL import Image
 
+import frameoverframe.config as config
+
 log = logging.getLogger("frameoverframe")
 
 
@@ -111,6 +113,20 @@ def file_not_exist(filepath):
 def me():
     """returns the name of the function that called me()"""
     return inspect.stack()[1][3] + "()"
+
+
+def rm_trash_files(src_dir):
+
+    for filename in src_dir:
+
+        for regex in config.TRASHABLE_FILES:
+            if re.search(regex, filename, re.IGNORECASE):
+                print(filename, "--contains somethign--", regex)
+        print("cone..")
+        input(".......")
+
+        if filename in config.TRASHABLE_FILES:
+            unlink(os.path.join(src_dir, filename))
 
 
 def test_one_extension(src_dir, fatal=True):
@@ -210,10 +226,6 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
 
     names.sort()
 
-    print("sorted_listdir()  names==", names)
-
-    # input("sorted_listdir()  names...")
-
     fullpaths = []
 
     #
@@ -229,7 +241,9 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
                 log.debug("sorted_listdir(): recursive=True")
                 really_fullpaths.append(os.path.join(directory, filename))
                 fullpaths.append(os.path.join(directory, filename))
-                sorted_listdir(os.path.join(directory, filename), recursive=True, first_pass=False)
+                sorted_listdir(
+                    os.path.join(directory, filename), recursive=True, first_pass=False
+                )
             log.debug("sorted_listdir(): not recursive")
             really_fullpaths.append(os.path.join(directory, filename))
             fullpaths.append(os.path.join(directory, filename))
@@ -355,7 +369,9 @@ def common_suffix(xs):
     def firstCharPrepended(s, cs):
         return cs[0] + s
 
-    return reduce(firstCharPrepended, takewhile(allSame, zip(*(reversed(x) for x in xs))), "")
+    return reduce(
+        firstCharPrepended, takewhile(allSame, zip(*(reversed(x) for x in xs))), ""
+    )
 
 
 def split_name_number(name):
@@ -430,7 +446,9 @@ def replace_eps_bounding_box(newx, newy, filepath):
     bounding_box = "%%BoundingBox:"
     hires_bounding_box = "%%HiResBoundingBox:"
     new_bounding_box = "{} 0 0 {} {}".format(bounding_box, newx, newy)
-    new_highres_bounding_box = "{} 0.00 0.00 {:4.2f} {:4.2f}".format(bounding_box, newx, newy)
+    new_highres_bounding_box = "{} 0.00 0.00 {:4.2f} {:4.2f}".format(
+        bounding_box, newx, newy
+    )
 
     # Safely read the input filename using 'with'
     with open(filepath) as f:
@@ -477,7 +495,9 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
     gs_bin = shutil.which("gs")
 
     if gs_bin is None:
-        raise FileNotFoundError("Cannot find binary for ghostscript 'gs' in your $PATH.\n")
+        raise FileNotFoundError(
+            "Cannot find binary for ghostscript 'gs' in your $PATH.\n"
+        )
 
     # fmt: off
     sys_call = [
@@ -501,7 +521,9 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
     calling_str = "Calling : ", " ".join(quoted_sys_call)
     log.info(calling_str)
 
-    result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=True)
+    result = run(
+        sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=True
+    )
     log.debug(
         "gs returncode={}, stdout={}, stderr={}".format(
             result.returncode, result.stdout, result.stderr
