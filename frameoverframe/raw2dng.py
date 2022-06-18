@@ -15,6 +15,7 @@ from pathlib import Path
 import frameoverframe.config as config
 import frameoverframe.utils as utils
 from frameoverframe.unmix import unmix
+import frameoverframe.config as config
 
 log = logging.getLogger("frameoverframe")
 
@@ -48,6 +49,13 @@ def WSL_path_converter(path):
     sys_call = [wslpath_bin, "-w", path]
 
     quoted_sys_call = [shlex.quote(i) for i in sys_call]
+    i_had_to_touch_path_because_wsl_sucks = False
+
+    if not os.path.exists(path):
+        #https://github.com/microsoft/WSL/issues/4908
+        log.debug('WSL_path_converter() path does not exist. touching file to get it. because wslpath sucks.')
+        i_had_to_touch_path_because_wsl_sucks = True
+        Path(path).touch()
 
     i_had_to_touch_path_because_wsl_sucks = False
 
@@ -108,14 +116,12 @@ def raw2dng(input_dirs, output_dir):
 
             _, ext = os.path.splitext(file)
 
-            # print('ext==', ext)
-            # print('ext.upper()==', ext.upper())
-            # print('RAW_EXT=', config.RAW_EXTENSIONS)
-            # input('...')
             if not ext.upper() in config.RAW_EXTENSIONS:
                 log.debug("skipping. File doesn't have a RAW extension.")
                 continue
+
             if ext.casefold() == ".dng".casefold():
+
                 log.debug("skipping. File is already a DNG.")
                 continue
 
