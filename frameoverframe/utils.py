@@ -122,11 +122,9 @@ def rm_trash_files(src_dir):
         for regex in config.TRASHABLE_FILES:
             if re.search(regex, filename, re.IGNORECASE):
                 print(filename, "--contains somethign--", regex)
-        print("cone..")
-        input(".......")
 
         if filename in config.TRASHABLE_FILES:
-            unlink(os.path.join(src_dir, filename))
+            os.unlink(os.path.join(src_dir, filename))
 
 
 def test_one_extension(src_dir, fatal=True):

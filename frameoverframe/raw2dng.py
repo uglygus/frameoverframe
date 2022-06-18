@@ -23,13 +23,17 @@ def what_strange_land_is_this():
     if platform.system() == "Darwin":
         return "Darwin"
     if platform.system() == "linux" or platform.system() == "Linux":
-        if "Microsoft" in platform.uname().release or "microsoft" in platform.uname().release:
+        if (
+            "Microsoft" in platform.uname().release
+            or "microsoft" in platform.uname().release
+        ):
             log.debug("under WSL")
             return "WSL"
         else:
             return "Linux"
     raise FileNotFoundError(
-        "Unknown system -- I should work under WSL and on Mac.\n" "Windows has not been tested.",
+        "Unknown system -- I should work under WSL and on Mac.\n"
+        "Windows has not been tested.",
     )
     return None
 
@@ -55,7 +59,6 @@ def WSL_path_converter(path):
         i_had_to_touch_path_because_wsl_sucks = True
         Path(path).touch()
 
-
     log.info("Calling : " + " ".join(quoted_sys_call))
     winpath = subprocess.check_output(sys_call)
 
@@ -67,11 +70,12 @@ def WSL_path_converter(path):
     return winpath.decode("utf-8")
 
 
-
 def raw2dng(input_dirs, output_dir):
     """convert RAW to DNG"""
 
-    log.debug("Top of raw2dng() input_dirs={} output_dir={}".format(input_dirs, output_dir))
+    log.debug(
+        "Top of raw2dng() input_dirs={} output_dir={}".format(input_dirs, output_dir)
+    )
 
     # add possible locations for Adobe DNG Converter to the PATH
     os.environ["PATH"] = (
@@ -81,7 +85,9 @@ def raw2dng(input_dirs, output_dir):
     )
 
     AdobeDNG_bin = (
-        shutil.which("Adobe DNG Converter") or shutil.which("Adobe DNG Converter.exe") or None
+        shutil.which("Adobe DNG Converter")
+        or shutil.which("Adobe DNG Converter.exe")
+        or None
     )
 
     if AdobeDNG_bin is None:
@@ -94,10 +100,10 @@ def raw2dng(input_dirs, output_dir):
     input_dirs.sort()
 
     for _dir in input_dirs:
-        print('_dir==', _dir)
-        outpur_dir = _dir.replace('_ARW', '_DNG')
-        print('output_dir=', output_dir)
-        input('...ok ok...')
+        print("_dir==", _dir)
+        outpur_dir = _dir.replace("_ARW", "_DNG")
+        print("output_dir=", output_dir)
+        # input('...ok ok...')
         for file in utils.sorted_listdir(_dir):
 
             _, ext = os.path.splitext(file)
