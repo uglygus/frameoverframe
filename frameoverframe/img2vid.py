@@ -30,7 +30,7 @@ import sys
 import tempfile
 
 from colorama import Fore, Style, init
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 from frameoverframe.config import RAW_EXTENSIONS, TRASH_FILES
 from frameoverframe.utils import me, sorted_listdir, test_one_extension
@@ -162,13 +162,16 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         out_filepath = output_file
 
     try:
-        log.debug(f"{me()} openning-->{sorted_listdir(input_dirs[0])[0]}")
+        log.debug(f"{me()} opening-->{sorted_listdir(input_dirs[0])[0]}")
         im = Image.open(sorted_listdir(input_dirs[0])[0])
     except Image.DecompressionBombError:
         log.warning(
             "Image is too large for PIL to open. "
             ' Change this line: PIL.Image.MAX_IMAGE_PIXELS = 244022272" in img2vid.py'
         )
+    except UnidentifiedImageError:
+        log.warning("Unsupported image file. %s", sorted_listdir(input_dirs[0])[0])
+        sys.exit(0)
 
     width, height = im.size
 
