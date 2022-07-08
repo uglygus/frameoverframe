@@ -40,7 +40,7 @@ log = logging.getLogger("frameoverframe")
 Image.MAX_IMAGE_PIXELS = 244022272
 
 
-def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
+def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False):
     """convert multiple image_dirs to a single video file"""
 
     # TODO: this should have a verbose flag and print this...
@@ -108,10 +108,11 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         suffix = "_best_h264"
         outfile_ext = ".mp4"
 
-        video_filter = (
-            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
-            + fnumber_filter
-        )
+        # video_filter = (
+        #     #    "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
+        #     #    +
+        #     fnumber_filter
+        # )
 
         # fmt: off
         ffmpeg_settings = [
@@ -120,9 +121,12 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
             "-vcodec", "libx264",
             "-crf", "17",
             "-pix_fmt", "yuv422p",
-            "-preset", "veryslow",
-            "-vf", video_filter
+            "-preset", "medium",
+            #"-vf", video_filter
         ]
+
+        if fnumber_filter:
+            ffmpeg_settings.append(["-vf", fnumber_filter])
         # fmt: on
 
     elif profile == "best_mxf":
@@ -132,8 +136,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
 
         # fit in UHD4k and pad
         video_filter = (
-            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
-            + fnumber_filter
+            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" + fnumber_filter
         )
         # fmt: off
         ffmpeg_settings = [

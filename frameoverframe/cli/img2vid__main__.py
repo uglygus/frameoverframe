@@ -60,9 +60,9 @@ def collect_args():
         "-p",
         "--profile",
         action="store",
-        default="preview",
+        default="best_h264",
         choices={"preview", "best_h264", "best_mxf"},
-        help="video file dimensions will be half the full dimentions.",
+        help="preview is 1080p best_h264 is fullsize.",
     )
     parser.add_argument(
         "-f",
