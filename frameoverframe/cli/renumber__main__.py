@@ -135,7 +135,7 @@ def main():
         log.info(f"renumbering {directory} ...")
 
         print("args.prefix=", args.prefix)
-        input("...")
+
         if args.prefix == ":folder":
             prefix = os.path.basename(os.path.normpath(directory))
         else:
