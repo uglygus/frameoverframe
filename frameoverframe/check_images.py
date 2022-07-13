@@ -95,7 +95,7 @@ def check_images(input_dirs):
     except FileNotFoundError as e:
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
     except:
-        print("Unexpected error:", sys.exc_info()[0])
+        log.ERROR("Unexpected error:", sys.exc_info()[0])
         raise
 
     if 0 == len(sorted_listdir(image_dir)):

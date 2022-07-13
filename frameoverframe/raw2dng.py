@@ -101,11 +101,19 @@ def raw2dng(input_dirs, output_dir):
 
     input_dirs.sort()
 
+    first_file = os.listdir(input_dirs[0])[0]
+    first_ext = os.path.splitext(first_file)[1]
+
+    print("first_file=", first_file)
+    print("first_ext=", first_ext)
+    #    input("....")
     for _dir in input_dirs:
-        print("_dir==", _dir)
-        outpur_dir = _dir.replace("_ARW", "_DNG")
-        print("output_dir=", output_dir)
-        # input('...ok ok...')
+        log.debug("_dir=={}".format(_dir))
+        for raw_ext in config.RAW_EXTENSIONS:
+            raw_ext.replace(".", "_")
+            outpur_dir = _dir.replace(raw_ext, first_ext)
+        log.debug("output_dir={}".format(output_dir))
+
         for file in utils.sorted_listdir(_dir):
 
             _, ext = os.path.splitext(file)
@@ -118,28 +126,18 @@ def raw2dng(input_dirs, output_dir):
                 log.debug("skipping. File is already a DNG.")
                 continue
 
-            print("file=", file)
-            output_file = re.sub("ARW", "dng", file, flags=re.I)
-            # output_file = file.replace(".ARW", ".dng")
-            print("look for output_file=", output_file)
-            # input('..')
+            log.debug("file={}, ext={}".format(file, ext))
+            output_file = re.sub(ext, ".dng", file, flags=re.I)
+            log.debug("look for output_file={}".format(output_file))
 
             if os.path.isfile(output_file):
                 log.info("{} already exists".format(output_file))
                 continue
-            # print('did not find it.')
-            # input('asdfds...')
 
             if what_strange_land_is_this() == "WSL":
                 file = WSL_path_converter(file)
 
             sys_call = [AdobeDNG_bin, "-c", "-p2", file]
-
-            # for sc in sys_call:
-            # print("syscall=", sc, type(sc))
-
-            for sc in sys_call:
-                print("syscall=", sc, type(sc))
 
             quoted_sys_call = [shlex.quote(i) for i in sys_call]
             log.info("\nCalling : " + " ".join(quoted_sys_call))
@@ -148,6 +146,6 @@ def raw2dng(input_dirs, output_dir):
             if result.returncode != 0:
                 log.debug("Adobe DNG Converter failed check your images.")
                 return 1
-
+            # input("...")
         unmix(_dir)
         return 0

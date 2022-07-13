@@ -3,7 +3,7 @@
 # extensions = ["JPG", "ARW", "CR2"]  # not sure if this ever gets used??
 
 # These should be case insensitive. Hopefully.
-RAW_EXTENSIONS = [".CR2", ".ARW", ".NEF", ".DNG", "GPR"]
+RAW_EXTENSIONS = [".CR2", ".ARW", ".NEF", ".DNG", ".GPR"]
 
 TRASH_FILES = [".DS_Store", "Thumbs.db"]
 
