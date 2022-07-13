@@ -7,6 +7,7 @@ Adobe DNG Converter wrapper
 import logging
 import os
 import platform
+import re
 import shlex
 import shutil
 import subprocess
@@ -15,7 +16,6 @@ from pathlib import Path
 import frameoverframe.config as config
 import frameoverframe.utils as utils
 from frameoverframe.unmix import unmix
-import frameoverframe.config as config
 
 log = logging.getLogger("frameoverframe")
 
@@ -24,17 +24,13 @@ def what_strange_land_is_this():
     if platform.system() == "Darwin":
         return "Darwin"
     if platform.system() == "linux" or platform.system() == "Linux":
-        if (
-            "Microsoft" in platform.uname().release
-            or "microsoft" in platform.uname().release
-        ):
+        if "Microsoft" in platform.uname().release or "microsoft" in platform.uname().release:
             log.debug("under WSL")
             return "WSL"
         else:
             return "Linux"
     raise FileNotFoundError(
-        "Unknown system -- I should work under WSL and on Mac.\n"
-        "Windows has not been tested.",
+        "Unknown system -- I should work under WSL and on Mac.\n" "Windows has not been tested.",
     )
     return None
 
@@ -52,8 +48,10 @@ def WSL_path_converter(path):
     i_had_to_touch_path_because_wsl_sucks = False
 
     if not os.path.exists(path):
-        #https://github.com/microsoft/WSL/issues/4908
-        log.debug('WSL_path_converter() path does not exist. touching file to get it. because wslpath sucks.')
+        # https://github.com/microsoft/WSL/issues/4908
+        log.debug(
+            "WSL_path_converter() path does not exist. touching file to get it. because wslpath sucks."
+        )
         i_had_to_touch_path_because_wsl_sucks = True
         Path(path).touch()
 
@@ -81,9 +79,7 @@ def WSL_path_converter(path):
 def raw2dng(input_dirs, output_dir):
     """convert RAW to DNG"""
 
-    log.debug(
-        "Top of raw2dng() input_dirs={} output_dir={}".format(input_dirs, output_dir)
-    )
+    log.debug("Top of raw2dng() input_dirs={} output_dir={}".format(input_dirs, output_dir))
 
     # add possible locations for Adobe DNG Converter to the PATH
     os.environ["PATH"] = (
@@ -93,9 +89,7 @@ def raw2dng(input_dirs, output_dir):
     )
 
     AdobeDNG_bin = (
-        shutil.which("Adobe DNG Converter")
-        or shutil.which("Adobe DNG Converter.exe")
-        or None
+        shutil.which("Adobe DNG Converter") or shutil.which("Adobe DNG Converter.exe") or None
     )
 
     if AdobeDNG_bin is None:
@@ -121,12 +115,13 @@ def raw2dng(input_dirs, output_dir):
                 continue
 
             if ext.casefold() == ".dng".casefold():
-
                 log.debug("skipping. File is already a DNG.")
                 continue
 
-            output_file = file.replace(".ARW", ".dng")
-            # print('look for output_file=', output_file)
+            print("file=", file)
+            output_file = re.sub("ARW", "dng", file, flags=re.I)
+            # output_file = file.replace(".ARW", ".dng")
+            print("look for output_file=", output_file)
             # input('..')
 
             if os.path.isfile(output_file):

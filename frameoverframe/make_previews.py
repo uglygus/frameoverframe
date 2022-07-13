@@ -39,7 +39,7 @@ def _make_previews(src_dir):
             log.info(f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Not a directory.")
             continue
 
-        if os.path.isfile(f"{item}.mp4") or os.path.isfile(f"{item}_preview.mp4"):
+        if os.path.isfile(f"{item}.mp4") or os.path.isfile(f"{item}_best_h264.mp4"):
             log.info(f"{item}' -- {Fore.GREEN}SKIPPING{Style.RESET_ALL} Video file already exists.")
             continue
 
