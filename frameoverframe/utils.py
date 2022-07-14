@@ -32,15 +32,23 @@ def exif_creation_date(filename):
     try:
         fh = open(filename, "rb")
     except FileNotFoundError:
-        return ()
+        log.info("File not found: {}".format(filename))
+        return
 
     tags = exifread.process_file(fh, stop_tag="DateTimeOriginal", details=False)
 
-    try:
-        exifdate = tags["EXIF DateTimeOriginal"].printable
-    except KeyError:
-        exifdate = None
+    print("type tags=", type(tags))
+    for t, v in tags.items():
+        print("t=", t, "v=", v)
 
+        # print("type t=", type(t))
+
+    try:
+        exifdate = tags["Image DateTimeOriginal"].printable
+        log.debug("EXIF: Image DateTimeOriginal = ".format(exifdate))
+    except KeyError:
+        log.debug("EXIF: Image DateTimeOriginal not found.")
+        exifdate = None
     return exifdate
 
 
@@ -91,11 +99,6 @@ def exif_write_filename(filename):
 
     with open(filename, "wb") as image_file:
         image_file.write(my_image.get_file())
-
-        # print("reading with exif_read_filename(filename), == ", exif_read_filename(filename))
-        #
-        # input("added exif data to :: ......")
-
     return
 
 
@@ -119,14 +122,7 @@ def me():
 
 def rm_trash_files(src_dir):
 
-    #  print("config.TRASH_FILES==", config.TRASH_FILES)
-    #  print(f"rm_trash_files({src_dir}) -->")
     for filename in os.listdir(src_dir):
-
-        # for regex in config.TRASH_FILES:
-        #     if re.search(regex, filename, re.IGNORECASE):
-        #         print(filename, "--contains somethign--", regex)
-        # print("filename=", filename)
         if filename in config.TRASH_FILES:
             print(f"unlinking-> {os.path.join(src_dir, filename)}")
             os.unlink(os.path.join(src_dir, filename))
@@ -244,9 +240,7 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
                 log.debug("sorted_listdir(): recursive=True")
                 really_fullpaths.append(os.path.join(directory, filename))
                 fullpaths.append(os.path.join(directory, filename))
-                sorted_listdir(
-                    os.path.join(directory, filename), recursive=True, first_pass=False
-                )
+                sorted_listdir(os.path.join(directory, filename), recursive=True, first_pass=False)
             log.debug("sorted_listdir(): not recursive")
             really_fullpaths.append(os.path.join(directory, filename))
             fullpaths.append(os.path.join(directory, filename))
@@ -372,9 +366,7 @@ def common_suffix(xs):
     def firstCharPrepended(s, cs):
         return cs[0] + s
 
-    return reduce(
-        firstCharPrepended, takewhile(allSame, zip(*(reversed(x) for x in xs))), ""
-    )
+    return reduce(firstCharPrepended, takewhile(allSame, zip(*(reversed(x) for x in xs))), "")
 
 
 def split_name_number(name):
@@ -449,9 +441,7 @@ def replace_eps_bounding_box(newx, newy, filepath):
     bounding_box = "%%BoundingBox:"
     hires_bounding_box = "%%HiResBoundingBox:"
     new_bounding_box = "{} 0 0 {} {}".format(bounding_box, newx, newy)
-    new_highres_bounding_box = "{} 0.00 0.00 {:4.2f} {:4.2f}".format(
-        bounding_box, newx, newy
-    )
+    new_highres_bounding_box = "{} 0.00 0.00 {:4.2f} {:4.2f}".format(bounding_box, newx, newy)
 
     # Safely read the input filename using 'with'
     with open(filepath) as f:
@@ -498,9 +488,7 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
     gs_bin = shutil.which("gs")
 
     if gs_bin is None:
-        raise FileNotFoundError(
-            "Cannot find binary for ghostscript 'gs' in your $PATH.\n"
-        )
+        raise FileNotFoundError("Cannot find binary for ghostscript 'gs' in your $PATH.\n")
 
     # fmt: off
     sys_call = [
@@ -524,9 +512,7 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
     calling_str = "Calling : ", " ".join(quoted_sys_call)
     log.info(calling_str)
 
-    result = run(
-        sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=True
-    )
+    result = run(sys_call, stdout=PIPE, stderr=PIPE, universal_newlines=True, check=True)
     log.debug(
         "gs returncode={}, stdout={}, stderr={}".format(
             result.returncode, result.stdout, result.stderr
