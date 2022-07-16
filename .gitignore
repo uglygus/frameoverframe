@@ -1,5 +1,8 @@
 .DS_Store
 .idea/
+.vscode/settings.json
+
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -125,4 +128,3 @@ venv.bak/
 dmypy.json
 
 *.tmp
-.vscode/settings.json
