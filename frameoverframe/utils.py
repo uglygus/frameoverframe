@@ -222,7 +222,6 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
         raise
 
     if first_pass:
-        # print("resetting really_fullpaths")
         really_fullpaths = []
 
     names.sort()
@@ -230,7 +229,7 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
     fullpaths = []
 
     for filename in names:
-        log.debug("sorted_listdir(): top of outer for: filename= %s", filename)
+        # log.debug("sorted_listdir(): top of outer for: filename= %s", filename)
         fullpath = os.path.join(directory, filename)
         if ignore_hidden and filename.startswith("."):
             continue

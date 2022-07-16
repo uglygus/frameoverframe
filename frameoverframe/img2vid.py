@@ -13,6 +13,13 @@ preview: (default)
     dimensions = max 1080p if image is over 1080 in one dimension shrink it to fit in a
     1080x1080 box. Does not change images under 1080x1080.
 
+    choices={"hd", "uhd", "prores", "best_mxf"}
+
+    Resolution is important!
+        VLC cannot play back
+            h264 at 9506x6336
+            h265 at 9506x6336
+
 best:
     encoding = DNxHR HQ
     fps = 23.976
@@ -98,52 +105,44 @@ def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False
             "-r", "30",
             "-vcodec", "libx264",
             "-pix_fmt", "yuv420p",
-            "-preset", "veryfast",
+            "-preset", "fast",
             "-vf", video_filter,
         ]
         # fmt: on
 
-    elif profile == "best_h264":
+    elif profile == "uhd":
 
-        suffix = "_best_h264"
+        suffix = "_UHD"
         outfile_ext = ".mp4"
 
-        # video_filter = (
-        #     #    "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160"
-        #     #    +
-        #     fnumber_filter
-        # )
+        video_filter = "scale=3840:-2" + fnumber_filter
 
         # fmt: off
         ffmpeg_settings = [
             #"-r", "24000/1001",
             "-r", "30",
             "-vcodec", "libx264",
-            "-crf", "17",
+            "-crf", "19",
             "-pix_fmt", "yuv422p",
             "-preset", "medium",
-            #"-vf", video_filter
+            "-vf", video_filter,
         ]
 
-        if fnumber_filter:
-            ffmpeg_settings.append(["-vf", fnumber_filter])
         # fmt: on
 
-    elif profile == "best_mxf":
+    elif profile == "prores":
 
-        suffix = "_best_mxf_sq"
-        outfile_ext = ".mxf"
+        suffix = "_prores"
+        outfile_ext = ".mov"
 
-        # fit in UHD4k and pad
-        video_filter = (
-            "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160" + fnumber_filter
-        )
+        video_filter = "scale=iw:ih" + fnumber_filter
         # fmt: off
         ffmpeg_settings = [
-            #"-r", "24000/1001",
+            # "-r", "24000/1001",
             "-r", "30",
-            "-vcodec", "dnxhd",
-            "-profile:v", "dnxhr_sq",
+            "-c:v", "prores_ks",
+            "-profile:v", "3",
+            "-vendor", "apl0",
             "-pix_fmt", "yuv422p",
             "-vf", video_filter,
         ]
@@ -151,7 +150,7 @@ def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False
 
     else:
         log.warning(
-            'ERROR: img2vid profile not supported: allowed values are "preview", "best" supplied: ',
+            'ERROR: img2vid profile not supported: allowed values are "preview", "uhd", "prores", "dnxhd" supplied: ',
             profile,
         )
         raise ValueError
@@ -170,7 +169,7 @@ def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False
     except Image.DecompressionBombError:
         log.warning(
             "Image is too large for PIL to open. "
-            ' Change this line: PIL.Image.MAX_IMAGE_PIXELS = 244022272" in img2vid.py'
+            " Change this line: PIL.Image.MAX_IMAGE_PIXELS = 244022272 in img2vid.py"
         )
     except UnidentifiedImageError:
         log.warning("Unsupported image file. %s", sorted_listdir(input_dirs[0])[0])

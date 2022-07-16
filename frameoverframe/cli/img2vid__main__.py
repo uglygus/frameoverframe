@@ -60,9 +60,9 @@ def collect_args():
         "-p",
         "--profile",
         action="store",
-        default="best_h264",
-        choices={"preview", "best_h264", "best_mxf"},
-        help="preview is 1080p best_h264 is fullsize.",
+        default="preview",
+        choices={"preview", "uhd", "prores"},
+        help="preview is 1080p/h264; uhd is 2160p/h264; prores is prores_sd/fullsize.",
     )
     parser.add_argument(
         "-f",
