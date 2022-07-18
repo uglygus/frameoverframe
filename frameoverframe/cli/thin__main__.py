@@ -83,6 +83,12 @@ def main():
     args.src_dirs.sort()
 
     for single_dir in args.src_dirs:
+
+        print("calling thin()")
+        print(f"{single_dir=}")
+        print(f"{args.every=}")
+        print(f"{args.dst_dir=}")
+        print(f"{args.inplace=}")
         thin(
             single_dir,
             args.every,
