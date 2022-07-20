@@ -40,7 +40,7 @@ from colorama import Fore, Style, init
 from PIL import Image, UnidentifiedImageError
 
 from frameoverframe.config import RAW_EXTENSIONS, TRASH_FILES
-from frameoverframe.utils import me, sorted_listdir, test_one_extension
+from frameoverframe.utils import me, sorted_listdir, test_empty_dir, test_one_extension
 
 log = logging.getLogger("frameoverframe")
 
@@ -68,6 +68,11 @@ def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False
                 f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Directory contains more than one extension. "
             )
             return 1
+
+        if test_empty_dir(_dir, fatal=False):
+            log.info("Directory is empty {}".format(_dir))
+            return 1
+
         if _dir[0][0] in RAW_EXTENSIONS:
             log.info(
                 f"'{_dir}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Directory contains raw file with extension, {_dir[0][0]} "
@@ -174,6 +179,8 @@ def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False
     except UnidentifiedImageError:
         log.warning("Unsupported image file. %s", sorted_listdir(input_dirs[0])[0])
         sys.exit(0)
+    except IndexError:
+        log.info("")
 
     width, height = im.size
 
