@@ -128,6 +128,21 @@ def rm_trash_files(src_dir):
             os.unlink(os.path.join(src_dir, filename))
 
 
+def test_empty_dir(src_dir, fatal=True):
+    """Make sure the directory is not empty.
+    return: True if the directory is empty.
+            False if there are more files than . and ..
+    """
+
+    if len(os.listdir(src_dir)) > 0:
+        return False
+    else:
+        if fatal:
+            log.warning(f"ERROR: Directory is empty: {src_dir}'")
+            sys.exit(1)
+        return True
+
+
 def test_one_extension(src_dir, fatal=True):
     """make sure the directory only has one extension type otherwise error out
 
