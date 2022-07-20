@@ -7,10 +7,21 @@
 
 
 import argparse
+import logging.config
 import os
 import sys
 
+from frameoverframe.config import LOGGING_CONFIG
+
+#   logging.config.dictConfig() and logging.getLogger()
+#   must come after importing LOGGING_CONFIG
+#   but before any other frameoverframe modules.
+
+logging.config.dictConfig(LOGGING_CONFIG)
+
 from frameoverframe.recombine import recombine
+
+log = logging.getLogger("frameoverframe")
 
 
 def dir_path(path):
@@ -82,14 +93,34 @@ def collect_args():
         help="How many digits for number. (default 5) eg. 00001.jpg",
     )
 
-    return parser
+    verbosity = parser.add_mutually_exclusive_group()
+    verbosity.add_argument(
+        "--quiet",
+        "-q",
+        action="store_const",
+        const=logging.WARN,
+        dest="loglevel",
+        help="Only output when necessary.",
+    )
+    verbosity.add_argument(
+        "--verbose",
+        "-v",
+        action="store_const",
+        const=logging.DEBUG,
+        dest="loglevel",
+        help="Increase output verbosity.",
+    )
+    parser.set_defaults(loglevel=logging.INFO)
+    args = parser.parse_args()
+
+    return args
 
 
 def main():
     """Renumber Can be called from the commmandline."""
 
-    parser = collect_args()
-    args = parser.parse_args()
+    args = collect_args()
+    log.setLevel(args.loglevel)
 
     # print('args=', args)
 

@@ -28,6 +28,7 @@ import re
 import shutil
 import sys
 
+import frameoverframe.config as config
 import frameoverframe.utils as utils
 
 log = logging.getLogger("frameoverframe")
@@ -46,15 +47,23 @@ def new_dirname(src_dir, ext):
         /path/to/final_JPG_01
     """
 
-    # does it end in numbers _01 ? If so keep the numbers at the end.
+    log.debug("new_dirname({}, {})".format(src_dir, ext))
 
+    ext = ext.upper()
+
+    # does it end in numbers _01 ? If so keep the numbers at the end.
     m = re.search("_[0-9]+$", os.path.basename(src_dir))
 
     if m:
         stripped = re.sub("_[0-9]+$", "", os.path.basename(src_dir))
         newdir = stripped + "_" + ext + m[0]
     else:
-        newdir = os.path.basename(src_dir) + "_" + ext
+        if not src_dir.endswith("_" + ext.lstrip(".")):
+            src_dir_EXT = src_dir + "_" + ext
+            newdir = os.path.basename(src_dir) + "_" + ext
+        else:
+            newdir = src_dir
+    log.debug("new_dirname() returning: {}".format(os.path.join(os.path.dirname(src_dir), newdir)))
     return os.path.join(os.path.dirname(src_dir), newdir)
 
 
@@ -73,39 +82,41 @@ def unmix(src_dir):
 
     new_dirs = []
 
+    utils.rm_trash_files(src_dir)
+
     ext_list = utils.ext_list(src_dir)
 
     if ext_list == [""]:
-        log.warn("Directory has no files with extensions. Stopping.")
+        log.warning("Directory has no files with extensions. Stopping.")
         return new_dirs
 
     ext_list.sort()
+    log.debug(f"{ext_list=}")
 
     if len(ext_list) == 1:
         log.info(f"unmix: Looks good folder is already unmixed. {src_dir}")
-        log.debug(f"{ext_list[0]=}")
-        ext = ext_list[0].lstrip(".")
 
-        if not src_dir.endswith("_" + ext):
+        ext = ext_list[0].lstrip(".").upper()
+        if not src_dir.endswith("_" + ext.lstrip(".")):
             src_dir_EXT = src_dir + "_" + ext
             log.debug("Renaming {src_dir} to {src_dir_EXT}")
             os.rename(src_dir, src_dir_EXT)
         else:
-            log.debug("src_dir alread ends with %s" % ext)
+            log.debug("src_dir already ends with %s" % ext)
         return new_dirs
 
     if len(ext_list) == 0:
-        log.warn(f"unmix: Not sure if we can even get here? Extension list is empty. {src_dir}")
+        log.warning(f"unmix: Not sure if we can even get here? Extension list is empty. {src_dir}")
         return new_dirs
 
-    if len(ext_list) > 2:
-        log.warn(f"unmix: This folder has more than two extensions. Stopping. {src_dir}")
-        log.warn(f"{ext_list=}")
-        return new_dirs
+    # if len(ext_list) > 2:
+    #     log.warning(f"unmix: This folder has more than two extensions. Stopping. {src_dir}")
+    #     log.warning(f"{ext_list=}")
+    #     return new_dirs
 
     for d in ext_list:
         if d == "":
-            log.warn(f"unmix: This folder has other folders in it. Stopping. {src_dir}")
+            log.warning(f"unmix: This folder has other folders in it. Stopping. {src_dir}")
             return new_dirs
 
     for ext in ext_list:
@@ -115,27 +126,40 @@ def unmix(src_dir):
         try:
             os.mkdir(new_dir)
         except FileExistsError:
-            log.warn(f"ERROR: Directory already exists. {new_dir}")
-            raise
+            if new_dir == src_dir:
+                continue
+            else:
+                log.warning(f"ERROR: Directory already exists. {new_dir}")
+                sys.exit(1)
 
         new_dirs.append(new_dir)
 
+    keep_source_folder = False
+
     for item in os.listdir(src_dir):
-        if item == ".DS_Store":
+        if item in config.TRASH_FILES:
             continue
 
         ext = os.path.splitext(os.path.split(item)[1])[1]
         ext = ext.lstrip(".")
         orig_item = os.path.join(src_dir, item)
         new_item = new_dirname(src_dir, ext)
-        try:
-            log.debug(f"renaming {orig_item} -> {new_item}")
-            shutil.move(orig_item, new_item)
-        except FileNotFoundError as e:
-            log.warn(f"renaming {orig_item} -> {new_item}")
-            raise
+        using_same_source_folder = False
 
-    shutil.rmtree(src_dir)
+        if new_item == os.path.split(orig_item)[0]:
+            using_same_source_folder = True
+            keep_source_folder = True
+
+        if not using_same_source_folder:
+            try:
+                log.debug(f"moving {orig_item} -> {new_item}")
+                shutil.move(orig_item, new_item)
+            except FileNotFoundError as e:
+                log.warning(f"renaming {orig_item} -> {new_item}")
+                raise
+
+    if not keep_source_folder:
+        shutil.rmtree(src_dir)
 
     # new dirs is in alphabetical order so for both
     # Canon and Sony cameras the JPG folder is second.

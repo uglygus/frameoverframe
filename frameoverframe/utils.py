@@ -18,7 +18,11 @@ from exif import Image as exifImage  # need this to write tags
 from exif import LightSource
 from PIL import Image
 
+import frameoverframe.config as config
+
 log = logging.getLogger("frameoverframe")
+
+import frameoverframe.utils as utils
 
 
 def exif_creation_date(filename):
@@ -28,15 +32,23 @@ def exif_creation_date(filename):
     try:
         fh = open(filename, "rb")
     except FileNotFoundError:
-        return ()
+        log.info("File not found: {}".format(filename))
+        return
 
     tags = exifread.process_file(fh, stop_tag="DateTimeOriginal", details=False)
 
-    try:
-        exifdate = tags["EXIF DateTimeOriginal"].printable
-    except KeyError:
-        exifdate = None
+    print("type tags=", type(tags))
+    for t, v in tags.items():
+        print("t=", t, "v=", v)
 
+        # print("type t=", type(t))
+
+    try:
+        exifdate = tags["Image DateTimeOriginal"].printable
+        log.debug("EXIF: Image DateTimeOriginal = ".format(exifdate))
+    except KeyError:
+        log.debug("EXIF: Image DateTimeOriginal not found.")
+        exifdate = None
     return exifdate
 
 
@@ -87,11 +99,6 @@ def exif_write_filename(filename):
 
     with open(filename, "wb") as image_file:
         image_file.write(my_image.get_file())
-
-        # print("reading with exif_read_filename(filename), == ", exif_read_filename(filename))
-        #
-        # input("added exif data to :: ......")
-
     return
 
 
@@ -113,6 +120,14 @@ def me():
     return inspect.stack()[1][3] + "()"
 
 
+def rm_trash_files(src_dir):
+
+    for filename in os.listdir(src_dir):
+        if filename in config.TRASH_FILES:
+            print(f"unlinking-> {os.path.join(src_dir, filename)}")
+            os.unlink(os.path.join(src_dir, filename))
+
+
 def test_one_extension(src_dir, fatal=True):
     """make sure the directory only has one extension type otherwise error out
 
@@ -125,9 +140,9 @@ def test_one_extension(src_dir, fatal=True):
         if fatal:
             log.warning(
                 f"ERROR: Directory contains files with more than one extension.\n"
-                f" Consider running 'unmix' {src_dir}"
+                f" Consider running 'unmix {src_dir}'"
             )
-            raise IOError
+            sys.exit(1)
         return False
     return True
 
@@ -142,6 +157,8 @@ def ext_list(directorypath):
         nothing
     """
 
+    rm_trash_files(directorypath)
+
     dirlist = sorted_listdir(directorypath)
 
     extlist = []
@@ -151,7 +168,7 @@ def ext_list(directorypath):
         if ext not in extlist:
             extlist.append(ext)
 
-    #    log.debug(f"{utils.__name__} returning {ext_list=}")
+    log.debug(f"{utils.__name__} returning {ext_list=}")
     return extlist
 
 
@@ -213,13 +230,12 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
     fullpaths = []
 
     for filename in names:
-        log.debug("sorted_listdir(): top of outer for: filename= %s", filename)
+        # log.debug("sorted_listdir(): top of outer for: filename= %s", filename)
         fullpath = os.path.join(directory, filename)
         if ignore_hidden and filename.startswith("."):
             continue
+            
         if os.path.isdir(fullpath) == True:
-
-            # print(filename, " is a DIRectory")
             if recursive:
                 log.debug("sorted_listdir(): recursive=True")
                 really_fullpaths.append(os.path.join(directory, filename))
@@ -234,6 +250,9 @@ def sorted_listdir(directory, ignore_hidden=True, recursive=False, first_pass=Tr
             really_fullpaths.append(os.path.join(directory, filename))
             fullpaths.append(os.path.join(directory, filename))
 
+
+    # log.debug(f"sorted_listdir(): returning: {really_fullpaths}")
+    # input("done")
 
     return really_fullpaths
 

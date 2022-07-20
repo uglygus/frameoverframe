@@ -93,7 +93,7 @@ def main():
         try:
             unmix(directory)
         except FileNotFoundError as e:
-            log.warn(e)
+            log.warning(e)
             return 1
     return 0
 

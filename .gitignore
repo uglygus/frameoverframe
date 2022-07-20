@@ -1,5 +1,8 @@
 .DS_Store
 .idea/
+.vscode/settings.json
+
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

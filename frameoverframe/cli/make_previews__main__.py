@@ -9,7 +9,6 @@ given a folder check every subfolder and try to run img2vid on it.
 import argparse
 import logging.config
 import os
-import re
 import sys
 
 from frameoverframe.config import LOGGING_CONFIG
@@ -64,9 +63,6 @@ def main():
 
     """
 
-    logging.config.dictConfig(LOGGING_CONFIG)
-    log = logging.getLogger("frameoverframe")
-
     args = collect_args()
     log.setLevel(args.loglevel)
     #    log.critical("logging level : %s", logging.getLevelName(log.getEffectiveLevel()))
@@ -79,7 +75,7 @@ def main():
         try:
             make_previews(single_input)
         except FileNotFoundError as e:
-            log.warn("File not Found: %s", e)
+            log.warning("File not Found: %s", e)
 
     return 0
 

@@ -3,9 +3,9 @@
 # extensions = ["JPG", "ARW", "CR2"]  # not sure if this ever gets used??
 
 # These should be case insensitive. Hopefully.
-RAW_EXTENSIONS = [".CR2", ".ARW", ".NEF", ".DNG"]
+RAW_EXTENSIONS = [".CR2", ".ARW", ".NEF", ".DNG", ".GPR"]
 
-UNLINKABLE_FILES = [".DS_Store", "Thumbs.db"]
+TRASH_FILES = [".DS_Store", "Thumbs.db"]
 
 LOGFILE = "frameoverframe.log"
 
@@ -28,14 +28,14 @@ LOGGING_CONFIG = {
             "formatter": "simple",
             "stream": "ext://sys.stdout",
         },
-        "file": {
-            "level": "DEBUG",
-            "class": "logging.handlers.RotatingFileHandler",
-            "formatter": "detailed",
-            "filename": LOGFILE,
-            "maxBytes": 10485760,  # 10MB
-            "backupCount": 3,
-        },
+        # "file": {
+        #     "level": "DEBUG",
+        #     "class": "logging.handlers.RotatingFileHandler",
+        #     "formatter": "detailed",
+        #     "filename": LOGFILE,
+        #     "maxBytes": 10485760,  # 10MB
+        #     "backupCount": 3,
+        # },
     },
     # include "file" in the list of handlers to log to the file too.
     "loggers": {

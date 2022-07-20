@@ -50,7 +50,7 @@ setuptools.setup(
             "deflicker = frameoverframe.cli.deflicker__main__:main",
             "enfuse_batch = frameoverframe.cli.enfuse_batch__main__:main",
             "img2vid = frameoverframe.cli.img2vid__main__:main",
-            "fof = frameoverframe.cli.fof__main__:main",
+            "fof = frameoverframe.cli.fofinfo__main__:main",
             "fofinfo = frameoverframe.cli.fofinfo__main__:main",
             "make_previews = frameoverframe.cli.make_previews__main__:main",
             "raw2dng = frameoverframe.cli.raw2dng__main__:main",

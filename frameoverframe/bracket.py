@@ -15,6 +15,7 @@ import os
 import shutil
 import sys
 
+from frameoverframe.config import config.UNLINKABLE_FILES
 from . import renumber
 
 
@@ -97,7 +98,8 @@ def merge(input_dirs):
         thisdirlist = []
 
         for f in os.listdir(input_dir):
-            if f in FIlES_TO_IGNORE:
+            if f in config.UNLINKABLE_FILES:
+
                 continue
 
             thisdirlist.append(f)

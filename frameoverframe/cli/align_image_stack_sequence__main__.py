@@ -102,7 +102,7 @@ def main():
             align_image_stack_sequence(image_list, args.brackets)
 
         else:
-            log.warn("Cannot process files. Input must be a direcotry of images")
+            log.warning("Cannot process files. Input must be a direcotry of images")
             return 1
     log.info("DONE.")
     return 0

@@ -9,6 +9,7 @@ getbrightness()
 """
 
 import math
+import os
 from datetime import datetime
 
 import exifread
@@ -16,6 +17,13 @@ import matplotlib.pyplot as plt
 from PIL import Image, ImageStat
 
 import frameoverframe.utils as utils
+
+
+def num_frames(dirfile):
+
+    image_count = len(os.listdir(dirfile))
+    print("Length: ", image_count, "frames")
+    return image_count
 
 
 def print_exif_tags(filename, alltags=False):
@@ -36,7 +44,7 @@ def print_exif_tags(filename, alltags=False):
                 print(f"{tag} == {tags[tag]}")
         else:
             if tag in (
-                "Image Model",
+                "Image Make" "Image Model",
                 "EXIF ExifImageWidth",
                 "EXIF ExifImageLength",
                 "EXIF ExposureTime",
@@ -58,10 +66,10 @@ def get_brightness(filename):
     print(filename, " stat= ", stat)
     r, g, b = stat.mean
 
-    return math.sqrt(0.241 * (r ** 2) + 0.691 * (g ** 2) + 0.068 * (b ** 2))
+    return math.sqrt(0.241 * (r**2) + 0.691 * (g**2) + 0.068 * (b**2))
 
 
-def fps_single(img1, img2):
+def fps_pair(img1, img2):
     """
 
     calculated time difference betweeen images based on exif data
@@ -112,10 +120,9 @@ def fps_dir(input_dir):
 
     diffs = []
     for f in files:
-
-        diff = fps_single(prev, f)
+        diff = fps_pair(prev, f)
         diffs.append(diff)
-        # print(diff)
+        print("diff=", diff)
         prev = f
 
     avg = sum(diffs) / len(diffs)
