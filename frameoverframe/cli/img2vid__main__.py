@@ -61,7 +61,7 @@ def collect_args():
         "--profile",
         action="store",
         default="preview",
-        choices={"preview", "uhd", "prores"},
+        choices={"tiny", "preview", "uhd", "prores"},
         help="preview is 1080p/h264; uhd is 2160p/h264; prores is prores_sd/fullsize.",
     )
     parser.add_argument(

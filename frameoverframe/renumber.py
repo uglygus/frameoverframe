@@ -20,6 +20,7 @@ import sys
 import uuid
 
 import frameoverframe.utils as utils
+from frameoverframe.config import LOGGING_CONFIG, TRASH_FILES
 
 
 def sort_by_name(files):
@@ -56,7 +57,7 @@ def sort_by_exif_date(files, src_dir):
 
 
 def renumber(
-    src_dir, dst_dir=None, inplace=False, sort_method=None, start_at=0, prefix=None, padding=5
+    src_dir, dst_dir=None, inplace=False, sort_method="date", start_at=0, prefix=None, padding=5
 ):
     """
     Renames files representing an image sequence in the given directory to
@@ -103,14 +104,19 @@ def renumber(
 
     # collect only the files we want - could check file type or extensions here
     for f in os.listdir(src_dir):
-        if f == ".DS_Store":
-            continue
+        if f in TRASH_FILES:
+            os.unlink(os.path.join(src_dir, f))
         if os.path.isfile(os.path.join(src_dir, f)):
             file_list.append(f)
 
+    print(f"{sort_method=}")
+
     file_list_name = sort_by_name(file_list)
     if sort_method == "exif_date":
+        print(" starting sort_exif_date()")
         file_list_date = sort_by_exif_date(file_list, src_dir)
+        print("done sort_by_exif_date file_list_date=", file_list_date)
+
     else:
         print("EXIF date not present. Sorting by name.")
         file_list_date = None

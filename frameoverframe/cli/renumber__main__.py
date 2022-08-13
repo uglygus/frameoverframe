@@ -63,7 +63,7 @@ def collect_args():
         "-s",
         "--sort-method",
         type=str,
-        default=None,
+        default="exif_date",
         choices=["name", "exif_date"],
         help="Method to use when sorting files: 'name' or 'exif_date' ",
     )

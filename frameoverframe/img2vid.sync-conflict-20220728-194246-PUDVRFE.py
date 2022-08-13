@@ -13,7 +13,7 @@ preview: (default)
     dimensions = max 1080p if image is over 1080 in one dimension shrink it to fit in a
     1080x1080 box. Does not change images under 1080x1080.
 
-    choices={"tiny","preview", "uhd"}
+    choices={"hd", "uhd", "prores", "best_mxf"}
 
     Resolution is important!
         VLC cannot play back
@@ -95,28 +95,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
     else:
         fnumber_filter = ""
 
-    print("profile=", profile)
-    if profile == "tiny":
-
-        suffix = "_tiny"
-        outfile_ext = ".mp4"
-
-        # largest size is 1920x? DOES NOT CROP.
-        video_filter = "scale=480:-2" + fnumber_filter
-
-        # fmt: off
-        ffmpeg_settings = [
-            "-loglevel", "error", '-stats',
-        #    "-r", "24000/1001",
-            "-r", "30",
-            "-vcodec", "libx264",
-            "-pix_fmt", "yuv420p",
-            "-preset", "fast",
-            "-vf", video_filter,
-        ]
-        # fmt: on
-
-    elif profile == "preview":
+    if profile == "preview":
 
         suffix = "_preview"
         outfile_ext = ".mp4"
@@ -138,7 +117,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
 
     elif profile == "uhd":
 
-        suffix = "_uhd"
+        suffix = "_UHD"
         outfile_ext = ".mp4"
 
         video_filter = "scale=3840:-2" + fnumber_filter
@@ -156,10 +135,27 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
 
         # fmt: on
 
+    elif profile == "prores":
+
+        suffix = "_prores"
+        outfile_ext = ".mov"
+
+        video_filter = "scale=iw:ih" + fnumber_filter
+        # fmt: off
+        ffmpeg_settings = [
+            # "-r", "24000/1001",
+            "-r", "30",
+            "-c:v", "prores_ks",
+            "-profile:v", "3",
+            "-vendor", "apl0",
+            "-pix_fmt", "yuv422p",
+            "-vf", video_filter,
+        ]
+        # fmt: on
 
     else:
         log.warning(
-            'ERROR: img2vid profile not supported: allowed values are "tiny", "preview", "uhd",supplied: ',
+            'ERROR: img2vid profile not supported: allowed values are "preview", "uhd", "prores", "dnxhd" supplied: ',
             profile,
         )
         raise ValueError
