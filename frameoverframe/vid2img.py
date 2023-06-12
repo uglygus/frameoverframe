@@ -18,13 +18,16 @@ log = logging.getLogger("frameoverframe")
 def vid2img(input_mov, output_folder=None):
     """convert video file to a folder of images"""
 
+    log.debug(f"input_mov = {input_mov}")
     input_folder = os.path.dirname(input_mov)
-
+    log.debug(f"input_folder= {input_folder}")
+             
     filename = os.path.splitext(os.path.basename(input_mov))[0]
 
     if not output_folder:
-        output_folder = input_folder + "/" + filename
+        output_folder = os.path.join(input_folder, filename)
 
+    log.debug(f"creating output_folder= {output_folder}")
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
