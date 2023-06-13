@@ -5,7 +5,7 @@
 
     Takes one or more folders of images and creates a video. \
     This video is just a preview not meant for editing it is highly compressed. \
-    Framerate 24fps. \
+    Framerate 30fps. \
     By default video dimensions are the same as the original images \
     the --preview option will make the dimensions 1080p or smaller."
 )
@@ -43,7 +43,7 @@ def collect_args():
     parser = argparse.ArgumentParser(
         description="Takes one or more folders of images and creates a video. \
                      This video is just a preview not meant for editing it is highly compressed. \
-                     Framerate 24fps. \
+                     Framerate 30fps. \
                      By default video dimensions are the same as the original images \
                      the --preview option will make the dimensions 1080p or smaller."
     )
@@ -62,7 +62,7 @@ def collect_args():
         action="store",
         default="preview",
         choices={"tiny", "preview", "uhd", "prores"},
-        help="preview is 1080p/h264; uhd is 2160p/h264; prores is prores_sd/fullsize.",
+        help="tiny: 480p/h264, preview is 1080p/h264; uhd is 2160p/h264; prores is prores_sd/fullsize.",
     )
     parser.add_argument(
         "-f",
