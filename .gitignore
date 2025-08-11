@@ -128,3 +128,4 @@ venv.bak/
 dmypy.json
 
 *.tmp
+python3

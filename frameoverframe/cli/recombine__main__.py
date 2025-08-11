@@ -122,7 +122,7 @@ def main():
     args = collect_args()
     log.setLevel(args.loglevel)
 
-    # print('args=', args)
+    print('args=', args)
 
     recombine(
         args.src_dirs,

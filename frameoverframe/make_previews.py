@@ -72,7 +72,8 @@ def _make_previews(src_dir):
 
         if not was_the_list_of_dirs_modified:
             # log.info(f"Making video for '{item}'")
-            img2vid(item)
+            img2vid(item, profile="uhd")
+            print("uhd")
             log.info(
                 f"'{item}' -- {Fore.GREEN}SUCCESS{Style.RESET_ALL} Video for {item} succesfully made."
             )

@@ -109,6 +109,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
             "-loglevel", "error", '-stats',
         #    "-r", "24000/1001",
             "-r", "30",
+            "-n",
             "-vcodec", "libx264",
             "-pix_fmt", "yuv420p",
             "-preset", "fast",
@@ -129,6 +130,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
             "-loglevel", "error", '-stats',
         #    "-r", "24000/1001",
             "-r", "30",
+            "-n",
             "-vcodec", "libx264",
             "-pix_fmt", "yuv420p",
             "-preset", "fast",
@@ -147,6 +149,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
         ffmpeg_settings = [
             #"-r", "24000/1001",
             "-r", "30",
+            "-n",
             "-vcodec", "libx264",
             "-crf", "19",
             "-pix_fmt", "yuv422p",
@@ -154,8 +157,27 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
             "-vf", video_filter,
         ]
 
-        # fmt: on
+    elif profile == "prores":
 
+        suffix = "_prores"
+        outfile_ext = ".mov"
+
+        video_filter = "" + fnumber_filter
+
+        # fmt: off
+        ffmpeg_settings = [
+            #"-r", "24000/1001",
+            "-r", "30",
+            "-n",
+            "-vcodec", "prores_videotoolbox",
+          
+            "-profile:v", "hq",  
+            "-pixel_format", "yuv422p10lep",
+        
+           # "-vf", video_filter,
+        ]
+
+        # fmt: on
 
     else:
         log.warning(
