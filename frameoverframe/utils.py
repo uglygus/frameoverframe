@@ -342,7 +342,11 @@ def open_eps(filename, width=None):
         # print("new im size after scaling = ", img.size)
     if scale != 1:
         # print("scaling-thumbnail")
-        img.thumbnail([int(scale * d) for d in original], Image.ANTIALIAS)
+        try:
+            resample = Image.Resampling.LANCZOS
+        except AttributeError:
+            resample = Image.ANTIALIAS  # old pillow 10
+        img.thumbnail([int(scale * d) for d in original], resample)
         # print("new img_np size after thumbnail = ", img.size)
 
     # print("sleeping 60...")
@@ -520,7 +524,7 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
         "-sDEVICE=eps2write",
         "-dDEVICEWIDTHPOINTS={}".format(newsize[0]),
         "-dDEVICEHEIGHTPOINTS={}".format(newsize[1]),
-        "-c", f'"<</Install {{ {scale:4.2f} {scale:4.2f} scale }}>> setpagedevice"',
+        "-c", f'<</Install {{ {scale:4.2f} {scale:4.2f} scale }}>> setpagedevice',
         "-f",
         infile,
     ]

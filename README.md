@@ -47,3 +47,21 @@ A collection of scripts for organizing, converting and manipulating image sequen
 ### Tests
 The tests are scant and do not provide anywhere near coverage.
 `python -m unittest discover -s .`
+
+
+## Installation
+
+Dependencies...
+ffmpeg
+imagemagick
+autotrace
+
+
+###Linux
+
+```
+cd frameoverframe
+pipx install .
+cat requirements.txt | xargs pipx inject frameoverframe
+
+```

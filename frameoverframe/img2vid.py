@@ -222,8 +222,8 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
             return False
 
     tmp_link_dir = tempfile.mkdtemp(prefix="img2vid_")
-    # print("tmp_link_dir=", tmp_link_dir)
-
+    #print("tmp_link_dir=", tmp_link_dir)
+    #input('....')
     ext = os.path.splitext(sorted_listdir(input_dirs[0])[0])[1]
 
     # images = []
@@ -240,10 +240,11 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
                 sys.exit(1)
 
             tmp_link = os.path.join(tmp_link_dir, f"{counter:08}{ext}")
-            os.symlink(os.path.abspath(image), os.path.abspath(tmp_link))
-
+            print(f'making link {tmp_link}')
+            ret = os.symlink(os.path.abspath(image), os.path.abspath(tmp_link))
+            print('ret ==', ret)
             counter += 1
-
+   # input('symlinks made in temp dir...')
     ffmpeg_bin = shutil.which("ffmpeg")
 
     if ffmpeg_bin:
@@ -264,7 +265,7 @@ def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
 
         subprocess.call(sys_call)
 
-        shutil.rmtree(tmp_link_dir)
+        #shutil.rmtree(tmp_link_dir)
     else:
         log.warning("ERROR: ffmpeg is required and is not intstalled. (this is a log)")
         raise FileNotFoundError(
