@@ -184,7 +184,7 @@ def recombine(
         out_dir (list): List of directories that things were combined into. or None
     """
 
-    if len(src_dirs) < 2:
+    if len(src_dirs) < 1:
         return src_dirs
 
     # removing TRASH files
@@ -271,12 +271,11 @@ def recombine(
         tmp_dst_dirs.append(dst_dir)
     dst_dirs = tmp_dst_dirs
 
-    log.debug("list of destination direcries made:")
+    log.debug("list of destination directories made:")
     for d in dst_dirs:
         log.debug(d)
 
-    # input("...desst dir list createed...")
-    current_dir = 0
+s    current_dir = 0
     count = 0
     for item in all_files:
         if count >= max_files:

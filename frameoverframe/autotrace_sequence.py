@@ -5,7 +5,11 @@ import multiprocessing
 import time
 
 import numpy
-from moviepy.editor import ImageSequenceClip, VideoClip, VideoFileClip
+from moviepy.video.io.ImageSequenceClip import ImageSequenceClip
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.video.VideoClip import VideoClip
+
+# from moviepy.editor import ImageSequenceClip, VideoClip, VideoFileClip
 from PIL import Image
 
 from .autotrace import autotrace
@@ -82,7 +86,7 @@ def process_file(filename, args):
                 )
 
                 p = multiprocessing.Process(
-                    target=autotrace, args=(img, filename, framenumber, args.centerline)
+                    target=autotrace, args=(img, filename, framenumber, args.centerline, True)
                 )
                 jobs.append(p)
                 p.start()

@@ -13,7 +13,7 @@ preview: (default)
     dimensions = max 1080p if image is over 1080 in one dimension shrink it to fit in a
     1080x1080 box. Does not change images under 1080x1080.
 
-    choices={"hd", "uhd", "prores", "best_mxf"}
+    choices={"tiny","preview", "uhd"}
 
     Resolution is important!
         VLC cannot play back
@@ -47,7 +47,7 @@ log = logging.getLogger("frameoverframe")
 Image.MAX_IMAGE_PIXELS = 244022272
 
 
-def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False):
+def img2vid(input_dirs, output_file=None, profile="preview", framenumber=False):
     """convert multiple image_dirs to a single video file"""
 
     # TODO: this should have a verbose flag and print this...
@@ -95,7 +95,29 @@ def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False
     else:
         fnumber_filter = ""
 
-    if profile == "preview":
+    print("profile=", profile)
+    if profile == "tiny":
+
+        suffix = "_tiny"
+        outfile_ext = ".mp4"
+
+        # largest size is 1920x? DOES NOT CROP.
+        video_filter = "scale=480:-2" + fnumber_filter
+
+        # fmt: off
+        ffmpeg_settings = [
+            "-loglevel", "error", '-stats',
+        #    "-r", "24000/1001",
+            "-r", "30",
+            "-n",
+            "-vcodec", "libx264",
+            "-pix_fmt", "yuv420p",
+            "-preset", "fast",
+            "-vf", video_filter,
+        ]
+        # fmt: on
+
+    elif profile == "preview":
 
         suffix = "_preview"
         outfile_ext = ".mp4"
@@ -108,6 +130,7 @@ def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False
             "-loglevel", "error", '-stats',
         #    "-r", "24000/1001",
             "-r", "30",
+            "-n",
             "-vcodec", "libx264",
             "-pix_fmt", "yuv420p",
             "-preset", "fast",
@@ -117,7 +140,7 @@ def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False
 
     elif profile == "uhd":
 
-        suffix = "_UHD"
+        suffix = "_uhd"
         outfile_ext = ".mp4"
 
         video_filter = "scale=3840:-2" + fnumber_filter
@@ -126,6 +149,7 @@ def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False
         ffmpeg_settings = [
             #"-r", "24000/1001",
             "-r", "30",
+            "-n",
             "-vcodec", "libx264",
             "-crf", "19",
             "-pix_fmt", "yuv422p",
@@ -133,29 +157,31 @@ def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False
             "-vf", video_filter,
         ]
 
-        # fmt: on
-
     elif profile == "prores":
 
         suffix = "_prores"
         outfile_ext = ".mov"
 
-        video_filter = "scale=iw:ih" + fnumber_filter
+        video_filter = "" + fnumber_filter
+
         # fmt: off
         ffmpeg_settings = [
-            # "-r", "24000/1001",
+            #"-r", "24000/1001",
             "-r", "30",
-            "-c:v", "prores_ks",
-            "-profile:v", "3",
-            "-vendor", "apl0",
-            "-pix_fmt", "yuv422p",
-            "-vf", video_filter,
+            "-n",
+            "-vcodec", "prores_videotoolbox",
+          
+            "-profile:v", "hq",  
+            "-pixel_format", "yuv422p10lep",
+        
+           # "-vf", video_filter,
         ]
+
         # fmt: on
 
     else:
         log.warning(
-            'ERROR: img2vid profile not supported: allowed values are "preview", "uhd", "prores", "dnxhd" supplied: ',
+            'ERROR: img2vid profile not supported: allowed values are "tiny", "preview", "uhd",supplied: ',
             profile,
         )
         raise ValueError
@@ -196,8 +222,8 @@ def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False
             return False
 
     tmp_link_dir = tempfile.mkdtemp(prefix="img2vid_")
-    # print("tmp_link_dir=", tmp_link_dir)
-
+    #print("tmp_link_dir=", tmp_link_dir)
+    #input('....')
     ext = os.path.splitext(sorted_listdir(input_dirs[0])[0])[1]
 
     # images = []
@@ -214,10 +240,11 @@ def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False
                 sys.exit(1)
 
             tmp_link = os.path.join(tmp_link_dir, f"{counter:08}{ext}")
-            os.symlink(os.path.abspath(image), os.path.abspath(tmp_link))
-
+            print(f'making link {tmp_link}')
+            ret = os.symlink(os.path.abspath(image), os.path.abspath(tmp_link))
+            print('ret ==', ret)
             counter += 1
-
+   # input('symlinks made in temp dir...')
     ffmpeg_bin = shutil.which("ffmpeg")
 
     if ffmpeg_bin:
@@ -238,7 +265,7 @@ def img2vid(input_dirs, output_file=None, profile="best_h264", framenumber=False
 
         subprocess.call(sys_call)
 
-        shutil.rmtree(tmp_link_dir)
+        #shutil.rmtree(tmp_link_dir)
     else:
         log.warning("ERROR: ffmpeg is required and is not intstalled. (this is a log)")
         raise FileNotFoundError(

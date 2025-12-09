@@ -47,6 +47,8 @@ def autotrace(img, filename, framenumber, centerline, save_png=False):
         PIL Image or None
     """
 
+    print('autotrace centerline=', centerline)
+   
     autotrace_bin = shutil.which("autotrace")
     if not autotrace_bin:
         print("ERROR: The autotrace binary is not in your PATH")

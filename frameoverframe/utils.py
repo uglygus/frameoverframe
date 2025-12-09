@@ -28,6 +28,12 @@ import frameoverframe.utils as utils
 def exif_creation_date(filename):
     """given an image file return the creation time: EXIF DateTimeOriginal."""
 
+    # Some EXIF date fields to check...
+    #
+    # EXIF DateTimeOriginal
+    # EXIF DateTimeDigitized   ## This is a year before 'EXIF DateTimeOriginal' in some files?
+    # Image DateTime
+
     # Open image file for reading in binary mode
     try:
         fh = open(filename, "rb")
@@ -35,21 +41,22 @@ def exif_creation_date(filename):
         log.info("File not found: {}".format(filename))
         return
 
-    tags = exifread.process_file(fh, stop_tag="DateTimeOriginal", details=False)
+    tags = exifread.process_file(fh, details=False)
 
-    print("type tags=", type(tags))
+    log.debug("type tags=".format(type(tags)))
+
     for t, v in tags.items():
-        print("t=", t, "v=", v)
+        log.debug("t={}=    v={}=".format(t, v))
 
-        # print("type t=", type(t))
+    #print('tags["EXIF DateTimeOriginal"]=', tags["EXIF DateTimeOriginal"])
 
     try:
-        exifdate = tags["Image DateTimeOriginal"].printable
-        log.debug("EXIF: Image DateTimeOriginal = ".format(exifdate))
+        exifdate = tags["EXIF DateTimeOriginal"]  # .printable
+        log.debug("EXIF DateTimeOriginal = {}".format(exifdate))
     except KeyError:
-        log.debug("EXIF: Image DateTimeOriginal not found.")
+        log.debug("EXIF DateTimeOriginal not found.")
         exifdate = None
-    return exifdate
+    return str(exifdate)
 
 
 def exif_read_filename(filename):
@@ -183,7 +190,7 @@ def ext_list(directorypath):
         if ext not in extlist:
             extlist.append(ext)
 
-    log.debug(f"{utils.__name__} returning {ext_list=}")
+    log.debug("{} returning {}".format(utils.__name__, ext_list))
     return extlist
 
 
@@ -335,7 +342,11 @@ def open_eps(filename, width=None):
         # print("new im size after scaling = ", img.size)
     if scale != 1:
         # print("scaling-thumbnail")
-        img.thumbnail([int(scale * d) for d in original], Image.ANTIALIAS)
+        try:
+            resample = Image.Resampling.LANCZOS
+        except AttributeError:
+            resample = Image.ANTIALIAS  # old pillow 10
+        img.thumbnail([int(scale * d) for d in original], resample)
         # print("new img_np size after thumbnail = ", img.size)
 
     # print("sleeping 60...")
@@ -513,7 +524,7 @@ def resize_eps(infile, outfile, newsize=(3840, 2160)):
         "-sDEVICE=eps2write",
         "-dDEVICEWIDTHPOINTS={}".format(newsize[0]),
         "-dDEVICEHEIGHTPOINTS={}".format(newsize[1]),
-        "-c", f'"<</Install {{ {scale:4.2f} {scale:4.2f} scale }}>> setpagedevice"',
+        "-c", f'<</Install {{ {scale:4.2f} {scale:4.2f} scale }}>> setpagedevice',
         "-f",
         infile,
     ]

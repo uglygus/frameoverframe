@@ -5,8 +5,11 @@ import logging
 import os
 import sys
 
+import PIL.Image as Image
+
 import frameoverframe.autotrace
-import frameoverframe.autotrace_sequence
+
+# import frameoverframe.autotrace_sequence
 
 log = logging.getLogger("frameoverframe")
 
@@ -58,8 +61,12 @@ def main():
 
         single_input = os.path.abspath(single_input)
 
+        # def autotrace(img, filename, framenumber, centerline, save_png=False):
+
+        img = Image.open(single_input)
+
         if os.path.isfile(single_input):
-            frameoverframe.autotrace_sequence.process_file(single_input, args)
+            frameoverframe.autotrace.autotrace(img, single_input, 1, args.centerline)
 
         if os.path.isdir(single_input):
             print("Cannot process directories. input must be a video file.")
@@ -69,4 +76,6 @@ def main():
 
 
 if __name__ == "__main__":
+    sys.exit(main())
+    sys.exit(main())
     sys.exit(main())

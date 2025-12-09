@@ -39,7 +39,7 @@ def _make_previews(src_dir):
             log.info(f"'{item}' -- {Fore.RED}SKIPPING{Style.RESET_ALL} Not a directory.")
             continue
 
-        if os.path.isfile(f"{item}.mp4") or os.path.isfile(f"{item}_best_h264.mp4"):
+        if os.path.isfile(f"{item}.mp4") or os.path.isfile(f"{item}_preview.mp4"):
             log.info(f"{item}' -- {Fore.GREEN}SKIPPING{Style.RESET_ALL} Video file already exists.")
             continue
 
@@ -72,7 +72,8 @@ def _make_previews(src_dir):
 
         if not was_the_list_of_dirs_modified:
             # log.info(f"Making video for '{item}'")
-            img2vid(item)
+            img2vid(item, profile="uhd")
+            print("uhd")
             log.info(
                 f"'{item}' -- {Fore.GREEN}SUCCESS{Style.RESET_ALL} Video for {item} succesfully made."
             )
